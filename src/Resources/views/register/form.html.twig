@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入Bootstrap样式 -->
+<!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">-->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入Bootstrap-select插件样式 -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+    <!--    引入签名插件样式-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-steps@%5E1.0/dist/bootstrap-steps.min.css" rel="stylesheet">
+    <title>{{ classroom.title }} 报名资料填写</title>
+<style>
+    body {
+        background-color: rgb(244, 244, 244);
+        font-size: 16px;
+    }
+
+    .step-success .step-circle {
+        background-color: #28a745;
+    }
+    .no-border {
+        border: none;
+    }
+    .form-control:focus{ /*清除input框focus出现的边框*/
+        /*border-color:#fff;*/
+        webkit-box-shadow:none;
+        box-shadow:none;
+    }
+
+    .header-container{
+        display: flex;
+        align-items: center;
+        position: relative;
+        height: 30px;
+    }
+    .header-title{
+        position: absolute;top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.6rem;
+        white-space: nowrap;
+        font-weight: bold;
+        width: auto;
+
+    }
+    .step-font{
+        font-size: 0.75rem
+    }
+
+    .select-box{
+        flex:1
+    }
+    .form-size{
+        font-size: 0.95rem
+    }
+    .id-img-box{
+        margin-bottom: 20px;
+        background: #fff;
+        height: 150px;
+        display: flex;
+        flex-direction: row;
+        padding: 0 25px;
+        align-items: center;
+    }
+    .id-img-describe{
+        color: rgb(140,140,140)
+    }
+    .certificates-img-box{
+        margin-bottom:20px;background: #fff;height: 150px;display: flex;flex-direction:column;justify-content: center;padding: 0 25px
+    }
+    .certificates-describe{
+        display: flex;justify-content: space-between
+    }
+    .input-group {
+        margin-bottom: 20px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        /*border-radius: 5px;*/
+        padding: 0 25px;
+    }
+    label {
+        width: 100px;
+        margin-bottom: 0;
+    }
+    .form-step {
+        display: none; /* 隐藏所有步骤 */
+    }
+    .form-step.active {
+        display: block; /* 显示当前步骤 */
+    }
+
+
+    .custom-file-input {
+        /*display: none;*/
+        width: 100%;
+        height: 100%;
+    }
+
+
+    .custom-upload-btn {
+        margin: 5px 0;
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        border: 1px solid rgb(213, 213, 213);
+        background: rgb(250,250,250);
+        border-radius: 3px;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .custom-upload-btn img {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width:25px;height: 25px;
+        color: rgb(137,137,137);
+    }
+    .custom-upload-btn .text {
+        position: absolute;
+        top: 75%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 0.75rem;
+    }
+
+    .input-validate{
+        position: absolute;
+        top: 15px;
+        right: 10px;
+        font-size: 13px;
+        cursor: pointer;
+        color: blue;
+        z-index: 10;
+    }
+
+    .signature-container{
+        width: 100%;
+        /*height: 150px;*/
+        background: #fff;
+        padding: 10px 30px;
+    }
+    .signature-box{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height:100%;
+        border: 2px dashed #ccc;
+    }
+    .check-container{
+        /*position: fixed;bottom:7rem;font-size: 0.95rem;*/
+        margin: 20px;
+        font-size: 0.95rem;
+        /*left: 2.5rem;*/
+    }
+    .submit-btn{
+        position: fixed;bottom:8%;
+        left: 0;
+        width: 100%;
+        padding: 0 15px;
+    }
+    .success-box{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .success-text{
+        text-align: center;
+        margin-top: 10px;
+        color: #666;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+
+    .delete-icon{
+        display: none;position: absolute;width: 20px;height: 20px;
+        top:-5px
+    }
+
+    .preview-test{
+        display: none;
+    }
+
+    #preview9 {
+        display: none; /* Initially hide the preview image */
+        max-width: 100px; /* Set max width for the preview image */
+    }
+    #preview10 {
+        display: none; /* Initially hide the preview image */
+        max-width: 100px; /* Set max width for the preview image */
+    }
+    #preview11 {
+        display: none; /* Initially hide the preview image */
+        max-width: 100px; /* Set max width for the preview image */
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container mt-2">
+        <img src="{{ asset('bundles/jobtraining/register/back-icon.png') }}" id="prev-icon">
+        <div class="header-title">{{ classroom.title }}</div>
+    </div>
+
+    <!--    步骤条状态-->
+    <!--   step-content step-active step-success-->
+    <ul class="steps mt-2">
+        <li class="step step-active">
+            <div class="step-content">
+                <span class="step-circle"></span>
+                <span class="step-text step-font">填写基本信息</span>
+            </div>
+        </li>
+        <li class="step ">
+            <div class="step-content">
+                <span class="step-circle"></span>
+                <span class="step-text step-font">身份信息填写</span>
+            </div>
+        </li>
+        <li class="step">
+            <div class="step-content">
+                <span class="step-circle"></span>
+                <span class="step-text step-font">个人信息录入</span>
+            </div>
+        </li>
+    </ul>
+
+    <form id="myForm" class="mt-4 form-size" method="post" style="padding-bottom: 150px">
+        <!-- 第一步 -->
+        <div class="form-step" id="step1">
+            <div class="form-row align-items-center">
+                <div class="input-group">
+                    <label for="realName" class="font-weight-bold">姓名</label>
+                    <input type="text" class="form-control no-border" id="realName" placeholder="请输入姓名">
+                </div>
+            </div>
+            <div class="form-row align-items-center">
+                <div class="input-group">
+                    <label for="mobile" class="font-weight-bold">手机号</label>
+                    <input type="text" pattern="\d{11}" class="form-control no-border" id="mobile" placeholder="请输入手机号">
+                    <div class="input-validate" id="inputValidate">获取验证码</div>
+                </div>
+            </div>
+            <div class="form-row align-items-center">
+                <div class="input-group">
+                    <label for="captcha" class="font-weight-bold">验证码</label>
+                    <input type="text" pattern="\d{6}" class="form-control no-border" id="captcha" placeholder="请输入验证码">
+                </div>
+            </div>
+        </div>
+        <!-- 第二步 -->
+        <div class="form-step" id="step2">
+            <div class="form-row align-items-center">
+                <div class="input-group">
+                    <label for="cardType" class="font-weight-bold">证件类型</label>
+                    <select id="cardType" class="selectpicker select-box" data-live-search="true" title="请选择证件类型">
+                        {% for item in cardTypes %}
+                            <option value="{{ item.value }}">{{ item.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row align-items-center">
+                <div class="input-group">
+                    <label for="cardNumber" class="font-weight-bold">身份证号</label>
+                    <input type="text" class="form-control no-border" id="cardNumber" placeholder="请输入身份证号">
+                </div>
+            </div>
+            <div class="id-img-box">
+
+                    <div id="idPicture1Box">
+                        <div class="custom-upload-btn">
+<!--                            capture="camera"-->
+                            <input type="file" class="custom-file-input" id="idPicture1" accept="image/*"  >
+                             <img src="{{ asset('bundles/jobtraining/register/add.png') }}">
+                            <div class="text">上传照片</div>
+                        </div>
+                        <div class="id-img-describe">身份证人像页</div>
+                    </div>
+                <div style="position: relative">
+                    <img id="preview9" src="" alt="Image preview..."  class="custom-upload-btn" data-toggle="modal" data-target="#imageModal"/>
+                    <img src="{{ asset('bundles/jobtraining/register/delete.png') }}" id="delete-icon9" class="delete-icon">
+                    <div class="id-img-describe preview-test" id="previewTest9">身份证人像页</div>
+                </div>
+
+            </div>
+            <div class="id-img-box">
+                <div id="idPicture2Box">
+                <div class="custom-upload-btn">
+                    <input type="file" class="custom-file-input" id="idPicture2" accept="image/*" >
+                        <img src="{{ asset('bundles/jobtraining/register/add.png') }}">
+                    <div class="text">上传照片</div>
+                </div>
+                <div class="id-img-describe">身份证国徽页</div>
+                </div>
+                <div style="position: relative">
+                    <img id="preview10" src="" alt="Image preview..."  class="custom-upload-btn" data-toggle="modal" data-target="#imageModal2"/>
+                    <img src="{{ asset('bundles/jobtraining/register/delete.png') }}" id="delete-icon10" class="delete-icon">
+                    <div class="id-img-describe preview-test" id="previewTest10">身份证国徽页</div>
+                </div>
+            </div>
+        </div>
+        <!-- 第三步 -->
+        <div class="form-step" id="step3">
+            <div class="certificates-img-box">
+                <div class="certificates-describe"><span class="font-weight-bold">白底证件照</span><span><span id="whiteCertPhoto-num">0</span>/1</span></div>
+                <div id="whiteCertPhotoBox">
+                <div class="custom-upload-btn" style="background: #fff">
+                    <input type="file" class="custom-file-input" id="whiteCertPhoto" accept="image/*" >
+                    <i class="fa fa-plus">
+                        <img src="{{ asset('bundles/jobtraining/register/camera.png') }}">
+                    </i>
+                </div>
+                </div>
+                <div style="position: relative">
+                <img id="preview11" src="" alt="Image preview..."  class="custom-upload-btn" data-toggle="modal" data-target="#imageModal3"/>
+                <img src="{{ asset('bundles/jobtraining/register/delete.png') }}" id="delete-icon11" class="delete-icon">
+
+                </div>
+            </div>
+        </div>
+        <div id="signature-box">
+            <div class="signature-container">
+                <!--                            <div class="signature-box" >-->
+                <!--                                <img src="signature.png" style="margin-left: 10px">-->
+                <!--                                <div style="margin-top: 10px;font-weight: bold">点击录入签名</div>-->
+                <!--                            </div>-->
+                <span class="font-weight-bold">录入签名</span>
+                <div id="signature" style=" border: 2px dashed #ccc" class="mt-1">
+                </div>
+                <button id="clearButton" class="btn btn-warning btn-sm mt-2" style="color: #fff">清除签名</button>
+            </div>
+            <div class="check-container">
+                <label for="flexCheckIndeterminate" style="cursor: pointer;display: flex;width: 100%;align-items: center">
+                    <input class="form-check-input"
+                           type="checkbox" value=""
+                           id="flexCheckIndeterminate" style="margin-bottom: 5px">
+                    您已同意我们收集以上信息用于报名 {{ classroom.title }}
+                </label>
+            </div>
+        </div>
+    </form>
+
+    <div class="form-step" id="step4">
+        <div class="success-box">
+            <img src="{{ asset('bundles/jobtraining/register/success-icon.png') }}">
+            <div class="success-text">资料录入成功</div>
+        </div>
+    </div>
+<!--                    <div id="signature" style=" border: 2px dashed #ccc" class="mt-1">-->
+<!--                    </div>-->
+<!--    <button id="saveButton">Save base64</button>-->
+<!--    <button id="saveImg">Save img</button>-->
+<!--    <button id="clearButton">Clear</button>-->
+<!--    <div id="base64Output"></div>-->
+<!--    <div id="imageOutput"></div>-->
+    <div class="submit-btn" id="submitBtn">
+        <button id="nextButton" class="btn btn-lg btn-primary  mt-4 font-weight-bold " style="width: 100%;">
+            下一步
+        </button>
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="" class="img-fluid" id="fullImg9">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imageModal2" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="" class="img-fluid" id="fullImg10">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imageModal3" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <img src="" class="img-fluid" id="fullImg11">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 引入jQuery -->
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.3.1/jquery.min.js"></script>
+<!-- 引入Bootstrap.bundle -->
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>-->
+<!--引入签名插件-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jSignature/2.1.2/jSignature.min.js"></script>
+<!-- 引入Bootstrap-select插件脚本 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // $('#signature').jSignature({
+        //     height:250,
+        //     width: '100%',
+        // });
+        $('input:not([type=checkbox]):not([type=file])').on('focus', function() {
+            // 在输入框获得焦点时取消按钮的 fixed 样式
+            $('#submitBtn').css('position', 'static');
+        });
+
+        $('input:not([type=checkbox]):not([type=file])').on('blur', function() {
+            // 在输入框失去焦点时恢复按钮的 fixed 样式
+            $('#submitBtn').css('position', 'fixed');
+        });
+        $('#clearButton').on('click', function (event) {
+            event.preventDefault();
+            $('#signature').jSignature('clear');
+            // $('#imageOutput').empty();
+        });
+        // $('#saveButton').on('click', function () {
+        //     var data = $('#signature').jSignature('getData', 'default');
+        //     var base64data = data.replace('data:image/png;base64,', '');
+        //     $('#base64Output').text(base64data);
+        // });
+        // $('#saveImg').on('click', function () {
+        //     var data = $('#signature').jSignature('getData', 'image');
+        //     var imageData = "data:" + data[0] + "," + data[1];
+        //     $('#imageOutput').html('<img src="' + imageData + '"/>');
+        // });
+        $('#signature-box').hide()
+        var currentStep = 1;
+        $(".form-step").eq(0).addClass("active");
+        //上一步处理
+        $("#prev-icon").click(function () {
+            if(currentStep>1){
+                $(".form-step").eq(currentStep - 1).removeClass('active'); // 隐藏当前步骤
+                currentStep--;
+                $('#nextButton').prop('disabled', false);
+                if (currentStep === 1) {
+                    $(".step").eq(0).removeClass("step-success");
+                    $(".step").eq(1).removeClass("step-success");
+                    $(".step").eq(1).removeClass("step-active");
+                    $(".step").eq(2).removeClass("step-success");
+                    $(".step").eq(2).removeClass("step-active");
+                    $("#nextButton").text("下一步")
+                }
+                if (currentStep === 2) {
+                    $(".step").eq(0).addClass("step-success");
+                    $(".step").eq(1).removeClass("step-success");
+                    $(".step").eq(2).removeClass("step-active");
+                    $('#signature-box').hide()
+                    $("#nextButton").text("下一步")
+                }
+                $(".form-step").eq(currentStep - 1).addClass('active'); // 显示上一步
+            }
+
+        });
+        //下一步处理
+        //填写基本信息
+
+        // 第一步
+        var realName = '';
+        var mobile = '';
+        var captcha = '';
+
+        var cardType = '';
+        var cardNumber = '';
+        var idPicture1 = '';
+        var idPicture2 = '';
+
+        $("#nextButton").click(function () {
+            if (currentStep === 1) {
+                realName =  $('#realName').val();
+                if(!realName){
+                    alert('请输入姓名')
+                    return
+                }
+
+                mobile =  $('#mobile').val();
+                if(!mobile){
+                    alert('请输入手机号')
+                    return
+                }
+
+                captcha =  $('#captcha').val();
+                if(!captcha){
+                    alert('请输入验证码')
+                    return
+                }
+
+                $(".step").eq(0).addClass("step-success");
+                $(".step").eq(1).addClass("step-active");
+                $("#nextButton").text("下一步")
+            }
+            //身份信息填写
+            if (currentStep === 2) {
+                cardType = $('#cardType').val();
+                if(!cardType){
+                    alert('请选择证件类型')
+                    return
+                }
+
+                cardNumber = $('#cardNumber').val();
+                if(!cardNumber){
+                    alert('请输入身份证号')
+                    return
+                }
+
+                idPicture1 = $('#idPicture1').val();
+                if(!idPicture1){
+                    alert('请上传身份证人像页')
+                    return
+                }
+
+                idPicture2 = $('#idPicture2').val();
+                if(!idPicture2){
+                    alert('请上传身份证国徽页')
+                    return
+                }
+
+                $(".step").eq(0).addClass("step-success");
+                $(".step").eq(1).addClass("step-success");
+                $(".step").eq(2).addClass("step-active");
+                $('#signature').jSignature('destroy');
+                $('#signature-box').show()
+                $('#signature').jSignature({
+                    height:250,
+                    width: '100%',
+                });
+                $('#flexCheckIndeterminate').prop('checked', false);
+                $('#nextButton').prop('disabled', true);
+                //协议验证
+                $('#flexCheckIndeterminate').change(function() {
+                    if (this.checked) {
+                        $('#nextButton').prop('disabled', false);
+                    } else {
+
+                        $('#nextButton').prop('disabled', true);
+                    }
+                });
+                $("#nextButton").text("提交")
+            }
+            //个人信息录入提交
+            if (currentStep === 3) {
+                $("#nextButton").text("正在提交")
+                $('#nextButton').prop('disabled', true);
+
+                var realName =  $('#realName').val();
+                var mobile =$('#mobile').val();
+                var captcha =$('#captcha').val();
+                var cardType = $('#cardType').val();
+                var cardNumber = $('#cardNumber').val();
+
+                var idPicture1 = $('#idPicture1').val();
+                var idPicture2 = $('#idPicture2').val();
+                var whiteCertPhoto =$('#whiteCertPhoto').val();
+                if(!whiteCertPhoto){
+                    $('#nextButton').prop('disabled', false);
+                    $("#nextButton").text("提交")
+                    alert('请上传证件照')
+                    return
+                }
+
+                var signImage = $('#signature').jSignature('getData', 'default');
+                console.log('签名数据： ', signImage);
+                if(!signImage){
+                    $('#nextButton').prop('disabled', false);
+                    $("#nextButton").text("提交")
+                    alert('请先录入签名')
+                    return
+                }
+
+                console.log('realName: '+realName);
+                console.log('mobile: '+mobile);
+                console.log('captcha: '+captcha);
+                console.log('cardType: '+cardType);
+                console.log('cardNumber: '+cardNumber);
+                console.log('idPicture1: '+idPicture1);
+                console.log('idPicture2: '+idPicture2);
+                console.log('whiteCertPhoto: '+whiteCertPhoto)
+                console.log('signImage: '+signImage);
+
+                // 创建FormData对象
+                var formData = new FormData();
+
+                // 添加文本字段
+                formData.append('realName', realName);
+                formData.append('mobile', mobile);
+                formData.append('captcha', captcha);
+                formData.append('cardType', cardType);
+                formData.append('cardNumber', cardNumber);
+                formData.append('signImage', signImage);
+
+                // 添加文件字段，这里需要获取到文件的引用，例如从一个input元素
+                formData.append('idPicture1', $('#idPicture1').prop('files')[0]);
+                formData.append('idPicture2', $('#idPicture2').prop('files')[0]);
+                formData.append('whiteCertPhoto', $('#whiteCertPhoto').prop('files')[0]);
+
+                // 使用jQuery的ajax方法提交
+                $.ajax({
+                    url: '{{ url('job-training-register-submit-data', { id: qrcode.id }) }}',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false, // 阻止jQuery修改Content-Type头部
+                    processData: false, // 阻止jQuery处理数据，FormData会处理
+                    success: function (response) {
+                        var data = typeof response === 'string' ? JSON.parse(response) : response;
+                        if(data.code === 1) {
+                            alert('提交成功');
+                            //提交完成处理
+                            $("#prev-icon").hide()
+                            $("#nextButton").hide();
+                            $('#signature-box').hide();
+
+                            $(".step").eq(0).addClass("step-success");
+                            $(".step").eq(1).addClass("step-success");
+                            $(".step").eq(2).addClass("step-success");
+
+                            $('#step1').hide();
+                            $('#step2').hide();
+                            $('#step3').hide();
+                            $('#step4').show().addClass("step-success");
+                        } else {
+                            alert(data.message);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert('请求失败: ' + textStatus);
+                    }
+                });
+
+                return;
+            }
+
+            $(".form-step").eq(currentStep - 1).removeClass('active');
+            $(".form-step").eq(currentStep).addClass('active');
+            currentStep++;
+
+        });
+        //    点击获取手机验证码
+        var countdown = 60;
+        $('#inputValidate').click(function () {
+            if( $("#name5").val().length===11){
+                if (countdown == 60) {
+                    alert('验证码已发送');
+                    $(this).text('60秒后重新发送');
+                    var timer = setInterval(function () {
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            $('#inputValidate').text('获取手机验证码');
+                            countdown = 60;
+                        } else {
+                            $('#inputValidate').text(countdown + '秒后重新发送');
+                            countdown--;
+                        }
+                    }, 1000);
+                }
+            }else{
+                alert('请输入正确的手机号码')
+            }
+        });
+
+        // select搜索
+        $('.selectpicker').selectpicker(
+            {
+                noneResultsText: '没有匹配的结果 {0}',
+            }
+        );
+    //    图片预览
+        $('#idPicture1').on('change', function(event){
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function(){
+                var dataURL = reader.result;
+                $('#preview9').attr('src', dataURL).show(); // Show the preview image
+                $('#fullImg9').attr('src',dataURL)
+                $('#idPicture1Box').hide(); // Hide the upload button and text
+                $('#delete-icon9').show();
+                $('#previewTest9').show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        });
+        $('#idPicture2').on('change', function(event){
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function(){
+                var dataURL = reader.result;
+                $('#preview10').attr('src', dataURL).show(); // Show the preview image
+                $('#fullImg10').attr('src',dataURL)
+                $('#idPicture2Box').hide(); // Hide the upload button and text
+                $('#delete-icon10').show();
+                $('#previewTest10').show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        });
+        $('#whiteCertPhoto').on('change', function(event){
+            var input = event.target;
+            var reader = new FileReader();
+            reader.onload = function(){
+                var dataURL = reader.result;
+                $('#preview11').attr('src', dataURL).show(); // Show the preview image
+                $('#fullImg11').attr('src',dataURL)
+                $('#whiteCertPhoto-num').text('1')
+                $('#whiteCertPhotoBox').hide(); // Hide the upload button and text
+                $('#delete-icon11').show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        });
+        //删除图片
+        $('#delete-icon9').click(function(){
+            $('#preview9').attr('src', '').hide();
+            $('#idPicture1').val('');
+            $('#idPicture1Box').show();
+            $('#previewTest9').hide();
+            $(this).hide(); // Hide the delete icon
+        });
+        $('#delete-icon10').click(function(){
+            $('#preview10').attr('src', '').hide();
+            $('#idPicture2').val('');
+            $('#idPicture2Box').show();
+            $('#previewTest10').hide();
+            $(this).hide(); // Hide the delete icon
+        });
+        $('#delete-icon11').click(function(){
+            $('#preview11').attr('src', '').hide();
+            $('#whiteCertPhoto').val('');
+            $('#whiteCertPhoto-num').text('0')
+            $('#whiteCertPhotoBox').show();
+            $(this).hide(); // Hide the delete icon
+        });
+    });
+</script>
+</body>
+</html>
