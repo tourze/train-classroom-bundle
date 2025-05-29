@@ -17,6 +17,7 @@ class ScheduleStatusTest extends TestCase
     {
         $this->assertEquals('SCHEDULED', ScheduleStatus::SCHEDULED->value);
         $this->assertEquals('ONGOING', ScheduleStatus::ONGOING->value);
+        $this->assertEquals('IN_PROGRESS', ScheduleStatus::IN_PROGRESS->value);
         $this->assertEquals('COMPLETED', ScheduleStatus::COMPLETED->value);
         $this->assertEquals('CANCELLED', ScheduleStatus::CANCELLED->value);
         $this->assertEquals('SUSPENDED', ScheduleStatus::SUSPENDED->value);
@@ -30,6 +31,7 @@ class ScheduleStatusTest extends TestCase
     {
         $this->assertEquals('已排课', ScheduleStatus::SCHEDULED->getDescription());
         $this->assertEquals('进行中', ScheduleStatus::ONGOING->getDescription());
+        $this->assertEquals('进行中', ScheduleStatus::IN_PROGRESS->getDescription());
         $this->assertEquals('已完成', ScheduleStatus::COMPLETED->getDescription());
         $this->assertEquals('已取消', ScheduleStatus::CANCELLED->getDescription());
         $this->assertEquals('已暂停', ScheduleStatus::SUSPENDED->getDescription());
@@ -43,6 +45,7 @@ class ScheduleStatusTest extends TestCase
     {
         $this->assertEquals('primary', ScheduleStatus::SCHEDULED->getColor());
         $this->assertEquals('success', ScheduleStatus::ONGOING->getColor());
+        $this->assertEquals('success', ScheduleStatus::IN_PROGRESS->getColor());
         $this->assertEquals('info', ScheduleStatus::COMPLETED->getColor());
         $this->assertEquals('danger', ScheduleStatus::CANCELLED->getColor());
         $this->assertEquals('warning', ScheduleStatus::SUSPENDED->getColor());
@@ -63,10 +66,11 @@ class ScheduleStatusTest extends TestCase
             'CANCELLED' => '已取消',
             'SUSPENDED' => '已暂停',
             'POSTPONED' => '已延期',
+            'IN_PROGRESS' => '进行中',
         ];
         
         $this->assertEquals($expectedOptions, $options);
-        $this->assertCount(6, $options);
+        $this->assertCount(7, $options);
     }
 
     /**
@@ -76,6 +80,7 @@ class ScheduleStatusTest extends TestCase
     {
         $this->assertTrue(ScheduleStatus::SCHEDULED->isActive());
         $this->assertTrue(ScheduleStatus::ONGOING->isActive());
+        $this->assertTrue(ScheduleStatus::IN_PROGRESS->isActive());
         $this->assertFalse(ScheduleStatus::COMPLETED->isActive());
         $this->assertFalse(ScheduleStatus::CANCELLED->isActive());
         $this->assertFalse(ScheduleStatus::SUSPENDED->isActive());
@@ -104,6 +109,7 @@ class ScheduleStatusTest extends TestCase
         $this->assertTrue(ScheduleStatus::SUSPENDED->isEditable());
         $this->assertTrue(ScheduleStatus::POSTPONED->isEditable());
         $this->assertFalse(ScheduleStatus::ONGOING->isEditable());
+        $this->assertFalse(ScheduleStatus::IN_PROGRESS->isEditable());
         $this->assertFalse(ScheduleStatus::COMPLETED->isEditable());
         $this->assertFalse(ScheduleStatus::CANCELLED->isEditable());
     }
@@ -152,6 +158,7 @@ class ScheduleStatusTest extends TestCase
     {
         $this->assertEquals(ScheduleStatus::SCHEDULED, ScheduleStatus::from('SCHEDULED'));
         $this->assertEquals(ScheduleStatus::ONGOING, ScheduleStatus::from('ONGOING'));
+        $this->assertEquals(ScheduleStatus::IN_PROGRESS, ScheduleStatus::from('IN_PROGRESS'));
         $this->assertEquals(ScheduleStatus::COMPLETED, ScheduleStatus::from('COMPLETED'));
         $this->assertEquals(ScheduleStatus::CANCELLED, ScheduleStatus::from('CANCELLED'));
         $this->assertEquals(ScheduleStatus::SUSPENDED, ScheduleStatus::from('SUSPENDED'));

@@ -2,14 +2,14 @@
 
 namespace Tourze\TrainClassroomBundle\Procedure;
 
-use SenboTrainingBundle\Repository\RegistrationRepository;
-use SenboTrainingBundle\Repository\StudentRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
+use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 #[MethodDoc('获取当前学员的班级信息')]
 #[MethodExpose('GetJobTrainingJoinedClassroomList')]
@@ -17,7 +17,6 @@ use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 class GetJobTrainingJoinedClassroomList extends BaseProcedure
 {
     public function __construct(
-        private readonly StudentRepository $studentRepository,
         private readonly Security $security,
         private readonly RegistrationRepository $registrationRepository,
     ) {
@@ -25,12 +24,12 @@ class GetJobTrainingJoinedClassroomList extends BaseProcedure
 
     public function execute(): array
     {
-        $student = $this->studentRepository->findStudent($this->security->getUser());
-        if (!$student) {
-            throw new ApiException('请先绑定学员信息', -885);
+        $user = $this->security->getUser();
+        if (!$user instanceof UserInterface) {
+            throw new ApiException('请先登录', -885);
         }
 
-        $registrations = $this->registrationRepository->findBy(['student' => $student]);
+        $registrations = $this->registrationRepository->findBy(['student' => $user]);
         $list = [];
         foreach ($registrations as $registration) {
             $list[] = $registration->retrieveApiArray();

@@ -6,9 +6,11 @@ namespace Tourze\TrainClassroomBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineSnowflakeBundle\Attribute\SnowflakeId;
-use Tourze\DoctrineTimestampBundle\Attribute\Timestamp;
-use Tourze\DoctrineUserBundle\Attribute\User;
+use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
+use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
+use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 
@@ -25,13 +27,11 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 #[ORM\UniqueConstraint(name: 'uk_classroom_time', columns: ['classroom_id', 'start_time', 'end_time'])]
 class ClassroomSchedule
 {
-    /**
-     * 主键ID
-     */
     #[ORM\Id]
-    #[ORM\Column(type: Types::BIGINT)]
-    #[SnowflakeId]
-    private readonly string $id;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
+    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
+    private ?string $id = null;
 
     /**
      * 关联的教室
@@ -110,37 +110,31 @@ class ClassroomSchedule
      * 创建时间
      */
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Timestamp(on: ['create'])]
-    private readonly \DateTimeImmutable $createTime;
+    #[CreateTimeColumn]
+    private ?\DateTimeImmutable $createTime = null;
 
     /**
      * 更新时间
      */
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Timestamp(on: ['create', 'update'])]
-    private \DateTimeImmutable $updateTime;
+    #[UpdateTimeColumn]
+    private ?\DateTimeImmutable $updateTime = null;
 
     /**
      * 创建人
      */
     #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[User(on: ['create'])]
-    private readonly ?string $createdBy;
+    #[CreatedByColumn]
+    private ?string $createdBy = null;
 
     /**
      * 更新人
      */
     #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[User(on: ['create', 'update'])]
-    private ?string $updatedBy;
+    #[UpdatedByColumn]
+    private ?string $updatedBy = null;
 
-    /**
-     * 供应商ID（多租户支持）
-     */
-    #[ORM\Column(type: Types::BIGINT, nullable: true)]
-    private ?string $supplierId = null;
-
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -295,17 +289,6 @@ class ClassroomSchedule
     public function getUpdatedBy(): ?string
     {
         return $this->updatedBy;
-    }
-
-    public function getSupplierId(): ?string
-    {
-        return $this->supplierId;
-    }
-
-    public function setSupplierId(?string $supplierId): self
-    {
-        $this->supplierId = $supplierId;
-        return $this;
     }
 
     /**

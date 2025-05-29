@@ -5,98 +5,11 @@ services:
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
     public: false
 
-  # 仓储服务
-  Tourze\TrainClassroomBundle\Repository\:
-    resource: '../../Repository/*'
-    tags: ['doctrine.repository_service']
-
-  # 业务服务
-  Tourze\TrainClassroomBundle\Service\:
-    resource: '../../Service/*'
-    exclude: '../../Service/*Interface.php'
-
-  # 服务接口绑定
-  Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface:
-    alias: Tourze\TrainClassroomBundle\Service\AttendanceService
-
-  Tourze\TrainClassroomBundle\Service\ScheduleServiceInterface:
-    alias: Tourze\TrainClassroomBundle\Service\ScheduleService
-
-  Tourze\TrainClassroomBundle\Service\ClassroomServiceInterface:
-    alias: Tourze\TrainClassroomBundle\Service\ClassroomService
-
-  Tourze\TrainClassroomBundle\Service\DeviceServiceInterface:
-    alias: Tourze\TrainClassroomBundle\Service\DeviceService
-
-  # 控制器
-  Tourze\TrainClassroomBundle\Controller\:
-    resource: '../../Controller/*'
-    tags: ['controller.service_arguments']
-
-  # 命令
   Tourze\TrainClassroomBundle\Command\:
-    resource: '../../Command/*'
-    tags: ['console.command']
-
-  # 事件监听器
-  Tourze\TrainClassroomBundle\EventListener\:
-    resource: '../../EventListener/*'
-    tags: ['kernel.event_listener']
-
-  # 专用服务配置
-  tourze.train_classroom.attendance_service:
-    class: Tourze\TrainClassroomBundle\Service\AttendanceService
-    arguments:
-      $entityManager: '@doctrine.orm.entity_manager'
-      $attendanceRepository: '@Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository'
-      $logger: '@logger'
-    tags:
-      - { name: 'monolog.logger', channel: 'train_classroom' }
-
-  tourze.train_classroom.schedule_service:
-    class: Tourze\TrainClassroomBundle\Service\ScheduleService
-    arguments:
-      $entityManager: '@doctrine.orm.entity_manager'
-      $scheduleRepository: '@Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository'
-      $logger: '@logger'
-    tags:
-      - { name: 'monolog.logger', channel: 'train_classroom' }
-
-  tourze.train_classroom.classroom_service:
-    class: Tourze\TrainClassroomBundle\Service\ClassroomService
-    arguments:
-      $entityManager: '@doctrine.orm.entity_manager'
-      $classroomRepository: '@Tourze\TrainClassroomBundle\Repository\ClassroomRepository'
-      $scheduleRepository: '@Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository'
-      $logger: '@logger'
-      $security: '@security.helper'
-    tags:
-      - { name: 'monolog.logger', channel: 'train_classroom' }
-
-  tourze.train_classroom.device_service:
-    class: Tourze\TrainClassroomBundle\Service\DeviceService
-    arguments:
-      $entityManager: '@doctrine.orm.entity_manager'
-      $logger: '@logger'
-    tags:
-      - { name: 'monolog.logger', channel: 'train_classroom' }
-
-  # 仓储专用配置
-  Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository:
-    factory: ['@doctrine.orm.entity_manager', 'getRepository']
-    arguments: ['Tourze\TrainClassroomBundle\Entity\AttendanceRecord']
-
-  Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository:
-    factory: ['@doctrine.orm.entity_manager', 'getRepository']
-    arguments: ['Tourze\TrainClassroomBundle\Entity\ClassroomSchedule']
-
-  # 参数配置
-  tourze.train_classroom.config:
-    class: Symfony\Component\DependencyInjection\ParameterBag\ParameterBag
-    factory: ['@service_container', 'getParameter']
-    arguments: ['train_classroom.config']
-
-  # 日志配置
-  monolog.logger.train_classroom:
-    parent: monolog.logger
-    arguments: ['train_classroom']
+    resource: '../../Command/'
+  Tourze\TrainClassroomBundle\Controller\:
+    resource: '../../Controller/'
+  Tourze\TrainClassroomBundle\Repository\:
+    resource: '../../Repository/'
+  Tourze\TrainClassroomBundle\Service\:
+    resource: '../../Service/'

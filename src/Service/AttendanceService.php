@@ -49,9 +49,6 @@ class AttendanceService implements AttendanceServiceInterface
         $attendance->setRemark($remark);
         $attendance->setVerificationResult(VerificationResult::SUCCESS);
 
-        // 设置审计字段
-        $attendance->setSupplierId($registration->getSupplierId());
-
         $this->entityManager->persist($attendance);
         $this->entityManager->flush();
 
@@ -134,7 +131,7 @@ class AttendanceService implements AttendanceServiceInterface
                 case AttendanceType::BREAK_OUT:
                     $statistics['break_out_count']++;
                     break;
-                case AttendanceType::BREAK_RETURN:
+                case AttendanceType::BREAK_IN:
                     $statistics['break_return_count']++;
                     break;
             }
@@ -193,8 +190,8 @@ class AttendanceService implements AttendanceServiceInterface
         ?\DateTimeInterface $date = null
     ): array {
         $date = $date ?? new \DateTimeImmutable();
-        $startOfDay = $date->setTime(0, 0, 0);
-        $endOfDay = $date->setTime(23, 59, 59);
+        $startOfDay = $date->setTime(0, 0, 0, 0);
+        $endOfDay = $date->setTime(23, 59, 59, 999999);
 
         $records = $this->attendanceRepository->findByRegistrationAndDateRange(
             $registration,
@@ -266,7 +263,6 @@ class AttendanceService implements AttendanceServiceInterface
         $attendance->setRecordTime($recordTime);
         $attendance->setRemark("补录考勤：{$reason}");
         $attendance->setVerificationResult(VerificationResult::SUCCESS);
-        $attendance->setSupplierId($registration->getSupplierId());
 
         $this->entityManager->persist($attendance);
         $this->entityManager->flush();

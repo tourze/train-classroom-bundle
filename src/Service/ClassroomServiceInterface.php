@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Axtk\TrainClassroomBundle\Service;
+namespace Tourze\TrainClassroomBundle\Service;
 
-use Axtk\TrainClassroomBundle\Entity\Classroom;
-use Axtk\TrainClassroomBundle\Enum\ClassroomStatus;
-use Axtk\TrainClassroomBundle\Enum\ClassroomType;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Enum\ClassroomStatus;
+use Tourze\TrainClassroomBundle\Enum\ClassroomType;
 
 /**
  * 教室管理服务接口

@@ -68,9 +68,6 @@ class ScheduleService implements ScheduleServiceInterface
             $schedule->setMaxParticipants($options['max_participants']);
         }
 
-        // 设置审计字段
-        $schedule->setSupplierId($classroom->getSupplierId());
-
         $this->entityManager->persist($schedule);
         $this->entityManager->flush();
 

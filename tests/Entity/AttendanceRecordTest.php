@@ -175,17 +175,6 @@ class AttendanceRecordTest extends TestCase
     }
 
     /**
-     * 测试SupplierId的设置和获取
-     */
-    public function test_supplier_id_property(): void
-    {
-        $supplierId = '123456789';
-        $this->attendanceRecord->setSupplierId($supplierId);
-        
-        $this->assertSame($supplierId, $this->attendanceRecord->getSupplierId());
-    }
-
-    /**
      * 测试getLocationInfo业务方法
      */
     public function test_getLocationInfo_returns_location_array(): void
@@ -277,7 +266,6 @@ class AttendanceRecordTest extends TestCase
         $this->assertNull($this->attendanceRecord->getLatitude());
         $this->assertNull($this->attendanceRecord->getLongitude());
         $this->assertNull($this->attendanceRecord->getRemark());
-        $this->assertNull($this->attendanceRecord->getSupplierId());
     }
 
     /**

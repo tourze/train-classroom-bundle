@@ -3,13 +3,13 @@
 namespace Tourze\TrainClassroomBundle\Command;
 
 use Carbon\Carbon;
-use SenboTrainingBundle\Entity\Registration;
-use SenboTrainingBundle\Repository\RegistrationRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tourze\Symfony\CronJob\Attribute\AsCronTask;
+use Tourze\TrainClassroomBundle\Entity\Registration;
+use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 #[AsCronTask('* * * * *')]
 #[AsCommand(name: 'job-training:expire-registration', description: '过期无效的报班记录')]
@@ -30,7 +30,7 @@ class ExpireRegistrationLogCommand extends Command
             ->getQuery()
             ->getResult();
         foreach ($registrations as $registration) {
-            /* @var Registration $registration */
+            assert($registration instanceof Registration);
             $registration->setExpired(true);
             $this->registrationRepository->save($registration);
         }

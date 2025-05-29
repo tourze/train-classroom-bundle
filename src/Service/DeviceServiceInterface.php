@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Axtk\TrainClassroomBundle\Service;
+namespace Tourze\TrainClassroomBundle\Service;
 
-use Axtk\TrainClassroomBundle\Entity\Classroom;
-use Axtk\TrainClassroomBundle\Enum\AttendanceMethod;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 
 /**
  * 设备集成服务接口

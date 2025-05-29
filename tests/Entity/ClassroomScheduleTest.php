@@ -160,17 +160,6 @@ class ClassroomScheduleTest extends TestCase
     }
 
     /**
-     * 测试SupplierId的设置和获取
-     */
-    public function test_supplier_id_property(): void
-    {
-        $supplierId = '123456789';
-        $this->schedule->setSupplierId($supplierId);
-        
-        $this->assertSame($supplierId, $this->schedule->getSupplierId());
-    }
-
-    /**
      * 测试getDurationInMinutes业务方法
      */
     public function test_getDurationInMinutes_calculates_correctly(): void
@@ -371,7 +360,6 @@ class ClassroomScheduleTest extends TestCase
         $this->assertNull($this->schedule->getExpectedStudents());
         $this->assertNull($this->schedule->getActualStudents());
         $this->assertNull($this->schedule->getRemark());
-        $this->assertNull($this->schedule->getSupplierId());
     }
 
     /**

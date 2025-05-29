@@ -2,25 +2,18 @@
 
 namespace Tourze\TrainClassroomBundle\Entity;
 
-use AppBundle\Entity\Supplier;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ExamBundle\Entity\Bank;
-use ExamBundle\Entity\Category;
-use SenboTrainingBundle\Attribute\Column\SupplierColumn;
-use SenboTrainingBundle\Entity\Course;
-use SenboTrainingBundle\Entity\CreateTimeColumn;
-use SenboTrainingBundle\Entity\IndexColumn;
-use SenboTrainingBundle\Entity\Qrcode;
-use SenboTrainingBundle\Entity\Registration;
-use SenboTrainingBundle\Entity\UpdateTimeColumn;
-use SenboTrainingBundle\Repository\ClassroomRepository;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
+use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\CurdAction;
 use Tourze\EasyAdmin\Attribute\Action\Deletable;
@@ -32,6 +25,9 @@ use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Filter\Keyword;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\TrainCategoryBundle\Entity\Category;
+use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
+use Tourze\TrainCourseBundle\Entity\Course;
 
 #[AsPermission(title: '班级信息')]
 #[Listable]
@@ -42,43 +38,6 @@ use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 #[ORM\Table(name: 'job_training_classroom', options: ['comment' => '班级信息'])]
 class Classroom implements \Stringable, ApiArrayInterface
 {
-    #[Filterable]
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
-
-    #[UpdateTimeColumn]
-    #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[Filterable]
-    #[ExportColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
-    private ?\DateTimeInterface $updateTime = null;
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): void
-    {
-        $this->createTime = $createdAt;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function setUpdateTime(?\DateTimeInterface $updateTime): void
-    {
-        $this->updateTime = $updateTime;
-    }
-
-    public function getUpdateTime(): ?\DateTimeInterface
-    {
-        return $this->updateTime;
-    }
-
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
@@ -87,10 +46,6 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[SupplierColumn]
-    #[ORM\ManyToOne]
-    private ?Supplier $supplier = null;
 
     #[Filterable(label: '所属分类', inputWidth: 400)]
     #[ListColumn(title: '所属分类')]
@@ -133,18 +88,65 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     #[Ignore]
     #[CurdAction(label: '报班学员', drawerWidth: 1200)]
-    #[ORM\OneToMany(mappedBy: 'classroom', targetEntity: Registration::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $registrations;
 
     #[Ignore]
     #[CurdAction(label: '报班二维码', drawerWidth: 1200)]
-    #[ORM\OneToMany(mappedBy: 'classroom', targetEntity: Qrcode::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Qrcode::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $qrcodes;
 
     #[Ignore]
     #[CurdAction(label: '排课记录', drawerWidth: 1200)]
-    #[ORM\OneToMany(mappedBy: 'classroom', targetEntity: ClassroomSchedule::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ClassroomSchedule::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $schedules;
+
+    #[Filterable]
+    #[IndexColumn]
+    #[ListColumn(order: 98, sorter: true)]
+    #[ExportColumn]
+    #[CreateTimeColumn]
+    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
+
+    #[UpdateTimeColumn]
+    #[ListColumn(order: 99, sorter: true)]
+    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
+    #[Filterable]
+    #[ExportColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
+    private ?\DateTimeInterface $updateTime = null;
+
+    #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室类型'])]
+    private ?string $type = null;
+
+    #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室状态'])]
+    private ?string $status = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '容量'])]
+    private ?int $capacity = null;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true, options: ['comment' => '面积（平方米）'])]
+    private ?string $area = null;
+
+    #[ORM\Column(length: 255, nullable: true, options: ['comment' => '位置'])]
+    private ?string $location = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '描述'])]
+    private ?string $description = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '设备信息'])]
+    private ?array $devices = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['comment' => '供应商ID'])]
+    private ?int $supplierId = null;
+
+    #[ORM\Column(length: 100, nullable: true, options: ['comment' => '创建者'])]
+    private ?string $createdBy = null;
+
+    #[ORM\Column(length: 100, nullable: true, options: ['comment' => '更新者'])]
+    private ?string $updatedBy = null;
 
     public function __construct()
     {
@@ -167,16 +169,124 @@ class Classroom implements \Stringable, ApiArrayInterface
         return $this->id;
     }
 
-    public function getSupplier(): ?Supplier
+    public function getType(): ?string
     {
-        return $this->supplier;
+        return $this->type;
     }
 
-    public function setSupplier(?Supplier $supplier): static
+    public function setType(?string $type): static
     {
-        $this->supplier = $supplier;
-
+        $this->type = $type;
         return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getCapacity(): ?int
+    {
+        return $this->capacity;
+    }
+
+    public function setCapacity(?int $capacity): static
+    {
+        $this->capacity = $capacity;
+        return $this;
+    }
+
+    public function getArea(): ?float
+    {
+        return $this->area ? (float) $this->area : null;
+    }
+
+    public function setArea(?float $area): static
+    {
+        $this->area = $area ? (string) $area : null;
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): static
+    {
+        $this->location = $location;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getDevices(): ?array
+    {
+        return $this->devices;
+    }
+
+    public function setDevices(?array $devices): static
+    {
+        $this->devices = $devices;
+        return $this;
+    }
+
+    public function getSupplierId(): ?int
+    {
+        return $this->supplierId;
+    }
+
+    public function setSupplierId(?int $supplierId): static
+    {
+        $this->supplierId = $supplierId;
+        return $this;
+    }
+
+    public function getCreatedBy(): ?string
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?string $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?string
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?string $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+        return $this;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function getUpdateTime(): ?\DateTimeInterface
+    {
+        return $this->updateTime;
     }
 
     public function getTitle(): string

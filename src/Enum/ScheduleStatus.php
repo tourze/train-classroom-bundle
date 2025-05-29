@@ -21,6 +21,11 @@ enum ScheduleStatus: string
     case ONGOING = 'ONGOING';
 
     /**
+     * 进行中（别名）
+     */
+    case IN_PROGRESS = 'IN_PROGRESS';
+
+    /**
      * 已完成
      */
     case COMPLETED = 'COMPLETED';
@@ -47,7 +52,7 @@ enum ScheduleStatus: string
     {
         return match ($this) {
             self::SCHEDULED => '已排课',
-            self::ONGOING => '进行中',
+            self::ONGOING, self::IN_PROGRESS => '进行中',
             self::COMPLETED => '已完成',
             self::CANCELLED => '已取消',
             self::SUSPENDED => '已暂停',
@@ -62,7 +67,7 @@ enum ScheduleStatus: string
     {
         return match ($this) {
             self::SCHEDULED => 'primary',
-            self::ONGOING => 'success',
+            self::ONGOING, self::IN_PROGRESS => 'success',
             self::COMPLETED => 'info',
             self::CANCELLED => 'danger',
             self::SUSPENDED => 'warning',
@@ -90,6 +95,7 @@ enum ScheduleStatus: string
         return in_array($this, [
             self::SCHEDULED,
             self::ONGOING,
+            self::IN_PROGRESS,
         ]);
     }
 

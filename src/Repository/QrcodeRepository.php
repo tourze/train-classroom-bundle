@@ -4,8 +4,7 @@ namespace Tourze\TrainClassroomBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
-use SenboTrainingBundle\Entity\Qrcode;
+use Tourze\TrainClassroomBundle\Entity\Qrcode;
 
 /**
  * @method Qrcode|null find($id, $lockMode = null, $lockVersion = null)
@@ -15,8 +14,6 @@ use SenboTrainingBundle\Entity\Qrcode;
  */
 class QrcodeRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Qrcode::class);

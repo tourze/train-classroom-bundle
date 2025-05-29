@@ -29,12 +29,13 @@ class VerificationResultTest extends TestCase
     {
         $cases = VerificationResult::cases();
         
-        $this->assertCount(5, $cases);
+        $this->assertCount(6, $cases);
         $this->assertContains(VerificationResult::SUCCESS, $cases);
         $this->assertContains(VerificationResult::FAILED, $cases);
         $this->assertContains(VerificationResult::PENDING, $cases);
         $this->assertContains(VerificationResult::TIMEOUT, $cases);
         $this->assertContains(VerificationResult::ERROR, $cases);
+        $this->assertContains(VerificationResult::DEVICE_ERROR, $cases);
     }
 
     /**
@@ -47,6 +48,7 @@ class VerificationResultTest extends TestCase
         $this->assertEquals('待验证', VerificationResult::PENDING->getLabel());
         $this->assertEquals('验证超时', VerificationResult::TIMEOUT->getLabel());
         $this->assertEquals('验证错误', VerificationResult::ERROR->getLabel());
+        $this->assertEquals('设备错误', VerificationResult::DEVICE_ERROR->getLabel());
     }
 
     /**
@@ -62,10 +64,11 @@ class VerificationResultTest extends TestCase
             'PENDING' => '待验证',
             'TIMEOUT' => '验证超时',
             'ERROR' => '验证错误',
+            'DEVICE_ERROR' => '设备错误',
         ];
         
         $this->assertEquals($expectedOptions, $options);
-        $this->assertCount(5, $options);
+        $this->assertCount(6, $options);
         
         // 验证所有键都是字符串
         foreach (array_keys($options) as $key) {
@@ -98,6 +101,7 @@ class VerificationResultTest extends TestCase
         $this->assertTrue(VerificationResult::FAILED->isFailure());
         $this->assertTrue(VerificationResult::TIMEOUT->isFailure());
         $this->assertTrue(VerificationResult::ERROR->isFailure());
+        $this->assertTrue(VerificationResult::DEVICE_ERROR->isFailure());
         $this->assertFalse(VerificationResult::SUCCESS->isFailure());
         $this->assertFalse(VerificationResult::PENDING->isFailure());
     }
@@ -112,6 +116,7 @@ class VerificationResultTest extends TestCase
         $this->assertFalse(VerificationResult::FAILED->isPending());
         $this->assertFalse(VerificationResult::TIMEOUT->isPending());
         $this->assertFalse(VerificationResult::ERROR->isPending());
+        $this->assertFalse(VerificationResult::DEVICE_ERROR->isPending());
     }
 
     /**
@@ -124,6 +129,7 @@ class VerificationResultTest extends TestCase
         $this->assertEquals('text-warning', VerificationResult::PENDING->getColorClass());
         $this->assertEquals('text-secondary', VerificationResult::TIMEOUT->getColorClass());
         $this->assertEquals('text-danger', VerificationResult::ERROR->getColorClass());
+        $this->assertEquals('text-danger', VerificationResult::DEVICE_ERROR->getColorClass());
     }
 
     /**
@@ -136,6 +142,7 @@ class VerificationResultTest extends TestCase
         $this->assertEquals('fa-clock', VerificationResult::PENDING->getIconClass());
         $this->assertEquals('fa-hourglass-end', VerificationResult::TIMEOUT->getIconClass());
         $this->assertEquals('fa-exclamation-triangle', VerificationResult::ERROR->getIconClass());
+        $this->assertEquals('fa-cog', VerificationResult::DEVICE_ERROR->getIconClass());
     }
 
     /**
@@ -291,6 +298,6 @@ class VerificationResultTest extends TestCase
             $iconClasses[] = $iconClass;
         }
         
-        $this->assertCount(5, $iconClasses);
+        $this->assertCount(6, $iconClasses);
     }
 } 

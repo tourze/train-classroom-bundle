@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Axtk\TrainClassroomBundle\Service;
+namespace Tourze\TrainClassroomBundle\Service;
 
-use Axtk\TrainClassroomBundle\Entity\Classroom;
-use Axtk\TrainClassroomBundle\Entity\ClassroomSchedule;
-use Axtk\TrainClassroomBundle\Enum\ClassroomStatus;
-use Axtk\TrainClassroomBundle\Enum\ClassroomType;
-use Axtk\TrainClassroomBundle\Enum\ScheduleStatus;
-use Axtk\TrainClassroomBundle\Repository\ClassroomRepository;
-use Axtk\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Security;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Enum\ClassroomStatus;
+use Tourze\TrainClassroomBundle\Enum\ClassroomType;
+use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
+use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
+use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 教室管理服务实现
@@ -141,7 +140,7 @@ class ClassroomService implements ClassroomServiceInterface
     public function updateClassroomStatus(Classroom $classroom, ClassroomStatus $status, ?string $reason = null): Classroom
     {
         $oldStatus = $classroom->getStatus();
-        $classroom->setStatus($status);
+        $classroom->setStatus($status->value);
         
         // 更新审计字段
         $user = $this->security->getUser();
@@ -151,7 +150,7 @@ class ClassroomService implements ClassroomServiceInterface
         
         $this->logger->info('教室状态更新', [
             'classroom_id' => $classroom->getId(),
-            'old_status' => $oldStatus?->value,
+            'old_status' => $oldStatus,
             'new_status' => $status->value,
             'reason' => $reason,
         ]);
@@ -171,7 +170,7 @@ class ClassroomService implements ClassroomServiceInterface
             $classroom,
             $startTime,
             $endTime,
-            [ScheduleStatus::SCHEDULED, ScheduleStatus::IN_PROGRESS]
+            [ScheduleStatus::SCHEDULED->value, ScheduleStatus::IN_PROGRESS->value]
         );
         
         return empty($conflictingSchedules);
@@ -329,17 +328,17 @@ class ClassroomService implements ClassroomServiceInterface
     private function populateClassroomData(Classroom $classroom, array $data): void
     {
         if (isset($data['name'])) {
-            $classroom->setName($data['name']);
+            $classroom->setTitle($data['name']);
         }
         
         if (isset($data['type'])) {
             $type = is_string($data['type']) ? ClassroomType::from($data['type']) : $data['type'];
-            $classroom->setType($type);
+            $classroom->setType($type->value);
         }
         
         if (isset($data['status'])) {
             $status = is_string($data['status']) ? ClassroomStatus::from($data['status']) : $data['status'];
-            $classroom->setStatus($status);
+            $classroom->setStatus($status->value);
         }
         
         if (isset($data['capacity'])) {

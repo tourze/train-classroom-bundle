@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Axtk\TrainClassroomBundle\Controller;
+namespace Tourze\TrainClassroomBundle\Controller;
 
-use Axtk\TrainClassroomBundle\Entity\Classroom;
-use Axtk\TrainClassroomBundle\Enum\ClassroomStatus;
-use Axtk\TrainClassroomBundle\Enum\ClassroomType;
-use Axtk\TrainClassroomBundle\Service\ClassroomServiceInterface;
-use Axtk\TrainClassroomBundle\Service\DeviceServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Enum\ClassroomStatus;
+use Tourze\TrainClassroomBundle\Enum\ClassroomType;
+use Tourze\TrainClassroomBundle\Service\ClassroomServiceInterface;
+use Tourze\TrainClassroomBundle\Service\DeviceServiceInterface;
 
 /**
  * 教室管理API控制器
@@ -417,10 +417,10 @@ class ClassroomController extends AbstractController
             'description' => $classroom->getDescription(),
             'devices' => $classroom->getDevices(),
             'supplier_id' => $classroom->getSupplierId(),
-            'created_at' => $classroom->getCreatedAt()?->format('Y-m-d H:i:s'),
-            'updated_at' => $classroom->getUpdatedAt()?->format('Y-m-d H:i:s'),
+            'created_at' => $classroom->getCreateTime()?->format('Y-m-d H:i:s'),
+            'updated_at' => $classroom->getUpdateTime()?->format('Y-m-d H:i:s'),
             'created_by' => $classroom->getCreatedBy(),
             'updated_by' => $classroom->getUpdatedBy(),
         ];
     }
-} 
+}

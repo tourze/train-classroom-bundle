@@ -13,6 +13,7 @@ enum VerificationResult: string
     case PENDING = 'PENDING';     // 待验证
     case TIMEOUT = 'TIMEOUT';     // 验证超时
     case ERROR = 'ERROR';         // 验证错误
+    case DEVICE_ERROR = 'DEVICE_ERROR'; // 设备错误
 
     /**
      * 获取中文描述
@@ -25,6 +26,7 @@ enum VerificationResult: string
             self::PENDING => '待验证',
             self::TIMEOUT => '验证超时',
             self::ERROR => '验证错误',
+            self::DEVICE_ERROR => '设备错误',
         };
     }
 
@@ -53,7 +55,7 @@ enum VerificationResult: string
      */
     public function isFailure(): bool
     {
-        return $this === self::FAILED || $this === self::TIMEOUT || $this === self::ERROR;
+        return $this === self::FAILED || $this === self::TIMEOUT || $this === self::ERROR || $this === self::DEVICE_ERROR;
     }
 
     /**
@@ -75,6 +77,7 @@ enum VerificationResult: string
             self::PENDING => 'text-warning',
             self::TIMEOUT => 'text-secondary',
             self::ERROR => 'text-danger',
+            self::DEVICE_ERROR => 'text-danger',
         };
     }
 
@@ -89,6 +92,7 @@ enum VerificationResult: string
             self::PENDING => 'fa-clock',
             self::TIMEOUT => 'fa-hourglass-end',
             self::ERROR => 'fa-exclamation-triangle',
+            self::DEVICE_ERROR => 'fa-cog',
         };
     }
 } 

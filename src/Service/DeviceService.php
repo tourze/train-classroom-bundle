@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Axtk\TrainClassroomBundle\Service;
+namespace Tourze\TrainClassroomBundle\Service;
 
-use Axtk\TrainClassroomBundle\Entity\Classroom;
-use Axtk\TrainClassroomBundle\Enum\AttendanceMethod;
-use Axtk\TrainClassroomBundle\Enum\VerificationResult;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
+use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 
 /**
  * 设备集成服务实现

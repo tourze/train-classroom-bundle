@@ -6,16 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use SenboTrainingBundle\Entity\Classroom;
-use SenboTrainingBundle\Entity\CreateTimeColumn;
-use SenboTrainingBundle\Entity\Filterable;
-use SenboTrainingBundle\Entity\Registration;
-use SenboTrainingBundle\Entity\UpdateTimeColumn;
-use SenboTrainingBundle\Repository\QrcodeRepository;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
@@ -29,6 +25,7 @@ use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Keyword;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
+use Tourze\TrainClassroomBundle\Repository\QrcodeRepository;
 
 #[AsPermission(title: '报名二维码')]
 #[Deletable]
@@ -40,43 +37,6 @@ use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 #[ORM\UniqueConstraint(name: 'job_training_reg_qrcode_idx_uniq', columns: ['classroom_id', 'title'])]
 class Qrcode
 {
-    #[Filterable]
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
-
-    #[UpdateTimeColumn]
-    #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[Filterable]
-    #[ExportColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
-    private ?\DateTimeInterface $updateTime = null;
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): void
-    {
-        $this->createTime = $createdAt;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function setUpdateTime(?\DateTimeInterface $updateTime): void
-    {
-        $this->updateTime = $updateTime;
-    }
-
-    public function getUpdateTime(): ?\DateTimeInterface
-    {
-        return $this->updateTime;
-    }
-
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
@@ -124,8 +84,17 @@ class Qrcode
     private int $limitNumber;
 
     #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'qrcode', targetEntity: Registration::class)]
+    #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'qrcode')]
     private Collection $registrations;
+
+    #[IndexColumn]
+    #[CreateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
+
+    #[UpdateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
+    private ?\DateTimeInterface $updateTime = null;
 
     public function __construct()
     {
@@ -239,9 +208,23 @@ class Qrcode
         return $this;
     }
 
-    #[ListColumn(title: '报名人数')]
-    public function getRegistrationCount(): int
+    public function setCreateTime(?\DateTimeInterface $createdAt): void
     {
-        return $this->getRegistrations()->count();
+        $this->createTime = $createdAt;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function setUpdateTime(?\DateTimeInterface $updateTime): void
+    {
+        $this->updateTime = $updateTime;
+    }
+
+    public function getUpdateTime(): ?\DateTimeInterface
+    {
+        return $this->updateTime;
     }
 }

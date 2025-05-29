@@ -4,8 +4,7 @@ namespace Tourze\TrainClassroomBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
-use SenboTrainingBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
 
 /**
  * @method Classroom|null find($id, $lockMode = null, $lockVersion = null)
@@ -15,8 +14,6 @@ use SenboTrainingBundle\Entity\Classroom;
  */
 class ClassroomRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Classroom::class);

@@ -2,24 +2,12 @@
 
 namespace Tourze\TrainClassroomBundle\Entity;
 
-use AppBundle\Entity\Supplier;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ExamBundle\Entity\Bank;
-use SenboTrainingBundle\Attribute\Column\SupplierColumn;
-use SenboTrainingBundle\Entity\Classroom;
-use SenboTrainingBundle\Entity\Course;
-use SenboTrainingBundle\Entity\CreateTimeColumn;
-use SenboTrainingBundle\Entity\FaceDetect;
-use SenboTrainingBundle\Entity\LearnLog;
-use SenboTrainingBundle\Entity\LearnSession;
-use SenboTrainingBundle\Entity\Lesson;
-use SenboTrainingBundle\Entity\Qrcode;
-use SenboTrainingBundle\Entity\Student;
-use SenboTrainingBundle\Entity\UpdateTimeColumn;
-use SenboTrainingBundle\Repository\RegistrationRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
@@ -28,6 +16,8 @@ use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
@@ -44,8 +34,9 @@ use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Filter\Keyword;
 use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\TrainClassroomBundle\Enum\OrderStatus;
-use Tourze\TrainClassroomBundle\Enum\RegistrationLearnStatus;
 use Tourze\TrainClassroomBundle\Enum\TrainType;
+use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
+use Tourze\TrainCourseBundle\Entity\Course;
 
 /**
  * 通过报班记录，可以知道每个人的学习情况
@@ -61,43 +52,6 @@ use Tourze\TrainClassroomBundle\Enum\TrainType;
 #[ORM\HasLifecycleCallbacks]
 class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
-    #[Filterable]
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
-
-    #[UpdateTimeColumn]
-    #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[Filterable]
-    #[ExportColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
-    private ?\DateTimeInterface $updateTime = null;
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): void
-    {
-        $this->createTime = $createdAt;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function setUpdateTime(?\DateTimeInterface $updateTime): void
-    {
-        $this->updateTime = $updateTime;
-    }
-
-    public function getUpdateTime(): ?\DateTimeInterface
-    {
-        return $this->updateTime;
-    }
-
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
@@ -106,36 +60,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[CreatedByColumn]
-    #[Groups(['restful_read'])]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    #[Groups(['restful_read'])]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
-    private ?string $updatedBy = null;
-
-    #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
-    private ?string $createdFromIp = null;
-
-    #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
-    private ?string $updatedFromIp = null;
-
-    #[CreateUserAgentColumn]
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '创建时UA'])]
-    private ?string $createdFromUa = null;
-
-    #[UpdateUserAgentColumn]
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '更新时UA'])]
-    private ?string $updatedFromUa = null;
-
-    #[SupplierColumn]
-    #[ORM\ManyToOne]
-    private ?Supplier $supplier = null;
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
@@ -148,7 +72,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[FormField(title: '学员')]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    private Student $student;
+    private UserInterface $student;
 
     #[Ignore]
     #[Keyword(inputWidth: 60, name: 'course.title', label: '课程')]
@@ -193,15 +117,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '最后学习时间'])]
     private ?\DateTimeInterface $lastLearnTime = null;
 
-    #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'registration', targetEntity: FaceDetect::class)]
-    private Collection $faceDetects;
-
-    #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'registration', targetEntity: LearnSession::class, orphanRemoval: true)]
-    private Collection $sessions;
-
-    #[Ignore]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     private ?Qrcode $qrcode = null;
 
@@ -230,23 +145,49 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     private ?int $age = null;
 
     /**
-     * @var Collection<int, LearnLog>
-     */
-    #[ORM\OneToMany(mappedBy: 'registration', targetEntity: LearnLog::class)]
-    private Collection $learnLogs;
-
-    /**
      * @var Collection<int, AttendanceRecord>
      */
     #[Ignore]
-    #[ORM\OneToMany(mappedBy: 'registration', targetEntity: AttendanceRecord::class)]
+    #[ORM\OneToMany(targetEntity: AttendanceRecord::class, mappedBy: 'registration')]
     private Collection $attendanceRecords;
+
+    #[CreatedByColumn]
+    #[Groups(['restful_read'])]
+    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
+    private ?string $createdBy = null;
+
+    #[UpdatedByColumn]
+    #[Groups(['restful_read'])]
+    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
+    private ?string $updatedBy = null;
+
+    #[CreateIpColumn]
+    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
+    private ?string $createdFromIp = null;
+
+    #[UpdateIpColumn]
+    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
+    private ?string $updatedFromIp = null;
+
+    #[CreateUserAgentColumn]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '创建时UA'])]
+    private ?string $createdFromUa = null;
+
+    #[UpdateUserAgentColumn]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '更新时UA'])]
+    private ?string $updatedFromUa = null;
+
+    #[IndexColumn]
+    #[CreateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeInterface $createTime = null;
+
+    #[UpdateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
+    private ?\DateTimeInterface $updateTime = null;
 
     public function __construct()
     {
-        $this->faceDetects = new ArrayCollection();
-        $this->sessions = new ArrayCollection();
-        $this->learnLogs = new ArrayCollection();
         $this->attendanceRecords = new ArrayCollection();
     }
 
@@ -332,18 +273,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this->updatedFromUa;
     }
 
-    public function getSupplier(): ?Supplier
-    {
-        return $this->supplier;
-    }
-
-    public function setSupplier(?Supplier $supplier): static
-    {
-        $this->supplier = $supplier;
-
-        return $this;
-    }
-
     public function getClassroom(): Classroom
     {
         return $this->classroom;
@@ -358,12 +287,12 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this;
     }
 
-    public function getStudent(): Student
+    public function getStudent(): UserInterface
     {
         return $this->student;
     }
 
-    public function setStudent(Student $student): static
+    public function setStudent(UserInterface $student): static
     {
         $this->student = $student;
 
@@ -421,29 +350,29 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     /**
      * @return Collection<int, FaceDetect>
      */
-    public function getFaceDetects(): Collection
-    {
-        return $this->faceDetects;
-    }
+    // public function getFaceDetects(): Collection
+    // {
+    //     return $this->faceDetects;
+    // }
 
-    public function addFaceDetect(FaceDetect $faceDetect): static
+    public function addFaceDetect($faceDetect): static
     {
-        if (!$this->faceDetects->contains($faceDetect)) {
-            $this->faceDetects->add($faceDetect);
-            $faceDetect->setRegistration($this);
-        }
+        // if (!$this->faceDetects->contains($faceDetect)) {
+        //     $this->faceDetects->add($faceDetect);
+        //     $faceDetect->setRegistration($this);
+        // }
 
         return $this;
     }
 
-    public function removeFaceDetect(FaceDetect $faceDetect): static
+    public function removeFaceDetect($faceDetect): static
     {
-        if ($this->faceDetects->removeElement($faceDetect)) {
-            // set the owning side to null (unless already changed)
-            if ($faceDetect->getRegistration() === $this) {
-                $faceDetect->setRegistration(null);
-            }
-        }
+        // if ($this->faceDetects->removeElement($faceDetect)) {
+        //     // set the owning side to null (unless already changed)
+        //     if ($faceDetect->getRegistration() === $this) {
+        //         $faceDetect->setRegistration(null);
+        //     }
+        // }
 
         return $this;
     }
@@ -468,36 +397,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     public function setEndTime(?\DateTimeInterface $endTime): static
     {
         $this->endTime = $endTime;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, LearnSession>
-     */
-    public function getSessions(): Collection
-    {
-        return $this->sessions;
-    }
-
-    public function addSession(LearnSession $record): static
-    {
-        if (!$this->sessions->contains($record)) {
-            $this->sessions->add($record);
-            $record->setRegistration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSession(LearnSession $record): static
-    {
-        if ($this->sessions->removeElement($record)) {
-            // set the owning side to null (unless already changed)
-            if ($record->getRegistration() === $this) {
-                $record->setRegistration(null);
-            }
-        }
 
         return $this;
     }
@@ -576,66 +475,13 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
 
     public function retrieveApiArray(): array
     {
-        $learnStatus = $this->getLearnStatus();
-
         return [
             'id' => $this->getId(),
             'beginTime' => $this->getBeginTime()?->format('Y-m-d H:i:s'),
             'endTime' => $this->getEndTime()?->format('Y-m-d H:i:s'),
             'createTime' => $this->getCreateTime()?->format('Y-m-d H:i:s'),
             'classroom' => $this->getClassroom()->retrieveApiArray(),
-            'learnStatus' => [
-                'value' => $learnStatus->value,
-                'label' => $learnStatus->getLabel(),
-            ],
         ];
-    }
-
-    public function getSessionByLesson(Lesson $lesson): ?LearnSession
-    {
-        foreach ($this->getSessions() as $session) {
-            if ($session->getLesson()->getId() === $lesson->getId()) {
-                return $session;
-            }
-        }
-
-        return null;
-    }
-
-    public function getLearnStatus(): RegistrationLearnStatus
-    {
-        $finishCount = 0;
-        foreach ($this->getCourse()->getChapters() as $chapter) {
-            foreach ($chapter->getLessons() as $lesson) {
-                if ($session = $this->getSessionByLesson($lesson)) {
-                    if (!$session->isFinished()) {
-                        return RegistrationLearnStatus::LEARNING;
-                    }
-                    ++$finishCount;
-                }
-            }
-        }
-
-        if ($finishCount === $this->getCourse()->getLessonCount()) {
-            return RegistrationLearnStatus::FINISHED;
-        }
-
-        return RegistrationLearnStatus::PENDING; // 未开始学习
-    }
-
-    #[ORM\PrePersist]
-    public function ensureFilePath(): void
-    {
-        if (!$this->getCourse()) {
-            $this->setCourse($this->getClassroom()->getCourse());
-        }
-        if (!$this->getBank()) {
-            $this->setBank($this->getClassroom()->getBank());
-        }
-        if (null === $this->getPayPrice()) {
-            $price = $this->getCourse()->getPrice() + $this->getBank()->getPrice();
-            $this->setPayPrice($price);
-        }
     }
 
     public function isFinished(): ?bool
@@ -700,36 +546,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     }
 
     /**
-     * @return Collection<int, LearnLog>
-     */
-    public function getLearnLogs(): Collection
-    {
-        return $this->learnLogs;
-    }
-
-    public function addLearnLog(LearnLog $learnLog): static
-    {
-        if (!$this->learnLogs->contains($learnLog)) {
-            $this->learnLogs->add($learnLog);
-            $learnLog->setRegistration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLearnLog(LearnLog $learnLog): static
-    {
-        if ($this->learnLogs->removeElement($learnLog)) {
-            // set the owning side to null (unless already changed)
-            if ($learnLog->getRegistration() === $this) {
-                $learnLog->setRegistration(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, AttendanceRecord>
      */
     public function getAttendanceRecords(): Collection
@@ -750,12 +566,30 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     public function removeAttendanceRecord(AttendanceRecord $attendanceRecord): static
     {
         if ($this->attendanceRecords->removeElement($attendanceRecord)) {
-            // set the owning side to null (unless already changed)
-            if ($attendanceRecord->getRegistration() === $this) {
-                $attendanceRecord->setRegistration(null);
-            }
+            // 考勤记录被移除时，不需要设置关联为null，因为这可能破坏数据完整性
+            // 如果确实需要解除关联，应该在AttendanceRecord中添加支持nullable的setter方法
         }
 
         return $this;
+    }
+
+    public function setCreateTime(?\DateTimeInterface $createdAt): void
+    {
+        $this->createTime = $createdAt;
+    }
+
+    public function getCreateTime(): ?\DateTimeInterface
+    {
+        return $this->createTime;
+    }
+
+    public function setUpdateTime(?\DateTimeInterface $updateTime): void
+    {
+        $this->updateTime = $updateTime;
+    }
+
+    public function getUpdateTime(): ?\DateTimeInterface
+    {
+        return $this->updateTime;
     }
 }
