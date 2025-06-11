@@ -80,7 +80,7 @@ class AttendanceController extends AbstractController
                 'success' => false,
                 'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '考勤记录失败：' . $e->getMessage(),
@@ -111,7 +111,7 @@ class AttendanceController extends AbstractController
                 'message' => '批量导入完成',
                 'data' => $results,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '批量导入失败：' . $e->getMessage(),
@@ -142,7 +142,7 @@ class AttendanceController extends AbstractController
                 'success' => true,
                 'data' => $statistics,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取统计失败：' . $e->getMessage(),
@@ -174,7 +174,7 @@ class AttendanceController extends AbstractController
                 'success' => true,
                 'data' => $summary,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取汇总失败：' . $e->getMessage(),
@@ -212,7 +212,7 @@ class AttendanceController extends AbstractController
                     'count' => count($anomalies),
                 ],
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '检测异常失败：' . $e->getMessage(),
@@ -271,7 +271,7 @@ class AttendanceController extends AbstractController
                 'success' => false,
                 'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '补录考勤失败：' . $e->getMessage(),
@@ -303,7 +303,7 @@ class AttendanceController extends AbstractController
                 'success' => true,
                 'data' => $statistics,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取考勤率统计失败：' . $e->getMessage(),

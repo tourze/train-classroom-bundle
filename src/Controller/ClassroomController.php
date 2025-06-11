@@ -48,7 +48,7 @@ class ClassroomController extends AbstractController
                 'data' => $this->serializeClassroom($classroom),
                 'message' => '教室创建成功',
             ], 201);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -100,7 +100,7 @@ class ClassroomController extends AbstractController
                 'data' => $this->serializeClassroom($classroom),
                 'message' => '教室信息更新成功',
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -134,7 +134,7 @@ class ClassroomController extends AbstractController
                     'error' => '教室删除失败',
                 ], 400);
             }
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -209,7 +209,7 @@ class ClassroomController extends AbstractController
                 'data' => $this->serializeClassroom($classroom),
                 'message' => '教室状态更新成功',
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -244,7 +244,7 @@ class ClassroomController extends AbstractController
                     'end_time' => $endTime->format('Y-m-d H:i:s'),
                 ],
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -274,7 +274,7 @@ class ClassroomController extends AbstractController
                 'success' => true,
                 'data' => $stats,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -302,7 +302,7 @@ class ClassroomController extends AbstractController
                 'data' => $devices,
                 'total' => count($devices),
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -336,7 +336,7 @@ class ClassroomController extends AbstractController
                 'data' => $device,
                 'message' => '设备添加成功',
             ], 201);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -364,7 +364,7 @@ class ClassroomController extends AbstractController
                 'success' => true,
                 'data' => $data,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -393,7 +393,7 @@ class ClassroomController extends AbstractController
                 'data' => $results,
                 'message' => $dryRun ? '批量导入预览完成' : '批量导入完成',
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage(),

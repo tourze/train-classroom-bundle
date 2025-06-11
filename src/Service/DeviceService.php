@@ -162,7 +162,7 @@ class DeviceService implements DeviceServiceInterface
                 default:
                     return $this->testGenericDevice($deviceConfig);
             }
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -241,7 +241,7 @@ class DeviceService implements DeviceServiceInterface
                         'message' => '不支持的考勤方式',
                     ];
             }
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('考勤验证失败', [
                 'classroom_id' => $classroom->getId(),
                 'method' => $method->value,
@@ -369,7 +369,7 @@ class DeviceService implements DeviceServiceInterface
             try {
                 $this->syncSingleDevice($device, $options);
                 $results['success']++;
-            } catch  (\Throwable $e) {
+            } catch (\Throwable $e) {
                 $results['failed']++;
                 $results['errors'][] = [
                     'device_id' => $deviceId,

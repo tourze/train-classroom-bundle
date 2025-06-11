@@ -122,7 +122,7 @@ class UpdateScheduleStatusCommand extends Command
             ]);
 
             return Command::SUCCESS;
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             $io->error('状态更新失败: ' . $e->getMessage());
             $this->logger->error('排课状态更新失败', [
                 'error' => $e->getMessage(),

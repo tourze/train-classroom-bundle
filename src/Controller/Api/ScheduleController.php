@@ -85,7 +85,7 @@ class ScheduleController extends AbstractController
                 'success' => false,
                 'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '排课创建失败：' . $e->getMessage(),
@@ -142,7 +142,7 @@ class ScheduleController extends AbstractController
                     }, $conflicts),
                 ],
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '冲突检测失败：' . $e->getMessage(),
@@ -196,7 +196,7 @@ class ScheduleController extends AbstractController
                 'success' => false,
                 'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '状态更新失败：' . $e->getMessage(),
@@ -242,7 +242,7 @@ class ScheduleController extends AbstractController
                     'classrooms' => $availableClassrooms,
                 ],
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '查找可用教室失败：' . $e->getMessage(),
@@ -278,7 +278,7 @@ class ScheduleController extends AbstractController
                 'message' => '批量排课完成',
                 'data' => $results,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '批量排课失败：' . $e->getMessage(),
@@ -317,7 +317,7 @@ class ScheduleController extends AbstractController
                     'remark' => $cancelledSchedule->getRemark(),
                 ],
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '取消排课失败：' . $e->getMessage(),
@@ -374,7 +374,7 @@ class ScheduleController extends AbstractController
                 'success' => false,
                 'message' => $e->getMessage(),
             ], Response::HTTP_BAD_REQUEST);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '延期排课失败：' . $e->getMessage(),
@@ -413,7 +413,7 @@ class ScheduleController extends AbstractController
                 'success' => true,
                 'data' => $calendar,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取日历失败：' . $e->getMessage(),
@@ -458,7 +458,7 @@ class ScheduleController extends AbstractController
                 'success' => true,
                 'data' => $utilization,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取使用率统计失败：' . $e->getMessage(),
@@ -504,7 +504,7 @@ class ScheduleController extends AbstractController
                 'success' => true,
                 'data' => $statistics,
             ]);
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             return $this->json([
                 'success' => false,
                 'message' => '获取统计报表失败：' . $e->getMessage(),
