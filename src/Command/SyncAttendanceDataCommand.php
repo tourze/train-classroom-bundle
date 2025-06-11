@@ -142,7 +142,7 @@ class SyncAttendanceDataCommand extends Command
             }
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $io->error('同步过程中发生错误: ' . $e->getMessage());
             return Command::FAILURE;
         }

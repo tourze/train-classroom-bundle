@@ -116,7 +116,7 @@ class CleanupDataCommand extends Command
             $io->success(sprintf('数据清理完成，共清理 %d 项数据', $totalCleaned));
 
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $io->error('清理过程中发生错误: ' . $e->getMessage());
             return Command::FAILURE;
         }

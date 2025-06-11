@@ -228,7 +228,7 @@ class ScheduleService implements ScheduleServiceInterface
                 );
 
                 $results['success']++;
-            } catch (\Exception $e) {
+            } catch  (\Throwable $e) {
                 $results['failed']++;
                 $results['errors'][] = [
                     'index' => $index,

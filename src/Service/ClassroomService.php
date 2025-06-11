@@ -89,7 +89,7 @@ class ClassroomService implements ClassroomServiceInterface
             ]);
             
             return true;
-        } catch (\Exception $e) {
+        } catch  (\Throwable $e) {
             $this->logger->error('教室删除失败', [
                 'classroom_id' => $classroom->getId(),
                 'error' => $e->getMessage(),
@@ -307,7 +307,7 @@ class ClassroomService implements ClassroomServiceInterface
                 }
                 
                 $results['success']++;
-            } catch (\Exception $e) {
+            } catch  (\Throwable $e) {
                 $results['failed']++;
                 $results['errors'][] = [
                     'index' => $index,
