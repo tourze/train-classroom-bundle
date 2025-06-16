@@ -11,9 +11,7 @@
 - ✅ 班级信息管理（Classroom）- 支持班级基本信息、时间安排、课程关联、题库关联
 - ✅ 学员报名管理（Registration）- 支持学员报班、状态管理、学习记录关联
 - ✅ 二维码管理（Qrcode）- 支持报班二维码生成和管理
-- ✅ 培训分类关联 - 与ExamBundle的Category集成
 - ✅ 课程关联 - 与Course实体集成
-- ✅ 题库关联 - 与ExamBundle的Bank集成
 - ✅ 学习会话关联 - 与LearnSession集成
 - ✅ 人脸检测关联 - 与FaceDetect集成
 - ✅ 时间戳和用户追踪
@@ -225,7 +223,6 @@ class ClassroomStatisticsCommand extends Command
 ## 6. 依赖包
 
 - `train-course-bundle` - 课程管理
-- `exam-bundle` - 题库和分类
 - `train-record-bundle` - 学习记录
 - `face-detect-bundle` - 人脸识别
 - `doctrine-entity-checker-bundle` - 实体检查
