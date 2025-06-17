@@ -6,7 +6,7 @@ namespace Tourze\TrainClassroomBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Enum\ClassroomStatus;
 use Tourze\TrainClassroomBundle\Enum\ClassroomType;
