@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ExamBundle\Entity\Bank;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
@@ -80,11 +79,6 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
 
-    #[ListColumn(title: '关联题库')]
-    #[FormField(title: '关联题库')]
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Bank $bank = null;
 
     #[Ignore]
     #[CurdAction(label: '报班学员', drawerWidth: 1200)]
@@ -379,17 +373,6 @@ class Classroom implements \Stringable, ApiArrayInterface
         return $this;
     }
 
-    public function getBank(): ?Bank
-    {
-        return $this->bank;
-    }
-
-    public function setBank(?Bank $bank): static
-    {
-        $this->bank = $bank;
-
-        return $this;
-    }
 
     public function retrieveApiArray(): array
     {

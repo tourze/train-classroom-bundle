@@ -23,7 +23,6 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 #[ORM\Index(columns: ['classroom_id'], name: 'idx_classroom_id')]
 #[ORM\Index(columns: ['schedule_date'], name: 'idx_schedule_date')]
 #[ORM\Index(columns: ['teacher_id'], name: 'idx_teacher_id')]
-#[ORM\Index(columns: ['supplier_id'], name: 'idx_supplier_id')]
 #[ORM\UniqueConstraint(name: 'uk_classroom_time', columns: ['classroom_id', 'start_time', 'end_time'])]
 class ClassroomSchedule
 {

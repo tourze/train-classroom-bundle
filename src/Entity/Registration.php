@@ -2,12 +2,11 @@
 
 namespace Tourze\TrainClassroomBundle\Entity;
 
+use BizUserBundle\Entity\BizUser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ExamBundle\Entity\Bank;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
@@ -72,7 +71,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[FormField(title: '学员')]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    private UserInterface $student;
+    private BizUser $student;
 
     #[Ignore]
     #[Keyword(inputWidth: 60, name: 'course.title', label: '课程')]
@@ -80,11 +79,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
 
-    #[Ignore]
-    #[Keyword(inputWidth: 60, name: 'bank.title', label: '题库')]
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private Bank $bank;
 
     #[Groups(['admin_curd'])]
     #[ORM\Column(length: 10, nullable: true, enumType: TrainType::class, options: ['comment' => '培训类型'])]
@@ -287,12 +281,12 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this;
     }
 
-    public function getStudent(): UserInterface
+    public function getStudent(): BizUser
     {
         return $this->student;
     }
 
-    public function setStudent(UserInterface $student): static
+    public function setStudent(BizUser $student): static
     {
         $this->student = $student;
 
@@ -311,17 +305,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this;
     }
 
-    public function getBank(): Bank
-    {
-        return $this->bank;
-    }
-
-    public function setBank(Bank $bank): static
-    {
-        $this->bank = $bank;
-
-        return $this;
-    }
 
     public function getFirstLearnTime(): ?\DateTimeInterface
     {
