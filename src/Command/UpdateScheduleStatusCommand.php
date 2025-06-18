@@ -62,7 +62,7 @@ class UpdateScheduleStatusCommand extends Command
 
         $io->title('排课状态更新');
 
-        if ($dryRun !== null) {
+        if ($dryRun) {
             $io->note('运行在试运行模式，不会实际更新数据');
         }
 
@@ -107,7 +107,7 @@ class UpdateScheduleStatusCommand extends Command
             );
 
             if ($stats['total_processed'] > 0) {
-                if ($dryRun !== null) {
+                if ($dryRun) {
                     $io->success(sprintf('试运行完成，发现 %d 条记录需要更新', $stats['total_processed']));
                 } else {
                     $io->success(sprintf('状态更新完成，共更新 %d 条记录', $stats['total_processed']));
@@ -153,7 +153,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (($dryRun === null)) {
+                if (!$dryRun) {
                     $schedule->setStatus(ScheduleStatus::ONGOING);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);
@@ -193,7 +193,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (($dryRun === null)) {
+                if (!$dryRun) {
                     $schedule->setStatus(ScheduleStatus::COMPLETED);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);
@@ -233,7 +233,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (($dryRun === null)) {
+                if (!$dryRun) {
                     $schedule->setStatus(ScheduleStatus::COMPLETED);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);

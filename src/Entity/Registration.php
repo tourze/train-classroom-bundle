@@ -15,8 +15,6 @@ use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
@@ -172,10 +170,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '更新时UA'])]
     private ?string $updatedFromUa = null;
 
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]public function __construct()
+    public function __construct()
     {
         $this->attendanceRecords = new ArrayCollection();
     }
@@ -271,7 +266,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     {
         $this->classroom = $classroom;
         $this->setCourse($classroom->getCourse());
-        $this->setBank($classroom->getBank());
 
         return $this;
     }

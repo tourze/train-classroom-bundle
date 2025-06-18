@@ -70,7 +70,7 @@ class SyncAttendanceDataCommand extends Command
 
         $io->title('考勤数据同步工具');
 
-        if ($dryRun !== null) {
+        if ($dryRun) {
             $io->note('运行在试运行模式，不会实际写入数据');
         }
 
@@ -96,7 +96,7 @@ class SyncAttendanceDataCommand extends Command
             foreach ($batches as $batchIndex => $batch) {
                 $io->section(sprintf('处理批次 %d/%d (%d 条记录)', $batchIndex + 1, $totalBatches, count($batch)));
 
-                if (($dryRun === null)) {
+                if (!$dryRun) {
                     $results = $this->attendanceService->batchImportAttendance($batch);
                     $totalSuccess += $results['success'];
                     $totalFailed += $results['failed'];

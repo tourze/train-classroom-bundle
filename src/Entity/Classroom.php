@@ -9,10 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\CurdAction;
@@ -96,18 +93,7 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ORM\OneToMany(targetEntity: ClassroomSchedule::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $schedules;
 
-    #[Filterable]
-    #[IndexColumn]
-    #[ListColumn(order: 98, sorter: true)]
-    #[ExportColumn]
-    #[CreateTimeColumn]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
-    #[ListColumn(order: 99, sorter: true)]
-    #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[Filterable]
-    #[ExportColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]#[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室类型'])]
+    #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室类型'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室状态'])]
