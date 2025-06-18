@@ -120,7 +120,7 @@ class ClassroomScheduleRepository extends ServiceEntityRepository
             ->setParameter('startTime', $startTime)
             ->setParameter('endTime', $endTime);
 
-        if ($excludeId) {
+        if ($excludeId !== null) {
             $qb->andWhere('s.id != :excludeId')
                 ->setParameter('excludeId', $excludeId);
         }
@@ -146,7 +146,7 @@ class ClassroomScheduleRepository extends ServiceEntityRepository
             ->setParameter('startTime', $startTime)
             ->setParameter('endTime', $endTime);
 
-        if ($excludeId) {
+        if ($excludeId !== null) {
             $qb->andWhere('s.id != :excludeId')
                 ->setParameter('excludeId', $excludeId);
         }

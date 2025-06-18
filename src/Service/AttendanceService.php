@@ -75,7 +75,7 @@ class AttendanceService implements AttendanceServiceInterface
                 $registration = $this->entityManager->getRepository(Registration::class)
                     ->find($data['registration_id']);
 
-                if (!$registration) {
+                if (($registration === null)) {
                     throw new \InvalidArgumentException('报名记录不存在');
                 }
 
@@ -333,7 +333,7 @@ class AttendanceService implements AttendanceServiceInterface
     private function calculateTotalCourseDays(Registration $registration): int
     {
         $course = $registration->getCourse();
-        if (!$course || !$course->getStartTime() || !$course->getEndTime()) {
+        if (!$course || !$course->getStartTime() || ($course->getEndTime() === null)) {
             return 0;
         }
 

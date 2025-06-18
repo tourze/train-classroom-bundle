@@ -13,6 +13,7 @@ use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\CurdAction;
 use Tourze\EasyAdmin\Attribute\Action\Deletable;
@@ -37,6 +38,7 @@ use Tourze\TrainCourseBundle\Entity\Course;
 #[ORM\Table(name: 'job_training_classroom', options: ['comment' => '班级信息'])]
 class Classroom implements \Stringable, ApiArrayInterface
 {
+    use TimestampableAware;
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
@@ -79,7 +81,6 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
 
-
     #[Ignore]
     #[CurdAction(label: '报班学员', drawerWidth: 1200)]
     #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'classroom', orphanRemoval: true)]
@@ -101,18 +102,12 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ExportColumn]
     #[CreateTimeColumn]
     #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
-
-    #[UpdateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
     #[ListColumn(order: 99, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'restful_read'])]
     #[Filterable]
     #[ExportColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
-    private ?\DateTimeInterface $updateTime = null;
-
-    #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室类型'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]#[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室类型'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 20, nullable: true, options: ['comment' => '教室状态'])]
@@ -151,7 +146,7 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     public function __toString(): string
     {
-        if (!$this->getId()) {
+        if (($this->getId() === null)) {
             return '';
         }
 
@@ -271,19 +266,7 @@ class Classroom implements \Stringable, ApiArrayInterface
     {
         $this->updatedBy = $updatedBy;
         return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function getUpdateTime(): ?\DateTimeInterface
-    {
-        return $this->updateTime;
-    }
-
-    public function getTitle(): string
+    }public function getTitle(): string
     {
         return $this->title;
     }
@@ -372,7 +355,6 @@ class Classroom implements \Stringable, ApiArrayInterface
 
         return $this;
     }
-
 
     public function retrieveApiArray(): array
     {

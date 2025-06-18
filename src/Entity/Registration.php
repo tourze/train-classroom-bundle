@@ -17,6 +17,7 @@ use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
@@ -51,6 +52,7 @@ use Tourze\TrainCourseBundle\Entity\Course;
 #[ORM\HasLifecycleCallbacks]
 class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
+    use TimestampableAware;
     #[ExportColumn]
     #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
@@ -78,7 +80,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
-
 
     #[Groups(['admin_curd'])]
     #[ORM\Column(length: 10, nullable: true, enumType: TrainType::class, options: ['comment' => '培训类型'])]
@@ -173,21 +174,15 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
 
     #[IndexColumn]
     #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
-
-    #[UpdateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]
-    private ?\DateTimeInterface $updateTime = null;
-
-    public function __construct()
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]#[UpdateTimeColumn]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '更新时间'])]public function __construct()
     {
         $this->attendanceRecords = new ArrayCollection();
     }
 
     public function __toString(): string
     {
-        if (!$this->getId()) {
+        if (($this->getId() === null)) {
             return '';
         }
 
@@ -304,7 +299,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
 
         return $this;
     }
-
 
     public function getFirstLearnTime(): ?\DateTimeInterface
     {
@@ -554,25 +548,4 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         }
 
         return $this;
-    }
-
-    public function setCreateTime(?\DateTimeInterface $createdAt): void
-    {
-        $this->createTime = $createdAt;
-    }
-
-    public function getCreateTime(): ?\DateTimeInterface
-    {
-        return $this->createTime;
-    }
-
-    public function setUpdateTime(?\DateTimeInterface $updateTime): void
-    {
-        $this->updateTime = $updateTime;
-    }
-
-    public function getUpdateTime(): ?\DateTimeInterface
-    {
-        return $this->updateTime;
-    }
-}
+    }}

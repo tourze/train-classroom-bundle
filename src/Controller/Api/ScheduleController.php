@@ -49,7 +49,7 @@ class ScheduleController extends AbstractController
             $classroom = $this->entityManager->getRepository(Classroom::class)
                 ->find($data['classroom_id']);
 
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '教室不存在',
@@ -112,7 +112,7 @@ class ScheduleController extends AbstractController
             $classroom = $this->entityManager->getRepository(Classroom::class)
                 ->find($data['classroom_id']);
 
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '教室不存在',
@@ -160,7 +160,7 @@ class ScheduleController extends AbstractController
             $schedule = $this->entityManager->getRepository(ClassroomSchedule::class)
                 ->find($id);
 
-            if (!$schedule) {
+            if (($schedule === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '排课记录不存在',
@@ -214,7 +214,7 @@ class ScheduleController extends AbstractController
             $startTime = $request->query->get('start_time');
             $endTime = $request->query->get('end_time');
 
-            if (!$startTime || !$endTime) {
+            if (!$startTime || ($endTime === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '缺少必需参数：start_time, end_time',
@@ -296,7 +296,7 @@ class ScheduleController extends AbstractController
             $schedule = $this->entityManager->getRepository(ClassroomSchedule::class)
                 ->find($id);
 
-            if (!$schedule) {
+            if (($schedule === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '排课记录不存在',
@@ -335,7 +335,7 @@ class ScheduleController extends AbstractController
             $schedule = $this->entityManager->getRepository(ClassroomSchedule::class)
                 ->find($id);
 
-            if (!$schedule) {
+            if (($schedule === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '排课记录不存在',
@@ -392,7 +392,7 @@ class ScheduleController extends AbstractController
             $startDate = $request->query->get('start_date');
             $endDate = $request->query->get('end_date');
 
-            if (!$startDate || !$endDate) {
+            if (!$startDate || ($endDate === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '缺少必需参数：start_date, end_date',
@@ -431,7 +431,7 @@ class ScheduleController extends AbstractController
             $classroom = $this->entityManager->getRepository(Classroom::class)
                 ->find($classroomId);
 
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '教室不存在',
@@ -441,7 +441,7 @@ class ScheduleController extends AbstractController
             $startDate = $request->query->get('start_date');
             $endDate = $request->query->get('end_date');
 
-            if (!$startDate || !$endDate) {
+            if (!$startDate || ($endDate === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '缺少必需参数：start_date, end_date',
@@ -476,7 +476,7 @@ class ScheduleController extends AbstractController
             $startDate = $request->query->get('start_date');
             $endDate = $request->query->get('end_date');
 
-            if (!$startDate || !$endDate) {
+            if (!$startDate || ($endDate === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '缺少必需参数：start_date, end_date',

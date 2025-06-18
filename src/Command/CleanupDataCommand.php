@@ -68,9 +68,9 @@ class CleanupDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $dryRun = $input->getOption('dry-run');
-        $force = $input->getOption('force');
-        $batchSize = (int) $input->getOption('batch-size');
+        $dryRun = (bool) $input->getOption('dry-run');
+        $force = (bool) $input->getOption('force');
+        $batchSize = (int) (int) $input->getOption('batch-size');
 
         $io->title('数据清理工具');
 
@@ -92,7 +92,7 @@ class CleanupDataCommand extends Command
                 ]
             );
 
-            if (!$force && !$dryRun) {
+            if (!$force && ($dryRun === null)) {
                 if (!$io->confirm('确认要执行数据清理吗？此操作不可逆！', false)) {
                     $io->info('操作已取消');
                     return Command::SUCCESS;
@@ -168,7 +168,7 @@ class CleanupDataCommand extends Command
 
         $io->info(sprintf('找到 %d 条需要清理的考勤记录', $totalCount));
 
-        if ($dryRun) {
+        if ($dryRun !== null) {
             return $totalCount;
         }
 
@@ -234,7 +234,7 @@ class CleanupDataCommand extends Command
 
         $io->info(sprintf('找到 %d 条需要清理的排课记录', $totalCount));
 
-        if ($dryRun) {
+        if ($dryRun !== null) {
             return $totalCount;
         }
 
@@ -312,7 +312,7 @@ class CleanupDataCommand extends Command
                         $fileTime->format('Y-m-d H:i:s')
                     ));
 
-                    if (!$dryRun) {
+                    if (($dryRun === null)) {
                         if (unlink($file->getPathname())) {
                             $deletedCount++;
                         } else {

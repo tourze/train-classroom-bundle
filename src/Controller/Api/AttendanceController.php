@@ -48,7 +48,7 @@ class AttendanceController extends AbstractController
             $registration = $this->entityManager->getRepository(Registration::class)
                 ->find($data['registration_id']);
 
-            if (!$registration) {
+            if (($registration === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',
@@ -129,7 +129,7 @@ class AttendanceController extends AbstractController
             $registration = $this->entityManager->getRepository(Registration::class)
                 ->find($registrationId);
 
-            if (!$registration) {
+            if (($registration === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',
@@ -192,7 +192,7 @@ class AttendanceController extends AbstractController
             $registration = $this->entityManager->getRepository(Registration::class)
                 ->find($registrationId);
 
-            if (!$registration) {
+            if (($registration === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',
@@ -241,7 +241,7 @@ class AttendanceController extends AbstractController
             $registration = $this->entityManager->getRepository(Registration::class)
                 ->find($data['registration_id']);
 
-            if (!$registration) {
+            if (($registration === null)) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',

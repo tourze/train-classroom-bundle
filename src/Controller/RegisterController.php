@@ -32,7 +32,7 @@ class RegisterController extends AbstractController
             'id' => $id,
             'valid' => true,
         ]);
-        if (!$qrcode) {
+        if (($qrcode === null)) {
             throw new NotFoundHttpException('二维码无效');
         }
         // TODO: 实现报名人数检查逻辑
@@ -62,7 +62,7 @@ class RegisterController extends AbstractController
             'id' => $id,
             'valid' => true,
         ]);
-        if (!$qrcode) {
+        if (($qrcode === null)) {
             throw new NotFoundHttpException('二维码无效');
         }
         // TODO: 实现报名人数检查逻辑
@@ -86,7 +86,7 @@ class RegisterController extends AbstractController
         // TODO: 这里需要根据实际的用户系统来查找用户
         // $student = $this->studentRepository->findOneBy(['idCardNumber' => $cardNumber]);
         $student = null; // 临时注释，需要根据实际情况实现
-        if (!$student) {
+        if (($student === null)) {
             // $student = new Student();
             // $student->setIdCardType($cardType);
             // $student->setIdCardNumber($cardNumber);
@@ -96,7 +96,7 @@ class RegisterController extends AbstractController
                 'student' => $student,
                 'classroom' => $qrcode->getClassroom(),
             ]);
-            if ($registration) {
+            if ($registration !== null) {
                 return $this->json([
                     'code' => 1,
                     'message' => '您已经报名，不需要重复报名',
@@ -109,7 +109,7 @@ class RegisterController extends AbstractController
         //     'student' => $student,
         //     'classroom' => $qrcode->getClassroom(),
         // ]);
-        // if ($registration) {
+        // if ($registration !== null) {
         //     return $this->json([
         //         'code' => 1,
         //         'message' => '您已报名过，不需要重复报名',

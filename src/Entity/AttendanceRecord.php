@@ -11,6 +11,7 @@ use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
@@ -28,6 +29,7 @@ use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 #[ORM\Index(name: 'idx_attendance_type', columns: ['attendance_type'])]
 class AttendanceRecord
 {
+    use TimestampableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -284,19 +286,7 @@ class AttendanceRecord
     {
         $this->remark = $remark;
         return $this;
-    }
-
-    public function getCreateTime(): \DateTimeImmutable
-    {
-        return $this->createTime;
-    }
-
-    public function getUpdateTime(): \DateTimeImmutable
-    {
-        return $this->updateTime;
-    }
-
-    public function getCreatedBy(): ?string
+    }public function getCreatedBy(): ?string
     {
         return $this->createdBy;
     }

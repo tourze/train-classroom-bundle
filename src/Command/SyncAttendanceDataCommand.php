@@ -65,12 +65,12 @@ class SyncAttendanceDataCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $source = $input->getArgument('source');
-        $dryRun = $input->getOption('dry-run');
-        $batchSize = (int) $input->getOption('batch-size');
+        $dryRun = (bool) $input->getOption('dry-run');
+        $batchSize = (int) (int) $input->getOption('batch-size');
 
         $io->title('考勤数据同步工具');
 
-        if ($dryRun) {
+        if ($dryRun !== null) {
             $io->note('运行在试运行模式，不会实际写入数据');
         }
 
@@ -96,7 +96,7 @@ class SyncAttendanceDataCommand extends Command
             foreach ($batches as $batchIndex => $batch) {
                 $io->section(sprintf('处理批次 %d/%d (%d 条记录)', $batchIndex + 1, $totalBatches, count($batch)));
 
-                if (!$dryRun) {
+                if (($dryRun === null)) {
                     $results = $this->attendanceService->batchImportAttendance($batch);
                     $totalSuccess += $results['success'];
                     $totalFailed += $results['failed'];
@@ -171,7 +171,7 @@ class SyncAttendanceDataCommand extends Command
     private function loadFromFile(InputInterface $input, SymfonyStyle $io): array
     {
         $filePath = $input->getOption('file');
-        if (!$filePath) {
+        if (($filePath === null)) {
             throw new \InvalidArgumentException('使用文件数据源时必须指定 --file 参数');
         }
 
@@ -246,7 +246,7 @@ class SyncAttendanceDataCommand extends Command
     private function loadFromApi(InputInterface $input, SymfonyStyle $io): array
     {
         $apiUrl = $input->getOption('api-url');
-        if (!$apiUrl) {
+        if (($apiUrl === null)) {
             throw new \InvalidArgumentException('使用API数据源时必须指定 --api-url 参数');
         }
 
@@ -294,7 +294,7 @@ class SyncAttendanceDataCommand extends Command
     private function loadFromDatabase(InputInterface $input, SymfonyStyle $io): array
     {
         $dsn = $input->getOption('database-dsn');
-        if (!$dsn) {
+        if (($dsn === null)) {
             throw new \InvalidArgumentException('使用数据库数据源时必须指定 --database-dsn 参数');
         }
 

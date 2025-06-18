@@ -37,7 +37,7 @@ class ClassroomController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
-            if (!$data) {
+            if (($data === null)) {
                 return $this->json(['error' => '无效的JSON数据'], 400);
             }
             
@@ -64,7 +64,7 @@ class ClassroomController extends AbstractController
     {
         $classroom = $this->classroomService->getClassroomById($id);
         
-        if (!$classroom) {
+        if (($classroom === null)) {
             return $this->json(['error' => '教室不存在'], 404);
         }
         
@@ -83,13 +83,13 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
             $data = json_decode($request->getContent(), true);
             
-            if (!$data) {
+            if (($data === null)) {
                 return $this->json(['error' => '无效的JSON数据'], 400);
             }
             
@@ -117,13 +117,13 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
             $success = $this->classroomService->deleteClassroom($classroom);
             
-            if ($success) {
+            if ($success !== null) {
                 return $this->json([
                     'success' => true,
                     'message' => '教室删除成功',
@@ -189,7 +189,7 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
@@ -226,7 +226,7 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
@@ -261,7 +261,7 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
@@ -291,7 +291,7 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
@@ -319,13 +319,13 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             
             $data = json_decode($request->getContent(), true);
             
-            if (!$data) {
+            if (($data === null)) {
                 return $this->json(['error' => '无效的JSON数据'], 400);
             }
             
@@ -353,7 +353,7 @@ class ClassroomController extends AbstractController
         try {
             $classroom = $this->classroomService->getClassroomById($id);
             
-            if (!$classroom) {
+            if (($classroom === null)) {
                 return $this->json(['error' => '教室不存在'], 404);
             }
             

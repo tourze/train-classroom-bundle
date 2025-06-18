@@ -298,11 +298,11 @@ class ClassroomService implements ClassroomServiceInterface
                 
                 // 检查是否已存在
                 $existing = $this->classroomRepository->findOneBy(['name' => $data['name']]);
-                if ($existing) {
+                if ($existing !== null) {
                     throw new \InvalidArgumentException('教室名称已存在');
                 }
                 
-                if (!$dryRun) {
+                if (($dryRun === null)) {
                     $this->createClassroom($data);
                 }
                 

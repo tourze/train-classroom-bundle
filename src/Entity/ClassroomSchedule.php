@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
@@ -26,6 +27,7 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 #[ORM\UniqueConstraint(name: 'uk_classroom_time', columns: ['classroom_id', 'start_time', 'end_time'])]
 class ClassroomSchedule
 {
+    use TimestampableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -268,19 +270,7 @@ class ClassroomSchedule
     {
         $this->remark = $remark;
         return $this;
-    }
-
-    public function getCreateTime(): \DateTimeImmutable
-    {
-        return $this->createTime;
-    }
-
-    public function getUpdateTime(): \DateTimeImmutable
-    {
-        return $this->updateTime;
-    }
-
-    public function getCreatedBy(): ?string
+    }public function getCreatedBy(): ?string
     {
         return $this->createdBy;
     }

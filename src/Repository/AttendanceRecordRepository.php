@@ -180,4 +180,21 @@ class AttendanceRecordRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * 查找过期的报名记录
+     * 
+     * @param \DateTimeInterface $expiryDate
+     * @return array
+     */
+    public function findExpiredRegistrations(\DateTimeInterface $expiryDate): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.status = :status')
+            ->andWhere('r.createdAt < :expiryDate')
+            ->setParameter('status', 'pending')
+            ->setParameter('expiryDate', $expiryDate)
+            ->getQuery()
+            ->getResult();
+    }
 } 

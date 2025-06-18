@@ -105,7 +105,7 @@ class ScheduleService implements ScheduleServiceInterface
         $oldStatus = $schedule->getStatus();
         $schedule->setStatus($status);
         
-        if ($reason) {
+        if ($reason !== null) {
             $currentRemark = $schedule->getRemark();
             $newRemark = $currentRemark 
                 ? $currentRemark . "\n状态变更：{$oldStatus->getDescription()} -> {$status->getDescription()}，原因：{$reason}"
@@ -200,7 +200,7 @@ class ScheduleService implements ScheduleServiceInterface
                 $classroom = $this->entityManager->getRepository(Classroom::class)
                     ->find($data['classroom_id']);
 
-                if (!$classroom) {
+                if (($classroom === null)) {
                     throw new \InvalidArgumentException('教室不存在');
                 }
 
@@ -210,7 +210,7 @@ class ScheduleService implements ScheduleServiceInterface
                 // 检查冲突
                 $conflicts = $this->detectScheduleConflicts($classroom, $startTime, $endTime);
                 if (!empty($conflicts)) {
-                    if ($skipConflicts) {
+                    if ($skipConflicts !== null) {
                         $results['skipped']++;
                         continue;
                     } else {

@@ -56,13 +56,13 @@ class UpdateScheduleStatusCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $dryRun = $input->getOption('dry-run');
-        $batchSize = (int) $input->getOption('batch-size');
-        $force = $input->getOption('force');
+        $dryRun = (bool) $input->getOption('dry-run');
+        $batchSize = (int) (int) $input->getOption('batch-size');
+        $force = (bool) $input->getOption('force');
 
         $io->title('排课状态更新');
 
-        if ($dryRun) {
+        if ($dryRun !== null) {
             $io->note('运行在试运行模式，不会实际更新数据');
         }
 
@@ -107,7 +107,7 @@ class UpdateScheduleStatusCommand extends Command
             );
 
             if ($stats['total_processed'] > 0) {
-                if ($dryRun) {
+                if ($dryRun !== null) {
                     $io->success(sprintf('试运行完成，发现 %d 条记录需要更新', $stats['total_processed']));
                 } else {
                     $io->success(sprintf('状态更新完成，共更新 %d 条记录', $stats['total_processed']));
@@ -153,7 +153,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (!$dryRun) {
+                if (($dryRun === null)) {
                     $schedule->setStatus(ScheduleStatus::ONGOING);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);
@@ -161,7 +161,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (!$dryRun) {
+            if (($dryRun === null)) {
                 $this->entityManager->flush();
             }
 
@@ -193,7 +193,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (!$dryRun) {
+                if (($dryRun === null)) {
                     $schedule->setStatus(ScheduleStatus::COMPLETED);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);
@@ -201,7 +201,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (!$dryRun) {
+            if (($dryRun === null)) {
                 $this->entityManager->flush();
             }
 
@@ -233,7 +233,7 @@ class UpdateScheduleStatusCommand extends Command
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
-                if (!$dryRun) {
+                if (($dryRun === null)) {
                     $schedule->setStatus(ScheduleStatus::COMPLETED);
                     $schedule->setUpdatedAt(new \DateTime());
                     $this->entityManager->persist($schedule);
@@ -241,7 +241,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (!$dryRun) {
+            if (($dryRun === null)) {
                 $this->entityManager->flush();
             }
 
