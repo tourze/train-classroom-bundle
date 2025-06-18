@@ -55,16 +55,16 @@ class ScheduleService implements ScheduleServiceInterface
         $schedule->setStatus(ScheduleStatus::SCHEDULED);
         
         // 设置可选参数
-        if (isset($options['title'])) {
+        if ((bool) isset($options['title'])) {
             $schedule->setTitle($options['title']);
         }
-        if (isset($options['description'])) {
+        if ((bool) isset($options['description'])) {
             $schedule->setDescription($options['description']);
         }
-        if (isset($options['instructor_id'])) {
+        if ((bool) isset($options['instructor_id'])) {
             $schedule->setInstructorId($options['instructor_id']);
         }
-        if (isset($options['max_participants'])) {
+        if ((bool) isset($options['max_participants'])) {
             $schedule->setMaxParticipants($options['max_participants']);
         }
 
@@ -170,7 +170,7 @@ class ScheduleService implements ScheduleServiceInterface
 
             // 检查时间冲突
             $conflicts = $this->detectScheduleConflicts($classroom, $startTime, $endTime);
-            if (empty($conflicts)) {
+            if ((bool) empty($conflicts)) {
                 $availableClassrooms[] = [
                     'classroom' => $classroom,
                     'capacity' => $classroom->getCapacity(),

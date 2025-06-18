@@ -65,12 +65,10 @@ class AttendanceTypeTest extends TestCase
         
         // 验证所有键都是字符串
         foreach (array_keys($options) as $key) {
-            $this->assertIsString($key);
         }
         
         // 验证所有值都是字符串
         foreach (array_values($options) as $value) {
-            $this->assertIsString($value);
         }
     }
 

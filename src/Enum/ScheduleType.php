@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 排课类型枚举
  * 定义不同的排课类型
  */
 enum ScheduleType: string
-{
-    /**
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+/**
      * 常规课程
      */
     case REGULAR = 'REGULAR';
@@ -86,5 +95,13 @@ enum ScheduleType: string
     public function isAssessment(): bool
     {
         return $this === self::EXAM;
+    }
+
+    public function getLabel(): string
+    {
+        return match($this) {
+            // TODO: 添加具体的标签映射
+            default => $this->name,
+        };
     }
 } 

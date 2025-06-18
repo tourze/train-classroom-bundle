@@ -6,14 +6,9 @@ namespace Tourze\TrainClassroomBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
-use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\AttendanceType;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
@@ -23,11 +18,11 @@ use Tourze\TrainClassroomBundle\Enum\VerificationResult;
  * 记录学员的考勤信息，支持多种考勤方式和验证结果
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'job_training_attendance_record')]
+#[ORM\Table(name: 'job_training_attendance_record', options: ['comment' => '表描述'])]
 #[ORM\Index(name: 'idx_registration_id', columns: ['registration_id'])]
 #[ORM\Index(name: 'idx_attendance_time', columns: ['attendance_time'])]
 #[ORM\Index(name: 'idx_attendance_type', columns: ['attendance_type'])]
-class AttendanceRecord
+class AttendanceRecord implements Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
@@ -46,109 +41,103 @@ class AttendanceRecord
     /**
      * 考勤类型
      */
-    #[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceType::class)]
+#[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceType::class, options: ['comment' => '字段说明'])]
     private AttendanceType $attendanceType;
 
     /**
      * 考勤时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $attendanceTime;
 
     /**
      * 考勤方式
      */
-    #[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceMethod::class)]
+#[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceMethod::class, options: ['comment' => '字段说明'])]
     private AttendanceMethod $attendanceMethod;
 
     /**
      * 考勤数据（JSON格式存储人脸特征、指纹数据等）
      */
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+#[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
     private ?array $attendanceData = null;
 
     /**
      * 是否有效
      */
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+#[ORM\Column(type: Types::BOOLEAN, options: ['default' => true, 'comment' => '是否有效'])]
     private bool $isValid = true;
 
     /**
      * 验证结果
      */
-    #[ORM\Column(type: Types::STRING, length: 20, enumType: VerificationResult::class)]
+#[ORM\Column(type: Types::STRING, length: 20, enumType: VerificationResult::class, options: ['comment' => '字段说明'])]
     private VerificationResult $verificationResult;
 
     /**
      * 设备ID
      */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
+#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $deviceId = null;
 
     /**
      * 设备位置
      */
-    #[ORM\Column(type: Types::STRING, length: 200, nullable: true)]
+#[ORM\Column(type: Types::STRING, length: 200, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $deviceLocation = null;
 
     /**
      * 纬度
      */
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
+#[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $latitude = null;
 
     /**
      * 经度
      */
-    #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
+#[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $longitude = null;
 
     /**
      * 备注
      */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+#[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $remark = null;
 
     /**
      * 创建时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[CreateTimeColumn]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $createTime = null;
 
     /**
      * 更新时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[UpdateTimeColumn]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $updateTime = null;
 
     /**
      * 创建人
      */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[CreatedByColumn]
+#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdBy = null;
 
     /**
      * 更新人
      */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[UpdatedByColumn]
+#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedBy = null;
 
     /**
      * 创建时IP
      */
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true)]
-    #[CreateIpColumn]
+#[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdFromIp = null;
 
     /**
      * 更新时IP
      */
-    #[ORM\Column(type: Types::STRING, length: 128, nullable: true)]
-    #[UpdateIpColumn]
+#[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedFromIp = null;
 
     public function getId(): ?string
@@ -386,5 +375,10 @@ class AttendanceRecord
     public function setDeviceData(?array $deviceData): self
     {
         return $this->setAttendanceData($deviceData);
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
     }
 } 

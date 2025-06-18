@@ -28,7 +28,7 @@ class RegistrationRepository extends ServiceEntityRepository
     {
         $this->getEntityManager()->persist($registration);
         
-        if ($flush) {
+        if ((bool) $flush) {
             $this->getEntityManager()->flush();
         }
     }

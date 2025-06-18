@@ -11,7 +11,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
@@ -20,17 +19,8 @@ use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\BoolColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\TrainClassroomBundle\Enum\OrderStatus;
 use Tourze\TrainClassroomBundle\Enum\TrainType;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
@@ -39,11 +29,7 @@ use Tourze\TrainCourseBundle\Entity\Course;
 /**
  * 通过报班记录，可以知道每个人的学习情况
  */
-#[AsPermission(title: '报班记录')]
 #[Listable]
-#[Creatable]
-#[Editable]
-#[Deletable]
 #[ORM\Entity(repositoryClass: RegistrationRepository::class)]
 #[ORM\Table(name: 'job_training_class_registration', options: ['comment' => '报班记录'])]
 #[ORM\UniqueConstraint(name: 'job_training_class_registration_idx_uniq', columns: ['classroom_id', 'student_id'])]
@@ -51,8 +37,6 @@ use Tourze\TrainCourseBundle\Entity\Course;
 class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -67,8 +51,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[Ignore]
     #[Keyword(inputWidth: 60, name: 'student.realName', label: '学生姓名')]
     #[Keyword(inputWidth: 60, name: 'student.idCardNumber', label: '证件号码')]
-    #[ListColumn(title: '学员')]
-    #[FormField(title: '学员')]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
     private BizUser $student;
@@ -83,52 +65,37 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\Column(length: 10, nullable: true, enumType: TrainType::class, options: ['comment' => '培训类型'])]
     private ?TrainType $trainType = null;
 
-    #[ListColumn]
-    #[ORM\Column(length: 20, nullable: true, enumType: OrderStatus::class, options: ['comment' => '状态'])]
     private ?OrderStatus $status = OrderStatus::PENDING;
 
-    #[Filterable]
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[FormField(span: 8)]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['comment' => '开通时间'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '开通时间'])]
     private ?\DateTimeInterface $beginTime;
 
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[FormField(span: 8)]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '过期时间'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '过期时间'])]
     private ?\DateTimeInterface $endTime = null;
 
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '首次学习时间'])]
     private ?\DateTimeInterface $firstLearnTime = null;
 
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '最后学习时间'])]
     private ?\DateTimeInterface $lastLearnTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     private ?Qrcode $qrcode = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '支付时间'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '支付时间'])]
     private ?\DateTimeInterface $payTime = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '退款失败'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '退款失败'])]
     private ?\DateTimeInterface $refundTime = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 20, scale: 2, nullable: true, options: ['comment' => '扣款金额'])]
     private ?string $payPrice = null;
 
-    #[BoolColumn]
-    #[IndexColumn]
-    #[ListColumn]
-    #[ORM\Column(options: ['comment' => '是否完成'])]
     private bool $finished = false;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '完成时间'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '完成时间'])]
     private ?\DateTimeInterface $finishTime = null;
 
     #[ORM\Column(nullable: true, options: ['comment' => '是否已过期', 'default' => false])]
@@ -155,19 +122,15 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     private ?string $updatedBy = null;
 
     #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
     private ?string $createdFromIp = null;
 
     #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
     private ?string $updatedFromIp = null;
 
     #[CreateUserAgentColumn]
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '创建时UA'])]
     private ?string $createdFromUa = null;
 
     #[UpdateUserAgentColumn]
-    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '更新时UA'])]
     private ?string $updatedFromUa = null;
 
     public function __construct()

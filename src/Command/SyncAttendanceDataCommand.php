@@ -24,6 +24,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 )]
 class SyncAttendanceDataCommand extends Command
 {
+    protected const NAME = 'train-classroom:sync-attendance';
     public function __construct(
         private readonly AttendanceServiceInterface $attendanceService
     ) {
@@ -70,14 +71,14 @@ class SyncAttendanceDataCommand extends Command
 
         $io->title('考勤数据同步工具');
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             $io->note('运行在试运行模式，不会实际写入数据');
         }
 
         try {
             $attendanceData = $this->loadAttendanceData($source, $input, $io);
 
-            if (empty($attendanceData)) {
+            if ((bool) empty($attendanceData)) {
                 $io->warning('没有找到需要同步的考勤数据');
                 return Command::SUCCESS;
             }
@@ -213,7 +214,7 @@ class SyncAttendanceDataCommand extends Command
 
         // 读取数据行
         while (($row = fgetcsv($handle)) !== false) {
-            if (count($row) === count($headers)) {
+            if ((bool) count($row) === count($headers)) {
                 $data[] = array_combine($headers, $row);
             }
         }
@@ -233,7 +234,7 @@ class SyncAttendanceDataCommand extends Command
         }
 
         $data = json_decode($content, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if ((bool) json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('JSON格式错误: ' . json_last_error_msg());
         }
 
@@ -254,10 +255,12 @@ class SyncAttendanceDataCommand extends Command
 
         // 构建查询参数
         $params = [];
-        if ($dateFrom = $input->getOption('date-from')) {
+        $dateFrom = $input->getOption('date-from');
+        if ($dateFrom !== null) {
             $params['date_from'] = $dateFrom;
         }
-        if ($dateTo = $input->getOption('date-to')) {
+        $dateTo = $input->getOption('date-to');
+        if ($dateTo !== null) {
             $params['date_to'] = $dateTo;
         }
 
@@ -281,7 +284,7 @@ class SyncAttendanceDataCommand extends Command
         }
 
         $data = json_decode($response, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if ((bool) json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('API响应JSON格式错误: ' . json_last_error_msg());
         }
 

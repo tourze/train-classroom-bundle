@@ -11,33 +11,19 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
 use Tourze\EasyAdmin\Attribute\Action\CurdAction;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
 use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
-use Tourze\EasyAdmin\Attribute\Permission\AsPermission;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
 use Tourze\TrainCourseBundle\Entity\Course;
 
-#[AsPermission(title: '班级信息')]
 #[Listable]
-#[Creatable]
-#[Editable]
-#[Deletable]
 #[ORM\Entity(repositoryClass: ClassroomRepository::class)]
 #[ORM\Table(name: 'job_training_classroom', options: ['comment' => '班级信息'])]
 class Classroom implements \Stringable, ApiArrayInterface
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -46,34 +32,23 @@ class Classroom implements \Stringable, ApiArrayInterface
     private ?string $id = null;
 
     #[Filterable(label: '所属分类', inputWidth: 400)]
-    #[ListColumn(title: '所属分类')]
     // #[FormField(title: '所属分类', optionWhere: 'a.parent IS NULL')]
-    #[FormField(title: '所属分类')]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Category $category;
 
     #[Groups(['admin_curd'])]
-    #[Keyword]
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 150, options: ['comment' => '班级名称'])]
     private string $title;
 
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[FormField(span: 6)]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '开始时间'])]
     private ?\DateTimeInterface $startTime = null;
 
     #[Groups(['admin_curd'])]
-    #[ListColumn]
-    #[FormField(span: 6)]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '结束时间'])]
     private ?\DateTimeInterface $endTime = null;
 
-    #[ListColumn(title: '关联课程')]
-    #[FormField(title: '关联课程')]
     #[ORM\ManyToOne(inversedBy: 'classrooms')]
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;

@@ -2,13 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 教室类型枚举
  * 定义不同类型的培训教室
  */
 enum ClassroomType: string
-{
-    case PHYSICAL = 'PHYSICAL';   // 物理教室
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+case PHYSICAL = 'PHYSICAL';   // 物理教室
     case VIRTUAL = 'VIRTUAL';     // 虚拟教室
     case HYBRID = 'HYBRID';       // 混合教室
 

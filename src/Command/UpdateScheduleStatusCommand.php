@@ -26,6 +26,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 )]
 class UpdateScheduleStatusCommand extends Command
 {
+    protected const NAME = 'train-classroom:update-schedule-status';
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ClassroomScheduleRepository $scheduleRepository,
@@ -57,12 +58,12 @@ class UpdateScheduleStatusCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
-        $batchSize = (int) (int) $input->getOption('batch-size');
+        $batchSize = (int) $input->getOption('batch-size');
         $force = (bool) $input->getOption('force');
 
         $io->title('排课状态更新');
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             $io->note('运行在试运行模式，不会实际更新数据');
         }
 
@@ -107,7 +108,7 @@ class UpdateScheduleStatusCommand extends Command
             );
 
             if ($stats['total_processed'] > 0) {
-                if ($dryRun) {
+                if ((bool) $dryRun) {
                     $io->success(sprintf('试运行完成，发现 %d 条记录需要更新', $stats['total_processed']));
                 } else {
                     $io->success(sprintf('状态更新完成，共更新 %d 条记录', $stats['total_processed']));
@@ -161,7 +162,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (($dryRun === null)) {
+            if (!$dryRun) {
                 $this->entityManager->flush();
             }
 
@@ -201,7 +202,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (($dryRun === null)) {
+            if (!$dryRun) {
                 $this->entityManager->flush();
             }
 
@@ -241,7 +242,7 @@ class UpdateScheduleStatusCommand extends Command
                 $io->progressAdvance();
             }
 
-            if (($dryRun === null)) {
+            if (!$dryRun) {
                 $this->entityManager->flush();
             }
 

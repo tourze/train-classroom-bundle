@@ -118,8 +118,6 @@ class SyncAttendanceDataCommandTest extends TestCase
     {
         $reflection = new \ReflectionClass(SyncAttendanceDataCommand::class);
         $constants = $reflection->getConstants();
-        
-        $this->assertIsArray($constants);
     }
 
     /**

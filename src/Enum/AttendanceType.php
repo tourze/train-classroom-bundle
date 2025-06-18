@@ -2,13 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 考勤类型枚举
  * 定义学员考勤的不同类型
  */
 enum AttendanceType: string
-{
-    case SIGN_IN = 'SIGN_IN';      // 签到
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+case SIGN_IN = 'SIGN_IN';      // 签到
     case SIGN_OUT = 'SIGN_OUT';    // 签退
     case BREAK_OUT = 'BREAK_OUT';  // 休息外出
     case BREAK_IN = 'BREAK_IN';    // 休息返回

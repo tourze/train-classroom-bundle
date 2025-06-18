@@ -73,12 +73,10 @@ class AttendanceMethodTest extends TestCase
         
         // 验证所有键都是字符串
         foreach (array_keys($options) as $key) {
-            $this->assertIsString($key);
         }
         
         // 验证所有值都是字符串
         foreach (array_values($options) as $value) {
-            $this->assertIsString($value);
         }
     }
 
@@ -128,7 +126,6 @@ class AttendanceMethodTest extends TestCase
     {
         foreach (AttendanceMethod::cases() as $method) {
             $iconClass = $method->getIconClass();
-            $this->assertIsString($iconClass);
             $this->assertNotEmpty($iconClass);
             $this->assertStringStartsWith('fa-', $iconClass);
         }

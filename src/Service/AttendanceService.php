@@ -206,7 +206,7 @@ class AttendanceService implements AttendanceServiceInterface
         $signOutRecords = array_filter($records, fn($r) => $r->getType() === AttendanceType::SIGN_OUT);
 
         // 异常1：多次签到
-        if (count($signInRecords) > 1) {
+        if ((bool) count($signInRecords) > 1) {
             $anomalies[] = [
                 'type' => 'multiple_sign_in',
                 'message' => '当日存在多次签到记录',
@@ -215,7 +215,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常2：多次签退
-        if (count($signOutRecords) > 1) {
+        if ((bool) count($signOutRecords) > 1) {
             $anomalies[] = [
                 'type' => 'multiple_sign_out',
                 'message' => '当日存在多次签退记录',
@@ -224,7 +224,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常3：只有签退没有签到
-        if (count($signOutRecords) > 0 && count($signInRecords) === 0) {
+        if ((bool) count($signOutRecords) > 0 && count($signInRecords) === 0) {
             $anomalies[] = [
                 'type' => 'sign_out_without_sign_in',
                 'message' => '存在签退记录但无签到记录',
@@ -233,7 +233,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常4：签退时间早于签到时间
-        if (count($signInRecords) > 0 && count($signOutRecords) > 0) {
+        if ((bool) count($signInRecords) > 0 && count($signOutRecords) > 0) {
             $latestSignIn = max(array_map(fn($r) => $r->getRecordTime(), $signInRecords));
             $earliestSignOut = min(array_map(fn($r) => $r->getRecordTime(), $signOutRecords));
 
@@ -308,7 +308,7 @@ class AttendanceService implements AttendanceServiceInterface
         );
 
         // 签到和签退每天只能有一次
-        if (in_array($type, [AttendanceType::SIGN_IN, AttendanceType::SIGN_OUT]) && count($existingRecords) > 0) {
+        if ((bool) in_array($type, [AttendanceType::SIGN_IN, AttendanceType::SIGN_OUT]) && count($existingRecords) > 0) {
             return false;
         }
 

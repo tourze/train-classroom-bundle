@@ -26,6 +26,7 @@ use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
 )]
 class CleanupDataCommand extends Command
 {
+    protected const NAME = 'train-classroom:cleanup-data';
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ParameterBagInterface $parameterBag
@@ -74,7 +75,7 @@ class CleanupDataCommand extends Command
 
         $io->title('数据清理工具');
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             $io->note('运行在试运行模式，不会实际删除数据');
         }
 
@@ -92,7 +93,7 @@ class CleanupDataCommand extends Command
                 ]
             );
 
-            if (!$force && !$dryRun) {
+            if (!$force && (bool) !$dryRun) {
                 if (!$io->confirm('确认要执行数据清理吗？此操作不可逆！', false)) {
                     $io->info('操作已取消');
                     return Command::SUCCESS;
@@ -168,7 +169,7 @@ class CleanupDataCommand extends Command
 
         $io->info(sprintf('找到 %d 条需要清理的考勤记录', $totalCount));
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             return $totalCount;
         }
 
@@ -184,7 +185,7 @@ class CleanupDataCommand extends Command
 
             $records = $qb->getQuery()->getResult();
 
-            if (empty($records)) {
+            if ((bool) empty($records)) {
                 break;
             }
 
@@ -234,7 +235,7 @@ class CleanupDataCommand extends Command
 
         $io->info(sprintf('找到 %d 条需要清理的排课记录', $totalCount));
 
-        if ($dryRun) {
+        if ((bool) $dryRun) {
             return $totalCount;
         }
 
@@ -252,7 +253,7 @@ class CleanupDataCommand extends Command
 
             $records = $qb->getQuery()->getResult();
 
-            if (empty($records)) {
+            if ((bool) empty($records)) {
                 break;
             }
 

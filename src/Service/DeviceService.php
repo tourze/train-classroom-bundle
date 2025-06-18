@@ -33,7 +33,7 @@ class DeviceService implements DeviceServiceInterface
     {
         $devices = $classroom->getDevices() ?? [];
         
-        if (is_string($devices)) {
+        if ((bool) is_string($devices)) {
             $devices = json_decode($devices, true) ?? [];
         }
         
@@ -386,11 +386,11 @@ class DeviceService implements DeviceServiceInterface
      */
     private function validateDeviceConfig(array $config): void
     {
-        if (empty($config['type'])) {
+        if ((bool) empty($config['type'])) {
             throw new \InvalidArgumentException('设备类型不能为空');
         }
         
-        if (empty($config['name'])) {
+        if ((bool) empty($config['name'])) {
             throw new \InvalidArgumentException('设备名称不能为空');
         }
     }

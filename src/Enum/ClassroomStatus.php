@@ -2,13 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 教室状态枚举
  * 定义教室的运行状态
  */
 enum ClassroomStatus: string
-{
-    case ACTIVE = 'ACTIVE';           // 活跃
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+case ACTIVE = 'ACTIVE';           // 活跃
     case INACTIVE = 'INACTIVE';       // 非活跃
     case MAINTENANCE = 'MAINTENANCE'; // 维护中
     case RESERVED = 'RESERVED';       // 预留

@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 订单状态枚举
  */
 enum OrderStatus: string
-{
+ implements Itemable, Labelable, Selectable{
 
-    case PENDING = 'pending';
+    
+    use ItemTrait;
+    use SelectTrait;
+case PENDING = 'pending';
     case PAID = 'paid';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
@@ -71,5 +80,13 @@ enum OrderStatus: string
     public function isRefunded(): bool
     {
         return $this === self::REFUNDED;
+    }
+
+    public function getLabel(): string
+    {
+        return match($this) {
+            // TODO: 添加具体的标签映射
+            default => $this->name,
+        };
     }
 } 

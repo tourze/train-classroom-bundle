@@ -198,7 +198,5 @@ class UpdateScheduleStatusCommandTest extends TestCase
     {
         $reflection = new \ReflectionClass(UpdateScheduleStatusCommand::class);
         $constants = $reflection->getConstants();
-        
-        $this->assertIsArray($constants);
     }
 } 

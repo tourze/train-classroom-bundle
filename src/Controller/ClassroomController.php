@@ -154,7 +154,7 @@ class ClassroomController extends AbstractController
         
         // 解析类型参数
         $classroomType = null;
-        if ($type && ClassroomType::tryFrom($type)) {
+        if ($type && (bool) ClassroomType::tryFrom($type)) {
             $classroomType = ClassroomType::from($type);
         }
         

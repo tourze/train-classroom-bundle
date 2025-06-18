@@ -15,6 +15,7 @@ use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 #[AsCommand(name: 'job-training:expire-registration', description: '过期无效的报班记录')]
 class ExpireRegistrationLogCommand extends Command
 {
+    protected const NAME = 'job-training:expire-registration';
     public function __construct(
         private readonly RegistrationRepository $registrationRepository,
     ) {

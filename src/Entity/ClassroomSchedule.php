@@ -6,12 +6,9 @@ namespace Tourze\TrainClassroomBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\UpdateTimeColumn;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 
@@ -20,12 +17,12 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
  * 管理教室的课程安排和教师分配
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'job_training_classroom_schedule')]
+#[ORM\Table(name: 'job_training_classroom_schedule', options: ['comment' => '表描述'])]
 #[ORM\Index(columns: ['classroom_id'], name: 'idx_classroom_id')]
 #[ORM\Index(columns: ['schedule_date'], name: 'idx_schedule_date')]
 #[ORM\Index(columns: ['teacher_id'], name: 'idx_teacher_id')]
 #[ORM\UniqueConstraint(name: 'uk_classroom_time', columns: ['classroom_id', 'start_time', 'end_time'])]
-class ClassroomSchedule
+class ClassroomSchedule implements Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
@@ -44,95 +41,91 @@ class ClassroomSchedule
     /**
      * 教师ID
      */
-    #[ORM\Column(type: Types::STRING, length: 100)]
+#[ORM\Column(type: Types::STRING, length: 100, options: ['comment' => '字段说明'])]
     private string $teacherId;
 
     /**
      * 排课日期
      */
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+#[ORM\Column(type: Types::DATE_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $scheduleDate;
 
     /**
      * 开始时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $startTime;
 
     /**
      * 结束时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $endTime;
 
     /**
      * 排课类型
      */
-    #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleType::class)]
+#[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleType::class, options: ['comment' => '字段说明'])]
     private ScheduleType $scheduleType;
 
     /**
      * 排课状态
      */
-    #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleStatus::class)]
+#[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleStatus::class, options: ['comment' => '字段说明'])]
     private ScheduleStatus $scheduleStatus;
 
     /**
      * 排课配置（重复规则等）
      */
-    #[ORM\Column(type: Types::JSON, nullable: true)]
+#[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
     private ?array $scheduleConfig = null;
 
     /**
      * 课程内容
      */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+#[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $courseContent = null;
 
     /**
      * 预期学员数
      */
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+#[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
     private ?int $expectedStudents = null;
 
     /**
      * 实际学员数
      */
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+#[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
     private ?int $actualStudents = null;
 
     /**
      * 备注
      */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+#[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $remark = null;
 
     /**
      * 创建时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[CreateTimeColumn]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $createTime = null;
 
     /**
      * 更新时间
      */
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[UpdateTimeColumn]
+#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $updateTime = null;
 
     /**
      * 创建人
      */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[CreatedByColumn]
+#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdBy = null;
 
     /**
      * 更新人
      */
-    #[ORM\Column(type: Types::STRING, length: 100, nullable: true)]
-    #[UpdatedByColumn]
+#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedBy = null;
 
     public function getId(): ?string
@@ -331,5 +324,10 @@ class ClassroomSchedule
             'expected_students' => $this->expectedStudents,
             'actual_students' => $this->actualStudents,
         ];
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->id;
     }
 } 

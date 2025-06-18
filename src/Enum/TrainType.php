@@ -4,12 +4,21 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 培训类型枚举
  */
 enum TrainType: string
-{
-    case ONLINE = 'online';
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+case ONLINE = 'online';
     case OFFLINE = 'offline';
     case HYBRID = 'hybrid';
 
@@ -59,5 +68,13 @@ enum TrainType: string
     public function isHybrid(): bool
     {
         return $this === self::HYBRID;
+    }
+
+    public function getLabel(): string
+    {
+        return match($this) {
+            // TODO: 添加具体的标签映射
+            default => $this->name,
+        };
     }
 } 

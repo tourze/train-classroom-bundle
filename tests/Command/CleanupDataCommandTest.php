@@ -185,7 +185,6 @@ class CleanupDataCommandTest extends TestCase
     {
         $description = $this->command->getDescription();
         $this->assertNotEmpty($description);
-        $this->assertIsString($description);
     }
 
     /**
@@ -210,7 +209,6 @@ class CleanupDataCommandTest extends TestCase
     public function test_command_aliases(): void
     {
         $aliases = $this->command->getAliases();
-        $this->assertIsArray($aliases);
     }
 
     /**

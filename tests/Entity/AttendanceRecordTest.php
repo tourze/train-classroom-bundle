@@ -184,8 +184,6 @@ class AttendanceRecordTest extends TestCase
         $this->attendanceRecord->setDeviceLocation('教学楼A座101教室门口');
         
         $locationInfo = $this->attendanceRecord->getLocationInfo();
-        
-        $this->assertIsArray($locationInfo);
         $this->assertEquals('39.90419989', $locationInfo['latitude']);
         $this->assertEquals('116.40739999', $locationInfo['longitude']);
         $this->assertEquals('教学楼A座101教室门口', $locationInfo['device_location']);

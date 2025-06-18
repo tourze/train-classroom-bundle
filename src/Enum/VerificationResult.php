@@ -2,13 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 验证结果枚举
  * 定义考勤验证的结果状态
  */
 enum VerificationResult: string
-{
-    case SUCCESS = 'SUCCESS';     // 验证成功
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+case SUCCESS = 'SUCCESS';     // 验证成功
     case FAILED = 'FAILED';       // 验证失败
     case PENDING = 'PENDING';     // 待验证
     case TIMEOUT = 'TIMEOUT';     // 验证超时

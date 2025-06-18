@@ -127,7 +127,7 @@ class ClassroomService implements ClassroomServiceInterface
         foreach ($filters as $field => $value) {
             $classrooms = array_filter($classrooms, function (Classroom $classroom) use ($field, $value) {
                 $getter = 'get' . ucfirst($field);
-                if (method_exists($classroom, $getter)) {
+                if ((bool) method_exists($classroom, $getter)) {
                     return $classroom->$getter() === $value;
                 }
                 return true;
@@ -221,7 +221,7 @@ class ClassroomService implements ClassroomServiceInterface
         $devices = $classroom->getDevices() ?? [];
         
         // 如果设备信息是JSON字符串，解析为数组
-        if (is_string($devices)) {
+        if ((bool) is_string($devices)) {
             $devices = json_decode($devices, true) ?? [];
         }
         
@@ -292,7 +292,7 @@ class ClassroomService implements ClassroomServiceInterface
         foreach ($classroomsData as $index => $data) {
             try {
                 // 验证必需字段
-                if (empty($data['name'])) {
+                if ((bool) empty($data['name'])) {
                     throw new \InvalidArgumentException('教室名称不能为空');
                 }
                 
@@ -327,41 +327,41 @@ class ClassroomService implements ClassroomServiceInterface
      */
     private function populateClassroomData(Classroom $classroom, array $data): void
     {
-        if (isset($data['name'])) {
+        if ((bool) isset($data['name'])) {
             $classroom->setTitle($data['name']);
         }
         
-        if (isset($data['type'])) {
+        if ((bool) isset($data['type'])) {
             $type = is_string($data['type']) ? ClassroomType::from($data['type']) : $data['type'];
             $classroom->setType($type->value);
         }
         
-        if (isset($data['status'])) {
+        if ((bool) isset($data['status'])) {
             $status = is_string($data['status']) ? ClassroomStatus::from($data['status']) : $data['status'];
             $classroom->setStatus($status->value);
         }
         
-        if (isset($data['capacity'])) {
+        if ((bool) isset($data['capacity'])) {
             $classroom->setCapacity((int) $data['capacity']);
         }
         
-        if (isset($data['area'])) {
+        if ((bool) isset($data['area'])) {
             $classroom->setArea((float) $data['area']);
         }
         
-        if (isset($data['location'])) {
+        if ((bool) isset($data['location'])) {
             $classroom->setLocation($data['location']);
         }
         
-        if (isset($data['description'])) {
+        if ((bool) isset($data['description'])) {
             $classroom->setDescription($data['description']);
         }
         
-        if (isset($data['devices'])) {
+        if ((bool) isset($data['devices'])) {
             $classroom->setDevices($data['devices']);
         }
         
-        if (isset($data['supplier_id'])) {
+        if ((bool) isset($data['supplier_id'])) {
             $classroom->setSupplierId((int) $data['supplier_id']);
         }
     }
