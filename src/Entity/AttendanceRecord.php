@@ -38,105 +38,54 @@ class AttendanceRecord implements Stringable
     #[ORM\JoinColumn(name: 'registration_id', referencedColumnName: 'id', nullable: false)]
     private Registration $registration;
 
-    /**
-     * 考勤类型
-     */
 #[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceType::class, options: ['comment' => '字段说明'])]
     private AttendanceType $attendanceType;
 
-    /**
-     * 考勤时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $attendanceTime;
 
-    /**
-     * 考勤方式
-     */
 #[ORM\Column(type: Types::STRING, length: 20, enumType: AttendanceMethod::class, options: ['comment' => '字段说明'])]
     private AttendanceMethod $attendanceMethod;
 
-    /**
-     * 考勤数据（JSON格式存储人脸特征、指纹数据等）
-     */
 #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
     private ?array $attendanceData = null;
 
-    /**
-     * 是否有效
-     */
 #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true, 'comment' => '是否有效'])]
     private bool $isValid = true;
 
-    /**
-     * 验证结果
-     */
 #[ORM\Column(type: Types::STRING, length: 20, enumType: VerificationResult::class, options: ['comment' => '字段说明'])]
     private VerificationResult $verificationResult;
 
-    /**
-     * 设备ID
-     */
 #[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $deviceId = null;
 
-    /**
-     * 设备位置
-     */
 #[ORM\Column(type: Types::STRING, length: 200, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $deviceLocation = null;
 
-    /**
-     * 纬度
-     */
 #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $latitude = null;
 
-    /**
-     * 经度
-     */
 #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $longitude = null;
 
-    /**
-     * 备注
-     */
 #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $remark = null;
 
-    /**
-     * 创建时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $createTime = null;
 
-    /**
-     * 更新时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $updateTime = null;
 
-    /**
-     * 创建人
-     */
 #[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdBy = null;
 
-    /**
-     * 更新人
-     */
 #[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedBy = null;
 
-    /**
-     * 创建时IP
-     */
 #[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdFromIp = null;
 
-    /**
-     * 更新时IP
-     */
 #[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedFromIp = null;
 

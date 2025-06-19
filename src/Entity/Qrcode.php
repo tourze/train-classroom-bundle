@@ -14,10 +14,8 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Column\TreeView;
 use Tourze\TrainClassroomBundle\Repository\QrcodeRepository;
 
-#[TreeView(dataModel: Qrcode::class, targetAttribute: 'parent')]
 #[ORM\Entity(repositoryClass: QrcodeRepository::class)]
 #[ORM\Table(name: 'job_training_reg_qrcode', options: ['comment' => '报名二维码'])]
 #[ORM\UniqueConstraint(name: 'job_training_reg_qrcode_idx_uniq', columns: ['classroom_id', 'title'])]

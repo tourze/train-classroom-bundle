@@ -19,7 +19,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
  * 用于从外部设备同步考勤数据
  */
 #[AsCommand(
-    name: 'train-classroom:sync-attendance',
+    name: self::NAME,
     description: '同步考勤数据从外部设备或系统'
 )]
 class SyncAttendanceDataCommand extends Command

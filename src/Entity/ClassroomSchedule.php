@@ -38,93 +38,48 @@ class ClassroomSchedule implements Stringable
     #[ORM\JoinColumn(name: 'classroom_id', referencedColumnName: 'id', nullable: false)]
     private Classroom $classroom;
 
-    /**
-     * 教师ID
-     */
 #[ORM\Column(type: Types::STRING, length: 100, options: ['comment' => '字段说明'])]
     private string $teacherId;
 
-    /**
-     * 排课日期
-     */
 #[ORM\Column(type: Types::DATE_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $scheduleDate;
 
-    /**
-     * 开始时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $startTime;
 
-    /**
-     * 结束时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private \DateTimeImmutable $endTime;
 
-    /**
-     * 排课类型
-     */
 #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleType::class, options: ['comment' => '字段说明'])]
     private ScheduleType $scheduleType;
 
-    /**
-     * 排课状态
-     */
 #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleStatus::class, options: ['comment' => '字段说明'])]
     private ScheduleStatus $scheduleStatus;
 
-    /**
-     * 排课配置（重复规则等）
-     */
 #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
     private ?array $scheduleConfig = null;
 
-    /**
-     * 课程内容
-     */
 #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $courseContent = null;
 
-    /**
-     * 预期学员数
-     */
 #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
     private ?int $expectedStudents = null;
 
-    /**
-     * 实际学员数
-     */
 #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
     private ?int $actualStudents = null;
 
-    /**
-     * 备注
-     */
 #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $remark = null;
 
-    /**
-     * 创建时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $createTime = null;
 
-    /**
-     * 更新时间
-     */
 #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
     private ?\DateTimeImmutable $updateTime = null;
 
-    /**
-     * 创建人
-     */
 #[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $createdBy = null;
 
-    /**
-     * 更新人
-     */
 #[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $updatedBy = null;
 

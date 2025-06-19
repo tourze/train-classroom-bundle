@@ -19,8 +19,6 @@ use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Filter\Keyword;
 use Tourze\TrainClassroomBundle\Enum\OrderStatus;
 use Tourze\TrainClassroomBundle\Enum\TrainType;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
@@ -29,7 +27,6 @@ use Tourze\TrainCourseBundle\Entity\Course;
 /**
  * 通过报班记录，可以知道每个人的学习情况
  */
-#[Listable]
 #[ORM\Entity(repositoryClass: RegistrationRepository::class)]
 #[ORM\Table(name: 'job_training_class_registration', options: ['comment' => '报班记录'])]
 #[ORM\UniqueConstraint(name: 'job_training_class_registration_idx_uniq', columns: ['classroom_id', 'student_id'])]

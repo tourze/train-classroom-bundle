@@ -11,14 +11,10 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\CurdAction;
-use Tourze\EasyAdmin\Attribute\Action\Listable;
-use Tourze\EasyAdmin\Attribute\Filter\Filterable;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
 use Tourze\TrainCourseBundle\Entity\Course;
 
-#[Listable]
 #[ORM\Entity(repositoryClass: ClassroomRepository::class)]
 #[ORM\Table(name: 'job_training_classroom', options: ['comment' => '班级信息'])]
 class Classroom implements \Stringable, ApiArrayInterface
@@ -31,7 +27,6 @@ class Classroom implements \Stringable, ApiArrayInterface
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[Filterable(label: '所属分类', inputWidth: 400)]
     // #[FormField(title: '所属分类', optionWhere: 'a.parent IS NULL')]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -42,11 +37,11 @@ class Classroom implements \Stringable, ApiArrayInterface
     private string $title;
 
     #[Groups(['admin_curd'])]
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '开始时间'])]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '开始时间'])]
     private ?\DateTimeInterface $startTime = null;
 
     #[Groups(['admin_curd'])]
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true, options: ['comment' => '结束时间'])]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '结束时间'])]
     private ?\DateTimeInterface $endTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'classrooms')]
@@ -54,17 +49,14 @@ class Classroom implements \Stringable, ApiArrayInterface
     private Course $course;
 
     #[Ignore]
-    #[CurdAction(label: '报班学员', drawerWidth: 1200)]
     #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $registrations;
 
     #[Ignore]
-    #[CurdAction(label: '报班二维码', drawerWidth: 1200)]
     #[ORM\OneToMany(targetEntity: Qrcode::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $qrcodes;
 
     #[Ignore]
-    #[CurdAction(label: '排课记录', drawerWidth: 1200)]
     #[ORM\OneToMany(targetEntity: ClassroomSchedule::class, mappedBy: 'classroom', orphanRemoval: true)]
     private Collection $schedules;
 

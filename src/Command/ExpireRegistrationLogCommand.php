@@ -2,7 +2,7 @@
 
 namespace Tourze\TrainClassroomBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +12,7 @@ use Tourze\TrainClassroomBundle\Entity\Registration;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 #[AsCronTask('* * * * *')]
-#[AsCommand(name: 'job-training:expire-registration', description: '过期无效的报班记录')]
+#[AsCommand(name: self::NAME, description: '过期无效的报班记录')]
 class ExpireRegistrationLogCommand extends Command
 {
     protected const NAME = 'job-training:expire-registration';
@@ -27,7 +27,7 @@ class ExpireRegistrationLogCommand extends Command
         $registrations = $this->registrationRepository
             ->createQueryBuilder('a')
             ->where('a.endTime<:now AND a.expired=false AND a.finished=false')
-            ->setParameter('now', Carbon::now())
+            ->setParameter('now', CarbonImmutable::now())
             ->getQuery()
             ->getResult();
         foreach ($registrations as $registration) {

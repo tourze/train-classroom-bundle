@@ -21,7 +21,7 @@ use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
  * 用于清理过期的考勤记录、排课记录和相关文件
  */
 #[AsCommand(
-    name: 'train-classroom:cleanup-data',
+    name: self::NAME,
     description: '清理过期的考勤记录和相关文件'
 )]
 class CleanupDataCommand extends Command

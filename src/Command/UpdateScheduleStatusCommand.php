@@ -21,7 +21,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
  * 自动更新过期或需要状态变更的排课记录
  */
 #[AsCommand(
-    name: 'train-classroom:update-schedule-status',
+    name: self::NAME,
     description: '更新排课状态',
 )]
 class UpdateScheduleStatusCommand extends Command
