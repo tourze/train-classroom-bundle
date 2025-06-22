@@ -72,9 +72,9 @@ class ScheduleController extends AbstractController
                 'data' => [
                     'id' => $schedule->getId(),
                     'classroom_id' => $schedule->getClassroom()->getId(),
-                    'course_id' => $schedule->getCourseId(),
-                    'type' => $schedule->getType()->value,
-                    'status' => $schedule->getStatus()->value,
+                    'course_id' => $schedule->getTeacherId(),
+                    'type' => $schedule->getScheduleType()->value,
+                    'status' => $schedule->getScheduleStatus()->value,
                     'start_time' => $schedule->getStartTime()->format('Y-m-d H:i:s'),
                     'end_time' => $schedule->getEndTime()->format('Y-m-d H:i:s'),
                     'duration_minutes' => $schedule->getDurationInMinutes(),
@@ -137,7 +137,7 @@ class ScheduleController extends AbstractController
                             'title' => $schedule->getTitle(),
                             'start_time' => $schedule->getStartTime()->format('Y-m-d H:i:s'),
                             'end_time' => $schedule->getEndTime()->format('Y-m-d H:i:s'),
-                            'status' => $schedule->getStatus()->value,
+                            'status' => $schedule->getScheduleStatus()->value,
                         ];
                     }, $conflicts),
                 ],
@@ -187,7 +187,7 @@ class ScheduleController extends AbstractController
                 'message' => '状态更新成功',
                 'data' => [
                     'id' => $updatedSchedule->getId(),
-                    'status' => $updatedSchedule->getStatus()->value,
+                    'status' => $updatedSchedule->getScheduleStatus()->value,
                     'remark' => $updatedSchedule->getRemark(),
                 ],
             ]);
@@ -313,7 +313,7 @@ class ScheduleController extends AbstractController
                 'message' => '排课取消成功',
                 'data' => [
                     'id' => $cancelledSchedule->getId(),
-                    'status' => $cancelledSchedule->getStatus()->value,
+                    'status' => $cancelledSchedule->getScheduleStatus()->value,
                     'remark' => $cancelledSchedule->getRemark(),
                 ],
             ]);
@@ -363,7 +363,7 @@ class ScheduleController extends AbstractController
                 'message' => '排课延期成功',
                 'data' => [
                     'id' => $postponedSchedule->getId(),
-                    'status' => $postponedSchedule->getStatus()->value,
+                    'status' => $postponedSchedule->getScheduleStatus()->value,
                     'start_time' => $postponedSchedule->getStartTime()->format('Y-m-d H:i:s'),
                     'end_time' => $postponedSchedule->getEndTime()->format('Y-m-d H:i:s'),
                     'remark' => $postponedSchedule->getRemark(),

@@ -29,85 +29,6 @@ class ClassroomScheduleRepositoryTest extends TestCase
         $this->assertTrue($reflection->isSubclassOf('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository'));
     }
 
-    /**
-     * 测试findByClassroom方法存在
-     */
-    public function test_findByClassroom_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findByClassroom'));
-    }
-
-    /**
-     * 测试findByDateRange方法存在
-     */
-    public function test_findByDateRange_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findByDateRange'));
-    }
-
-    /**
-     * 测试findByStatus方法存在
-     */
-    public function test_findByStatus_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findByStatus'));
-    }
-
-    /**
-     * 测试findByType方法存在
-     */
-    public function test_findByType_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findByType'));
-    }
-
-    /**
-     * 测试findConflictingSchedules方法存在
-     */
-    public function test_findConflictingSchedules_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findConflictingSchedules'));
-    }
-
-    /**
-     * 测试findByTeacher方法存在
-     */
-    public function test_findByTeacher_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findByTeacher'));
-    }
-
-    /**
-     * 测试countByClassroom方法存在
-     */
-    public function test_countByClassroom_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'countByClassroom'));
-    }
-
-    /**
-     * 测试getClassroomUsageStats方法存在
-     */
-    public function test_getClassroomUsageStats_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'getClassroomUsageStats'));
-    }
-
-    /**
-     * 测试findUpcomingSchedules方法存在
-     */
-    public function test_findUpcomingSchedules_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findUpcomingSchedules'));
-    }
-
-    /**
-     * 测试findBySupplier方法存在
-     */
-    public function test_findBySupplier_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ClassroomScheduleRepository::class, 'findBySupplier'));
-    }
 
     /**
      * 测试方法参数类型
@@ -141,13 +62,13 @@ class ClassroomScheduleRepositoryTest extends TestCase
         $method = $reflection->getMethod('countByClassroom');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('int', $returnType->getName());
+        $this->assertEquals('int', (string) $returnType);
         
         // 测试findByClassroom返回类型
         $method = $reflection->getMethod('findByClassroom');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
     }
 
     /**

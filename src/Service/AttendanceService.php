@@ -332,13 +332,18 @@ class AttendanceService implements AttendanceServiceInterface
      */
     private function calculateTotalCourseDays(Registration $registration): int
     {
-        $course = $registration->getCourse();
-        if (!$course || !$course->getStartTime() || ($course->getEndTime() === null)) {
+        // TODO: Course 实体需要添加 getStartTime() 和 getEndTime() 方法
+        // $course = $registration->getCourse();
+        // if (!$course || !$course->getStartTime() || ($course->getEndTime() === null)) {
+        //     return 0;
+        // }
+        
+        // 临时使用报名时间作为课程时间
+        $startDate = $registration->getBeginTime();
+        $endDate = $registration->getEndTime();
+        if (!$startDate || !$endDate) {
             return 0;
         }
-
-        $startDate = $course->getStartTime();
-        $endDate = $course->getEndTime();
         $interval = $startDate->diff($endDate);
 
         return $interval->days + 1;

@@ -214,7 +214,7 @@ class SyncAttendanceDataCommand extends Command
 
         // 读取数据行
         while (($row = fgetcsv($handle)) !== false) {
-            if ((bool) count($row) === count($headers)) {
+            if (count($row) === count($headers)) {
                 $data[] = array_combine($headers, $row);
             }
         }
@@ -234,7 +234,7 @@ class SyncAttendanceDataCommand extends Command
         }
 
         $data = json_decode($content, true);
-        if ((bool) json_last_error() !== JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('JSON格式错误: ' . json_last_error_msg());
         }
 
@@ -284,7 +284,7 @@ class SyncAttendanceDataCommand extends Command
         }
 
         $data = json_decode($response, true);
-        if ((bool) json_last_error() !== JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('API响应JSON格式错误: ' . json_last_error_msg());
         }
 

@@ -18,7 +18,7 @@ interface ScheduleServiceInterface
 {
     /**
      * 创建排课
-     * 
+     *
      * @param Classroom $classroom 教室
      * @param int $courseId 课程ID
      * @param ScheduleType $type 排课类型
@@ -39,7 +39,7 @@ interface ScheduleServiceInterface
 
     /**
      * 检测排课冲突
-     * 
+     *
      * @param Classroom $classroom 教室
      * @param \DateTimeInterface $startTime 开始时间
      * @param \DateTimeInterface $endTime 结束时间
@@ -55,7 +55,7 @@ interface ScheduleServiceInterface
 
     /**
      * 更新排课状态
-     * 
+     *
      * @param ClassroomSchedule $schedule 排课记录
      * @param ScheduleStatus $status 新状态
      * @param string|null $reason 状态变更原因
@@ -69,7 +69,7 @@ interface ScheduleServiceInterface
 
     /**
      * 获取教室使用率统计
-     * 
+     *
      * @param Classroom $classroom 教室
      * @param \DateTimeInterface $startDate 开始日期
      * @param \DateTimeInterface $endDate 结束日期
@@ -83,7 +83,7 @@ interface ScheduleServiceInterface
 
     /**
      * 查找可用教室
-     * 
+     *
      * @param \DateTimeInterface $startTime 开始时间
      * @param \DateTimeInterface $endTime 结束时间
      * @param int|null $minCapacity 最小容量要求
@@ -99,7 +99,7 @@ interface ScheduleServiceInterface
 
     /**
      * 批量排课
-     * 
+     *
      * @param array $scheduleData 排课数据数组
      * @param bool $skipConflicts 是否跳过冲突的排课
      * @return array 批量排课结果
@@ -108,7 +108,7 @@ interface ScheduleServiceInterface
 
     /**
      * 取消排课
-     * 
+     *
      * @param ClassroomSchedule $schedule 排课记录
      * @param string $reason 取消原因
      * @return ClassroomSchedule
@@ -117,7 +117,7 @@ interface ScheduleServiceInterface
 
     /**
      * 延期排课
-     * 
+     *
      * @param ClassroomSchedule $schedule 排课记录
      * @param \DateTimeInterface $newStartTime 新开始时间
      * @param \DateTimeInterface $newEndTime 新结束时间
@@ -133,7 +133,7 @@ interface ScheduleServiceInterface
 
     /**
      * 获取排课日历数据
-     * 
+     *
      * @param \DateTimeInterface $startDate 开始日期
      * @param \DateTimeInterface $endDate 结束日期
      * @param array $classroomIds 教室ID列表，为空则查询所有
@@ -147,7 +147,7 @@ interface ScheduleServiceInterface
 
     /**
      * 获取排课统计报表
-     * 
+     *
      * @param \DateTimeInterface $startDate 开始日期
      * @param \DateTimeInterface $endDate 结束日期
      * @param array $filters 过滤条件

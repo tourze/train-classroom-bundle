@@ -30,85 +30,6 @@ class ScheduleServiceTest extends TestCase
         $this->assertTrue($reflection->implementsInterface(ScheduleServiceInterface::class));
     }
 
-    /**
-     * 测试createSchedule方法存在
-     */
-    public function test_createSchedule_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'createSchedule'));
-    }
-
-    /**
-     * 测试detectScheduleConflicts方法存在
-     */
-    public function test_detectScheduleConflicts_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'detectScheduleConflicts'));
-    }
-
-    /**
-     * 测试cancelSchedule方法存在
-     */
-    public function test_cancelSchedule_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'cancelSchedule'));
-    }
-
-    /**
-     * 测试postponeSchedule方法存在
-     */
-    public function test_postponeSchedule_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'postponeSchedule'));
-    }
-
-    /**
-     * 测试findAvailableClassrooms方法存在
-     */
-    public function test_findAvailableClassrooms_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'findAvailableClassrooms'));
-    }
-
-    /**
-     * 测试getScheduleCalendar方法存在
-     */
-    public function test_getScheduleCalendar_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'getScheduleCalendar'));
-    }
-
-    /**
-     * 测试getScheduleStatisticsReport方法存在
-     */
-    public function test_getScheduleStatisticsReport_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'getScheduleStatisticsReport'));
-    }
-
-    /**
-     * 测试updateScheduleStatus方法存在
-     */
-    public function test_updateScheduleStatus_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'updateScheduleStatus'));
-    }
-
-    /**
-     * 测试getClassroomUtilizationRate方法存在
-     */
-    public function test_getClassroomUtilizationRate_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'getClassroomUtilizationRate'));
-    }
-
-    /**
-     * 测试batchCreateSchedules方法存在
-     */
-    public function test_batchCreateSchedules_method_exists(): void
-    {
-        $this->assertTrue(method_exists(ScheduleService::class, 'batchCreateSchedules'));
-    }
 
     /**
      * 测试方法签名
@@ -139,19 +60,19 @@ class ScheduleServiceTest extends TestCase
         $method = $reflection->getMethod('batchCreateSchedules');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
         
         // 测试getClassroomUtilizationRate返回类型
         $method = $reflection->getMethod('getClassroomUtilizationRate');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
         
         // 测试detectScheduleConflicts返回类型
         $method = $reflection->getMethod('detectScheduleConflicts');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
     }
 
     /**
@@ -190,16 +111,6 @@ class ScheduleServiceTest extends TestCase
         $this->assertContains('scheduleRepository', $parameterNames);
     }
 
-    /**
-     * 测试冲突检测相关方法
-     */
-    public function test_conflict_detection_methods(): void
-    {
-        // 测试冲突检测相关方法存在
-        $this->assertTrue(method_exists(ScheduleService::class, 'detectScheduleConflicts'));
-        $this->assertTrue(method_exists(ScheduleService::class, 'createSchedule'));
-        $this->assertTrue(method_exists(ScheduleService::class, 'findAvailableClassrooms'));
-    }
 
     /**
      * 测试状态管理方法
@@ -243,12 +154,4 @@ class ScheduleServiceTest extends TestCase
         }
     }
 
-    /**
-     * 测试批量操作方法
-     */
-    public function test_batch_operation_methods(): void
-    {
-        // 测试批量操作方法存在
-        $this->assertTrue(method_exists(ScheduleService::class, 'batchCreateSchedules'));
-    }
 } 

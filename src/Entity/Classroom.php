@@ -146,12 +146,12 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     public function getArea(): ?float
     {
-        return $this->area ? (float) $this->area : null;
+        return $this->area !== null ? (float) $this->area : null;
     }
 
     public function setArea(?float $area): static
     {
-        $this->area = $area ? (string) $area : null;
+        $this->area = $area !== null ? (string) $area : null;
         return $this;
     }
 

@@ -18,7 +18,7 @@ interface AttendanceServiceInterface
 {
     /**
      * 记录考勤
-     * 
+     *
      * @param Registration $registration 报名记录
      * @param AttendanceType $type 考勤类型
      * @param AttendanceMethod $method 考勤方式
@@ -36,7 +36,7 @@ interface AttendanceServiceInterface
 
     /**
      * 批量导入考勤记录
-     * 
+     *
      * @param array $attendanceData 考勤数据数组
      * @return array 导入结果统计
      */
@@ -44,7 +44,7 @@ interface AttendanceServiceInterface
 
     /**
      * 获取学员考勤统计
-     * 
+     *
      * @param Registration $registration 报名记录
      * @return array 考勤统计数据
      */
@@ -52,7 +52,7 @@ interface AttendanceServiceInterface
 
     /**
      * 获取课程考勤汇总
-     * 
+     *
      * @param int $courseId 课程ID
      * @param \DateTimeInterface|null $startDate 开始日期
      * @param \DateTimeInterface|null $endDate 结束日期
@@ -66,7 +66,7 @@ interface AttendanceServiceInterface
 
     /**
      * 检测考勤异常
-     * 
+     *
      * @param Registration $registration 报名记录
      * @param \DateTimeInterface|null $date 检测日期，默认今天
      * @return array 异常记录列表
@@ -78,7 +78,7 @@ interface AttendanceServiceInterface
 
     /**
      * 补录考勤记录
-     * 
+     *
      * @param Registration $registration 报名记录
      * @param AttendanceType $type 考勤类型
      * @param \DateTimeInterface $recordTime 补录时间
@@ -94,7 +94,7 @@ interface AttendanceServiceInterface
 
     /**
      * 验证考勤有效性
-     * 
+     *
      * @param Registration $registration 报名记录
      * @param AttendanceType $type 考勤类型
      * @param \DateTimeInterface|null $recordTime 记录时间
@@ -108,7 +108,7 @@ interface AttendanceServiceInterface
 
     /**
      * 获取考勤率统计
-     * 
+     *
      * @param int $courseId 课程ID
      * @param \DateTimeInterface|null $startDate 开始日期
      * @param \DateTimeInterface|null $endDate 结束日期

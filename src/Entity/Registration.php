@@ -2,11 +2,11 @@
 
 namespace Tourze\TrainClassroomBundle\Entity;
 
-use BizUserBundle\Entity\BizUser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\AdminArrayInterface;
@@ -46,14 +46,11 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     private Classroom $classroom;
 
     #[Ignore]
-    #[Keyword(inputWidth: 60, name: 'student.realName', label: '学生姓名')]
-    #[Keyword(inputWidth: 60, name: 'student.idCardNumber', label: '证件号码')]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
-    private BizUser $student;
+    private UserInterface $student;
 
     #[Ignore]
-    #[Keyword(inputWidth: 60, name: 'course.title', label: '课程')]
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
@@ -230,12 +227,12 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this;
     }
 
-    public function getStudent(): BizUser
+    public function getStudent(): UserInterface
     {
         return $this->student;
     }
 
-    public function setStudent(BizUser $student): static
+    public function setStudent(UserInterface $student): static
     {
         $this->student = $student;
 
@@ -418,6 +415,28 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     public function isFinished(): ?bool
     {
         return $this->finished;
+    }
+    
+    /**
+     * 检查报名是否有效
+     */
+    public function isActive(): bool
+    {
+        // 如果已完成则不活跃
+        if ($this->finished) {
+            return false;
+        }
+        
+        // 检查时间范围
+        $now = new \DateTimeImmutable();
+        if ($this->beginTime && $now < $this->beginTime) {
+            return false;
+        }
+        if ($this->endTime && $now > $this->endTime) {
+            return false;
+        }
+        
+        return true;
     }
 
     public function setFinished(?bool $finished): static

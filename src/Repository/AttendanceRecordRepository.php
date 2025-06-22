@@ -183,7 +183,7 @@ class AttendanceRecordRepository extends ServiceEntityRepository
 
     /**
      * 查找过期的报名记录
-     * 
+     *
      * @param \DateTimeInterface $expiryDate
      * @return array
      */

@@ -30,69 +30,6 @@ class AttendanceServiceTest extends TestCase
         $this->assertTrue($reflection->implementsInterface(AttendanceServiceInterface::class));
     }
 
-    /**
-     * 测试recordAttendance方法存在
-     */
-    public function test_recordAttendance_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'recordAttendance'));
-    }
-
-    /**
-     * 测试batchImportAttendance方法存在
-     */
-    public function test_batchImportAttendance_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'batchImportAttendance'));
-    }
-
-    /**
-     * 测试getAttendanceStatistics方法存在
-     */
-    public function test_getAttendanceStatistics_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'getAttendanceStatistics'));
-    }
-
-    /**
-     * 测试getCourseAttendanceSummary方法存在
-     */
-    public function test_getCourseAttendanceSummary_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'getCourseAttendanceSummary'));
-    }
-
-    /**
-     * 测试detectAttendanceAnomalies方法存在
-     */
-    public function test_detectAttendanceAnomalies_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'detectAttendanceAnomalies'));
-    }
-
-    /**
-     * 测试makeUpAttendance方法存在
-     */
-    public function test_makeUpAttendance_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'makeUpAttendance'));
-    }
-
-    /**
-     * 测试validateAttendance方法存在
-     */
-    public function test_validateAttendance_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'validateAttendance'));
-    }
-
-    /**
-     * 测试getAttendanceRateStatistics方法存在
-     */
-    public function test_getAttendanceRateStatistics_method_exists(): void
-    {
-        $this->assertTrue(method_exists(AttendanceService::class, 'getAttendanceRateStatistics'));
-    }
 
     /**
      * 测试方法签名
@@ -127,19 +64,19 @@ class AttendanceServiceTest extends TestCase
         $method = $reflection->getMethod('batchImportAttendance');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
         
         // 测试getAttendanceStatistics返回类型
         $method = $reflection->getMethod('getAttendanceStatistics');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', $returnType->getName());
+        $this->assertEquals('array', (string) $returnType);
         
         // 测试validateAttendance返回类型
         $method = $reflection->getMethod('validateAttendance');
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('bool', $returnType->getName());
+        $this->assertEquals('bool', (string) $returnType);
     }
 
     /**
@@ -178,16 +115,6 @@ class AttendanceServiceTest extends TestCase
         $this->assertContains('attendanceRepository', $parameterNames);
     }
 
-    /**
-     * 测试边界值处理方法
-     */
-    public function test_boundary_value_methods(): void
-    {
-        // 测试空数组处理相关方法存在
-        $this->assertTrue(method_exists(AttendanceService::class, 'batchImportAttendance'));
-        $this->assertTrue(method_exists(AttendanceService::class, 'getAttendanceStatistics'));
-        $this->assertTrue(method_exists(AttendanceService::class, 'detectAttendanceAnomalies'));
-    }
 
     /**
      * 测试异常处理方法

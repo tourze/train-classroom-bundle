@@ -17,7 +17,7 @@ interface ClassroomServiceInterface
 {
     /**
      * 创建新教室
-     * 
+     *
      * @param array $data 教室数据
      * @return Classroom
      */
@@ -25,7 +25,7 @@ interface ClassroomServiceInterface
 
     /**
      * 更新教室信息
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $data 更新数据
      * @return Classroom
@@ -34,7 +34,7 @@ interface ClassroomServiceInterface
 
     /**
      * 删除教室
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @return bool
      */
@@ -42,7 +42,7 @@ interface ClassroomServiceInterface
 
     /**
      * 根据ID获取教室
-     * 
+     *
      * @param int $id 教室ID
      * @return Classroom|null
      */
@@ -50,7 +50,7 @@ interface ClassroomServiceInterface
 
     /**
      * 获取可用教室列表
-     * 
+     *
      * @param ClassroomType|null $type 教室类型
      * @param int|null $minCapacity 最小容量
      * @param array $filters 其他过滤条件
@@ -60,7 +60,7 @@ interface ClassroomServiceInterface
 
     /**
      * 更新教室状态
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param ClassroomStatus $status 新状态
      * @param string|null $reason 状态变更原因
@@ -70,7 +70,7 @@ interface ClassroomServiceInterface
 
     /**
      * 检查教室是否可用
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param \DateTimeInterface $startTime 开始时间
      * @param \DateTimeInterface $endTime 结束时间
@@ -80,7 +80,7 @@ interface ClassroomServiceInterface
 
     /**
      * 获取教室使用统计
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param \DateTimeInterface $startDate 开始日期
      * @param \DateTimeInterface $endDate 结束日期
@@ -90,7 +90,7 @@ interface ClassroomServiceInterface
 
     /**
      * 获取教室设备列表
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @return array
      */
@@ -98,7 +98,7 @@ interface ClassroomServiceInterface
 
     /**
      * 更新教室设备配置
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $devices 设备配置
      * @return Classroom
@@ -107,7 +107,7 @@ interface ClassroomServiceInterface
 
     /**
      * 获取教室环境监控数据
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param \DateTimeInterface|null $startTime 开始时间
      * @param \DateTimeInterface|null $endTime 结束时间
@@ -117,7 +117,7 @@ interface ClassroomServiceInterface
 
     /**
      * 批量导入教室数据
-     * 
+     *
      * @param array $classroomsData 教室数据数组
      * @param bool $dryRun 是否试运行
      * @return array 导入结果

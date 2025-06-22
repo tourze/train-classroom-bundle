@@ -71,23 +71,6 @@ class AttendanceRecord implements Stringable
 #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
     private ?string $remark = null;
 
-#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
-    private ?\DateTimeImmutable $createTime = null;
-
-#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
-    private ?\DateTimeImmutable $updateTime = null;
-
-#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
-    private ?string $createdBy = null;
-
-#[ORM\Column(type: Types::STRING, length: 100, nullable: true, options: ['comment' => '字段说明'])]
-    private ?string $updatedBy = null;
-
-#[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
-    private ?string $createdFromIp = null;
-
-#[ORM\Column(type: Types::STRING, length: 128, nullable: true, options: ['comment' => '字段说明'])]
-    private ?string $updatedFromIp = null;
 
     public function getId(): ?string
     {

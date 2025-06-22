@@ -48,24 +48,21 @@ class ScheduleService implements ScheduleServiceInterface
         // 创建排课记录
         $schedule = new ClassroomSchedule();
         $schedule->setClassroom($classroom);
-        $schedule->setCourseId($courseId);
-        $schedule->setType($type);
-        $schedule->setStartTime($startTime);
-        $schedule->setEndTime($endTime);
-        $schedule->setStatus(ScheduleStatus::SCHEDULED);
+        $schedule->setTeacherId($courseId);
+        $schedule->setScheduleType($type);
+        $schedule->setStartTime(\DateTimeImmutable::createFromInterface($startTime));
+        $schedule->setEndTime(\DateTimeImmutable::createFromInterface($endTime));
+        $schedule->setScheduleStatus(ScheduleStatus::SCHEDULED);
         
         // 设置可选参数
-        if ((bool) isset($options['title'])) {
-            $schedule->setTitle($options['title']);
+        if (isset($options['course_content'])) {
+            $schedule->setCourseContent($options['course_content']);
         }
-        if ((bool) isset($options['description'])) {
-            $schedule->setDescription($options['description']);
+        if (isset($options['expected_students'])) {
+            $schedule->setExpectedStudents($options['expected_students']);
         }
-        if ((bool) isset($options['instructor_id'])) {
-            $schedule->setInstructorId($options['instructor_id']);
-        }
-        if ((bool) isset($options['max_participants'])) {
-            $schedule->setMaxParticipants($options['max_participants']);
+        if (isset($options['remark'])) {
+            $schedule->setRemark($options['remark']);
         }
 
         $this->entityManager->persist($schedule);
@@ -102,8 +99,8 @@ class ScheduleService implements ScheduleServiceInterface
         ScheduleStatus $status,
         ?string $reason = null
     ): ClassroomSchedule {
-        $oldStatus = $schedule->getStatus();
-        $schedule->setStatus($status);
+        $oldStatus = $schedule->getScheduleStatus();
+        $schedule->setScheduleStatus($status);
         
         if ($reason !== null) {
             $currentRemark = $schedule->getRemark();
@@ -155,7 +152,7 @@ class ScheduleService implements ScheduleServiceInterface
 
             // 检查设施要求
             if (!empty($requiredFeatures)) {
-                $classroomFeatures = $classroom->getFeatures() ?? [];
+                $classroomFeatures = $classroom->getDevices() ?? [];
                 $hasAllFeatures = true;
                 foreach ($requiredFeatures as $feature) {
                     if (!in_array($feature, $classroomFeatures)) {
@@ -174,7 +171,7 @@ class ScheduleService implements ScheduleServiceInterface
                 $availableClassrooms[] = [
                     'classroom' => $classroom,
                     'capacity' => $classroom->getCapacity(),
-                    'features' => $classroom->getFeatures(),
+                    'devices' => $classroom->getDevices(),
                     'location' => $classroom->getLocation(),
                 ];
             }
@@ -274,9 +271,9 @@ class ScheduleService implements ScheduleServiceInterface
         $originalEndTime = $schedule->getEndTime()->format('Y-m-d H:i:s');
 
         // 更新时间
-        $schedule->setStartTime($newStartTime);
-        $schedule->setEndTime($newEndTime);
-        $schedule->setStatus(ScheduleStatus::POSTPONED);
+        $schedule->setStartTime(\DateTimeImmutable::createFromInterface($newStartTime));
+        $schedule->setEndTime(\DateTimeImmutable::createFromInterface($newEndTime));
+        $schedule->setScheduleStatus(ScheduleStatus::POSTPONED);
 
         // 添加延期备注
         $postponeRemark = "延期：原时间 {$originalStartTime} - {$originalEndTime}，延期原因：{$reason}";
@@ -323,7 +320,7 @@ class ScheduleService implements ScheduleServiceInterface
                 'classroom_id' => $schedule->getClassroom()->getId(),
                 'course_id' => $schedule->getCourseId(),
                 'type' => $schedule->getType()->value,
-                'status' => $schedule->getStatus()->value,
+                'status' => $schedule->getScheduleStatus()->value,
                 'start_time' => $schedule->getStartTime()->format('H:i'),
                 'end_time' => $schedule->getEndTime()->format('H:i'),
                 'duration' => $schedule->getDurationInMinutes(),

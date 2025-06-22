@@ -153,7 +153,7 @@ class UpdateScheduleStatusCommandTest extends TestCase
         $executeMethod = $reflection->getMethod('execute');
         $returnType = $executeMethod->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('int', $returnType->getName());
+        $this->assertEquals('int', (string) $returnType);
     }
 
     /**

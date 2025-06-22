@@ -16,7 +16,7 @@ interface DeviceServiceInterface
 {
     /**
      * 获取教室设备列表
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @return array
      */
@@ -24,7 +24,7 @@ interface DeviceServiceInterface
 
     /**
      * 添加设备到教室
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $deviceConfig 设备配置
      * @return array
@@ -33,7 +33,7 @@ interface DeviceServiceInterface
 
     /**
      * 移除教室设备
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param string $deviceId 设备ID
      * @return bool
@@ -42,7 +42,7 @@ interface DeviceServiceInterface
 
     /**
      * 更新设备配置
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param string $deviceId 设备ID
      * @param array $config 新配置
@@ -52,7 +52,7 @@ interface DeviceServiceInterface
 
     /**
      * 检查设备状态
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param string|null $deviceId 设备ID，为空时检查所有设备
      * @return array
@@ -61,7 +61,7 @@ interface DeviceServiceInterface
 
     /**
      * 测试设备连接
-     * 
+     *
      * @param array $deviceConfig 设备配置
      * @return array
      */
@@ -69,7 +69,7 @@ interface DeviceServiceInterface
 
     /**
      * 获取支持的考勤方式
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @return array
      */
@@ -77,7 +77,7 @@ interface DeviceServiceInterface
 
     /**
      * 执行考勤验证
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param AttendanceMethod $method 考勤方式
      * @param array $data 验证数据
@@ -87,7 +87,7 @@ interface DeviceServiceInterface
 
     /**
      * 获取监控设备录像
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param \DateTimeInterface $startTime 开始时间
      * @param \DateTimeInterface $endTime 结束时间
@@ -97,7 +97,7 @@ interface DeviceServiceInterface
 
     /**
      * 开始录像
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $options 录像选项
      * @return array
@@ -106,7 +106,7 @@ interface DeviceServiceInterface
 
     /**
      * 停止录像
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @return array
      */
@@ -114,7 +114,7 @@ interface DeviceServiceInterface
 
     /**
      * 获取环境监控数据
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $sensors 传感器类型
      * @return array
@@ -123,7 +123,7 @@ interface DeviceServiceInterface
 
     /**
      * 设置环境监控阈值
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $thresholds 阈值配置
      * @return bool
@@ -132,7 +132,7 @@ interface DeviceServiceInterface
 
     /**
      * 获取设备日志
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param string|null $deviceId 设备ID
      * @param \DateTimeInterface|null $startTime 开始时间
@@ -143,7 +143,7 @@ interface DeviceServiceInterface
 
     /**
      * 同步设备数据
-     * 
+     *
      * @param Classroom $classroom 教室实体
      * @param array $options 同步选项
      * @return array
