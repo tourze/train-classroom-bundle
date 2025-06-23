@@ -6,8 +6,6 @@ namespace Tourze\TrainClassroomBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
@@ -19,23 +17,15 @@ use Tourze\TrainClassroomBundle\Enum\VerificationResult;
  */
 class DeviceService implements DeviceServiceInterface
 {
-    private HttpClientInterface $httpClient;
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $logger,
-        ?HttpClientInterface $httpClient = null,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create();
     }
 
     public function getClassroomDevices(Classroom $classroom): array
     {
         $devices = $classroom->getDevices() ?? [];
-        
-        if ((bool) is_string($devices)) {
-            $devices = json_decode($devices, true) ?? [];
-        }
         
         // 获取设备状态
         foreach ($devices as &$device) {
@@ -198,7 +188,13 @@ class DeviceService implements DeviceServiceInterface
         // 总是支持手动考勤
         $methods[] = AttendanceMethod::MANUAL;
         
-        return array_unique($methods);
+        // 去重：使用枚举值作为键来去重
+        $uniqueMethods = [];
+        foreach ($methods as $method) {
+            $uniqueMethods[$method->value] = $method;
+        }
+        
+        return array_values($uniqueMethods);
     }
 
     public function performAttendanceVerification(Classroom $classroom, AttendanceMethod $method, array $data): array
@@ -386,11 +382,11 @@ class DeviceService implements DeviceServiceInterface
      */
     private function validateDeviceConfig(array $config): void
     {
-        if ((bool) empty($config['type'])) {
+        if (empty($config['type'])) {
             throw new \InvalidArgumentException('设备类型不能为空');
         }
         
-        if ((bool) empty($config['name'])) {
+        if (empty($config['name'])) {
             throw new \InvalidArgumentException('设备名称不能为空');
         }
     }

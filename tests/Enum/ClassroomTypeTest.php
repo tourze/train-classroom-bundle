@@ -203,12 +203,11 @@ class ClassroomTypeTest extends TestCase
     public function test_enum_comparison(): void
     {
         $physical1 = ClassroomType::PHYSICAL;
-        $physical2 = ClassroomType::PHYSICAL;
+        $physical2 = ClassroomType::from('PHYSICAL');
         $virtual = ClassroomType::VIRTUAL;
         
-        $this->assertTrue($physical1 === $physical2);
-        $this->assertFalse($physical1 === $virtual);
-        $this->assertTrue($physical1 !== $virtual);
+        $this->assertSame($physical1, $physical2);
+        $this->assertNotSame($physical1, $virtual);
     }
 
     /**

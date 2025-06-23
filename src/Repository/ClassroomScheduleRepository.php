@@ -277,4 +277,131 @@ class ClassroomScheduleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    
+    /**
+     * 查找活跃的排课记录（按教室）
+     */
+    public function findActiveSchedulesByClassroom(Classroom $classroom): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.classroom = :classroom')
+            ->andWhere('s.scheduleStatus IN (:activeStatuses)')
+            ->setParameter('classroom', $classroom)
+            ->setParameter('activeStatuses', [ScheduleStatus::SCHEDULED, ScheduleStatus::ONGOING])
+            ->orderBy('s.startTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * 获取教室使用率
+     */
+    public function getClassroomUtilizationRate(
+        Classroom $classroom,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        $totalHours = $this->createQueryBuilder('s')
+            ->select('SUM(TIMESTAMPDIFF(HOUR, s.startTime, s.endTime)) as total_hours')
+            ->andWhere('s.classroom = :classroom')
+            ->andWhere('s.scheduleDate BETWEEN :startDate AND :endDate')
+            ->andWhere('s.scheduleStatus != :cancelled')
+            ->setParameter('classroom', $classroom)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('cancelled', ScheduleStatus::CANCELLED)
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        $totalDays = $startDate->diff($endDate)->days + 1;
+        $workHoursPerDay = 8; // 假设每天工作8小时
+        $totalAvailableHours = $totalDays * $workHoursPerDay;
+        
+        return [
+            'total_hours' => (float)$totalHours,
+            'available_hours' => $totalAvailableHours,
+            'utilization_rate' => $totalAvailableHours > 0 ? round(((float)$totalHours / $totalAvailableHours) * 100, 2) : 0,
+        ];
+    }
+    
+    /**
+     * 查找指定日期范围内的排课
+     */
+    public function findSchedulesInDateRange(
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate,
+        array $classroomIds = []
+    ): array {
+        $qb = $this->createQueryBuilder('s')
+            ->andWhere('s.scheduleDate BETWEEN :startDate AND :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
+            
+        if (!empty($classroomIds)) {
+            $qb->andWhere('s.classroom IN (:classroomIds)')
+                ->setParameter('classroomIds', $classroomIds);
+        }
+        
+        return $qb->orderBy('s.scheduleDate', 'ASC')
+            ->addOrderBy('s.startTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * 根据教室和日期范围查找排课记录
+     */
+    public function findSchedulesByClassroomAndDateRange(
+        Classroom $classroom,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.classroom = :classroom')
+            ->andWhere('s.scheduleDate BETWEEN :startDate AND :endDate')
+            ->setParameter('classroom', $classroom)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('s.scheduleDate', 'ASC')
+            ->addOrderBy('s.startTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+    
+    /**
+     * 获取排课统计报告
+     */
+    public function getScheduleStatisticsReport(
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate,
+        array $filters = []
+    ): array {
+        $qb = $this->createQueryBuilder('s')
+            ->select([
+                'COUNT(DISTINCT s.id) as total_schedules',
+                'COUNT(DISTINCT s.classroom) as total_classrooms',
+                'COUNT(DISTINCT s.teacherId) as total_teachers',
+                'COUNT(CASE WHEN s.scheduleStatus = :completed THEN 1 END) as completed_schedules',
+                'COUNT(CASE WHEN s.scheduleStatus = :cancelled THEN 1 END) as cancelled_schedules',
+                'SUM(s.expectedStudents) as total_expected_students',
+                'SUM(s.actualStudents) as total_actual_students'
+            ])
+            ->andWhere('s.scheduleDate BETWEEN :startDate AND :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('completed', ScheduleStatus::COMPLETED)
+            ->setParameter('cancelled', ScheduleStatus::CANCELLED);
+            
+        if (!empty($filters['classroom_id'])) {
+            $qb->andWhere('s.classroom = :classroom_id')
+                ->setParameter('classroom_id', $filters['classroom_id']);
+        }
+        
+        if (!empty($filters['teacher_id'])) {
+            $qb->andWhere('s.teacherId = :teacher_id')
+                ->setParameter('teacher_id', $filters['teacher_id']);
+        }
+        
+        return $qb->getQuery()->getSingleResult();
+    }
 } 

@@ -145,11 +145,10 @@ class ScheduleTypeTest extends TestCase
     public function test_enum_comparison(): void
     {
         $regular1 = ScheduleType::REGULAR;
-        $regular2 = ScheduleType::REGULAR;
+        $regular2 = ScheduleType::from('REGULAR');
         $exam = ScheduleType::EXAM;
         
-        $this->assertTrue($regular1 === $regular2);
-        $this->assertFalse($regular1 === $exam);
-        $this->assertTrue($regular1 !== $exam);
+        $this->assertSame($regular1, $regular2);
+        $this->assertNotSame($regular1, $exam);
     }
 } 

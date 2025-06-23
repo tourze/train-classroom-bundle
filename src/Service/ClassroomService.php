@@ -46,7 +46,7 @@ class ClassroomService implements ClassroomServiceInterface
         $this->logger->info('教室创建成功', [
             'classroom_id' => $classroom->getId(),
             'name' => $classroom->getName(),
-            'type' => $classroom->getType()?->value,
+            'type' => $classroom->getType(),
             'capacity' => $classroom->getCapacity(),
         ]);
         
@@ -107,7 +107,7 @@ class ClassroomService implements ClassroomServiceInterface
     public function getAvailableClassrooms(?ClassroomType $type = null, ?int $minCapacity = null, array $filters = []): array
     {
         $criteria = [
-            'status' => ClassroomStatus::ACTIVE,
+            'status' => ClassroomStatus::ACTIVE->value,
         ];
         
         if ($type !== null) {
@@ -161,16 +161,15 @@ class ClassroomService implements ClassroomServiceInterface
     public function isClassroomAvailable(Classroom $classroom, \DateTimeInterface $startTime, \DateTimeInterface $endTime): bool
     {
         // 检查教室状态
-        if ($classroom->getStatus() !== ClassroomStatus::ACTIVE) {
+        if ($classroom->getStatus() !== ClassroomStatus::ACTIVE->value) {
             return false;
         }
         
         // 检查时间冲突
         $conflictingSchedules = $this->scheduleRepository->findConflictingSchedules(
             $classroom,
-            $startTime,
-            $endTime,
-            [ScheduleStatus::SCHEDULED->value, ScheduleStatus::IN_PROGRESS->value]
+            \DateTimeImmutable::createFromInterface($startTime),
+            \DateTimeImmutable::createFromInterface($endTime)
         );
         
         return empty($conflictingSchedules);
@@ -218,14 +217,7 @@ class ClassroomService implements ClassroomServiceInterface
 
     public function getClassroomDevices(Classroom $classroom): array
     {
-        $devices = $classroom->getDevices() ?? [];
-        
-        // 如果设备信息是JSON字符串，解析为数组
-        if ((bool) is_string($devices)) {
-            $devices = json_decode($devices, true) ?? [];
-        }
-        
-        return $devices;
+        return $classroom->getDevices() ?? [];
     }
 
     public function updateClassroomDevices(Classroom $classroom, array $devices): Classroom
@@ -302,7 +294,7 @@ class ClassroomService implements ClassroomServiceInterface
                     throw new \InvalidArgumentException('教室名称已存在');
                 }
                 
-                if (($dryRun === null)) {
+                if (!$dryRun) {
                     $this->createClassroom($data);
                 }
                 

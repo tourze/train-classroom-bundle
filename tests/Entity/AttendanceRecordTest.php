@@ -232,7 +232,8 @@ class AttendanceRecordTest extends TestCase
         $this->attendanceRecord->setDeviceLocation('教学楼A座101教室门口');
         
         // 由于readonly属性$id在测试环境中无法初始化，我们只验证方法存在
-        $this->assertTrue(method_exists($this->attendanceRecord, 'getSummary'));
+        $reflection = new \ReflectionClass($this->attendanceRecord);
+        $this->assertTrue($reflection->hasMethod('getSummary'));
         
         // 可以测试其他不依赖id的业务逻辑
         $this->assertTrue($this->attendanceRecord->isSuccessful());

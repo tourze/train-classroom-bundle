@@ -122,12 +122,11 @@ class AttendanceTypeTest extends TestCase
     public function test_enum_comparison(): void
     {
         $signIn1 = AttendanceType::SIGN_IN;
-        $signIn2 = AttendanceType::SIGN_IN;
+        $signIn2 = AttendanceType::from('SIGN_IN');
         $signOut = AttendanceType::SIGN_OUT;
         
-        $this->assertTrue($signIn1 === $signIn2);
-        $this->assertFalse($signIn1 === $signOut);
-        $this->assertTrue($signIn1 !== $signOut);
+        $this->assertSame($signIn1, $signIn2);
+        $this->assertNotSame($signIn1, $signOut);
     }
 
     /**

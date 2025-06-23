@@ -326,7 +326,8 @@ class ClassroomScheduleTest extends TestCase
         $this->schedule->setActualStudents(28);
         
         // 由于readonly属性$id在测试环境中无法初始化，我们只验证方法存在
-        $this->assertTrue(method_exists($this->schedule, 'getSummary'));
+        $reflection = new \ReflectionClass($this->schedule);
+        $this->assertTrue($reflection->hasMethod('getSummary'));
         
         // 可以测试其他不依赖id的业务逻辑
         $this->assertEquals(180, $this->schedule->getDurationInMinutes());

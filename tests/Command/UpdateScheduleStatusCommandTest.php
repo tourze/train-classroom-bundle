@@ -35,7 +35,8 @@ class UpdateScheduleStatusCommandTest extends TestCase
      */
     public function test_execute_method_exists(): void
     {
-        $this->assertTrue(method_exists(UpdateScheduleStatusCommand::class, 'execute'));
+        $reflection = new \ReflectionClass(UpdateScheduleStatusCommand::class);
+        $this->assertTrue($reflection->hasMethod('execute'));
     }
 
     /**
@@ -43,7 +44,8 @@ class UpdateScheduleStatusCommandTest extends TestCase
      */
     public function test_configure_method_exists(): void
     {
-        $this->assertTrue(method_exists(UpdateScheduleStatusCommand::class, 'configure'));
+        $reflection = new \ReflectionClass(UpdateScheduleStatusCommand::class);
+        $this->assertTrue($reflection->hasMethod('configure'));
     }
 
     /**
@@ -191,12 +193,4 @@ class UpdateScheduleStatusCommandTest extends TestCase
         $this->assertGreaterThanOrEqual(2, count($parameters));
     }
 
-    /**
-     * 测试类常量
-     */
-    public function test_class_constants(): void
-    {
-        $reflection = new \ReflectionClass(UpdateScheduleStatusCommand::class);
-        $constants = $reflection->getConstants();
-    }
 } 

@@ -9,7 +9,6 @@ use Tourze\DoctrineIndexedBundle\DoctrineIndexedBundle;
 use Tourze\DoctrineSnowflakeBundle\DoctrineSnowflakeBundle;
 use Tourze\DoctrineTimestampBundle\DoctrineTimestampBundle;
 use Tourze\IdcardManageBundle\IdcardManageBundle;
-use Tourze\TrainClassroomBundle\Service\AttributeControllerLoader;
 
 class TrainClassroomBundle extends Bundle implements BundleDependencyInterface
 {
@@ -26,6 +25,6 @@ class TrainClassroomBundle extends Bundle implements BundleDependencyInterface
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
-        AttributeControllerLoader::registerControllers($container, $this);
+        // Controller registration is handled via service configuration
     }
 }

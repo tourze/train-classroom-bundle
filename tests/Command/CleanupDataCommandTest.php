@@ -7,9 +7,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Tourze\TrainClassroomBundle\Command\CleanupDataCommand;
+use Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository;
+use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * CleanupDataCommand测试类
@@ -21,22 +22,26 @@ class CleanupDataCommandTest extends TestCase
     private CleanupDataCommand $command;
     private EntityManagerInterface&MockObject $entityManager;
     private ParameterBagInterface&MockObject $parameterBag;
-    private CommandTester $commandTester;
+    private AttendanceRecordRepository&MockObject $attendanceRecordRepository;
+    private ClassroomScheduleRepository&MockObject $classroomScheduleRepository;
 
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->parameterBag = $this->createMock(ParameterBagInterface::class);
+        $this->attendanceRecordRepository = $this->createMock(AttendanceRecordRepository::class);
+        $this->classroomScheduleRepository = $this->createMock(ClassroomScheduleRepository::class);
 
         $this->command = new CleanupDataCommand(
             $this->entityManager,
-            $this->parameterBag
+            $this->parameterBag,
+            $this->attendanceRecordRepository,
+            $this->classroomScheduleRepository
         );
 
         $application = new Application();
         $application->add($this->command);
 
-        $this->commandTester = new CommandTester($this->command);
     }
 
     /**
@@ -91,11 +96,13 @@ class CleanupDataCommandTest extends TestCase
         
         $this->assertNotNull($constructor);
         $parameters = $constructor->getParameters();
-        $this->assertCount(2, $parameters);
+        $this->assertCount(4, $parameters);
         
         // 验证参数名称
         $this->assertEquals('entityManager', $parameters[0]->getName());
         $this->assertEquals('parameterBag', $parameters[1]->getName());
+        $this->assertEquals('attendanceRecordRepository', $parameters[2]->getName());
+        $this->assertEquals('classroomScheduleRepository', $parameters[3]->getName());
     }
 
     /**
@@ -103,7 +110,8 @@ class CleanupDataCommandTest extends TestCase
      */
     public function test_execute_method_exists(): void
     {
-        $this->assertTrue(method_exists(CleanupDataCommand::class, 'execute'));
+        $reflection = new \ReflectionClass(CleanupDataCommand::class);
+        $this->assertTrue($reflection->hasMethod('execute'));
     }
 
     /**
@@ -111,7 +119,8 @@ class CleanupDataCommandTest extends TestCase
      */
     public function test_configure_method_exists(): void
     {
-        $this->assertTrue(method_exists(CleanupDataCommand::class, 'configure'));
+        $reflection = new \ReflectionClass(CleanupDataCommand::class);
+        $this->assertTrue($reflection->hasMethod('configure'));
     }
 
     /**
@@ -203,13 +212,6 @@ class CleanupDataCommandTest extends TestCase
         $this->assertEquals('1000', $batchOption->getDefault());
     }
 
-    /**
-     * 测试命令别名
-     */
-    public function test_command_aliases(): void
-    {
-        $aliases = $this->command->getAliases();
-    }
 
     /**
      * 测试私有方法存在

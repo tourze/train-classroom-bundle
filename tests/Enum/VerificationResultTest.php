@@ -273,12 +273,11 @@ class VerificationResultTest extends TestCase
     public function test_enum_comparison(): void
     {
         $success1 = VerificationResult::SUCCESS;
-        $success2 = VerificationResult::SUCCESS;
+        $success2 = VerificationResult::from('SUCCESS');
         $failed = VerificationResult::FAILED;
         
-        $this->assertTrue($success1 === $success2);
-        $this->assertFalse($success1 === $failed);
-        $this->assertTrue($success1 !== $failed);
+        $this->assertSame($success1, $success2);
+        $this->assertNotSame($success1, $failed);
     }
 
     /**

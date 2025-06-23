@@ -196,12 +196,11 @@ class AttendanceMethodTest extends TestCase
     public function test_enum_comparison(): void
     {
         $face1 = AttendanceMethod::FACE;
-        $face2 = AttendanceMethod::FACE;
+        $face2 = AttendanceMethod::from('FACE');
         $card = AttendanceMethod::CARD;
         
-        $this->assertTrue($face1 === $face2);
-        $this->assertFalse($face1 === $card);
-        $this->assertTrue($face1 !== $card);
+        $this->assertSame($face1, $face2);
+        $this->assertNotSame($face1, $card);
     }
 
     /**

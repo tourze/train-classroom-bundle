@@ -12,8 +12,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Tourze\TrainClassroomBundle\Entity\AttendanceRecord;
-use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
+use Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository;
+use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 数据清理命令
@@ -29,7 +29,9 @@ class CleanupDataCommand extends Command
     protected const NAME = 'train-classroom:cleanup-data';
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly ParameterBagInterface $parameterBag
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly AttendanceRecordRepository $attendanceRecordRepository,
+        private readonly ClassroomScheduleRepository $classroomScheduleRepository
     ) {
         parent::__construct();
     }
@@ -152,10 +154,8 @@ class CleanupDataCommand extends Command
         $cutoffDate = new \DateTimeImmutable("-{$retentionDays} days");
         $io->info(sprintf('清理 %s 之前的考勤记录', $cutoffDate->format('Y-m-d')));
 
-        $repository = $this->entityManager->getRepository(AttendanceRecord::class);
-        
         // 统计需要清理的记录数
-        $qb = $repository->createQueryBuilder('a')
+        $qb = $this->attendanceRecordRepository->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->where('a.recordTime < :cutoffDate')
             ->setParameter('cutoffDate', $cutoffDate);
@@ -178,7 +178,7 @@ class CleanupDataCommand extends Command
         $io->progressStart($totalCount);
 
         while ($deletedCount < $totalCount) {
-            $qb = $repository->createQueryBuilder('a')
+            $qb = $this->attendanceRecordRepository->createQueryBuilder('a')
                 ->where('a.recordTime < :cutoffDate')
                 ->setParameter('cutoffDate', $cutoffDate)
                 ->setMaxResults($batchSize);
@@ -216,10 +216,8 @@ class CleanupDataCommand extends Command
         $cutoffDate = new \DateTimeImmutable("-{$retentionDays} days");
         $io->info(sprintf('清理 %s 之前已完成的排课记录', $cutoffDate->format('Y-m-d')));
 
-        $repository = $this->entityManager->getRepository(ClassroomSchedule::class);
-        
         // 统计需要清理的记录数（只清理已完成的排课）
-        $qb = $repository->createQueryBuilder('s')
+        $qb = $this->classroomScheduleRepository->createQueryBuilder('s')
             ->select('COUNT(s.id)')
             ->where('s.endTime < :cutoffDate')
             ->andWhere('s.status = :completedStatus')
@@ -244,7 +242,7 @@ class CleanupDataCommand extends Command
         $io->progressStart($totalCount);
 
         while ($deletedCount < $totalCount) {
-            $qb = $repository->createQueryBuilder('s')
+            $qb = $this->classroomScheduleRepository->createQueryBuilder('s')
                 ->where('s.endTime < :cutoffDate')
                 ->andWhere('s.status = :completedStatus')
                 ->setParameter('cutoffDate', $cutoffDate)

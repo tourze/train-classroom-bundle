@@ -10,6 +10,7 @@ use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
+use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
 use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
@@ -22,6 +23,7 @@ class ScheduleService implements ScheduleServiceInterface
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ClassroomScheduleRepository $scheduleRepository,
+        private readonly ClassroomRepository $classroomRepository,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -48,7 +50,7 @@ class ScheduleService implements ScheduleServiceInterface
         // 创建排课记录
         $schedule = new ClassroomSchedule();
         $schedule->setClassroom($classroom);
-        $schedule->setTeacherId($courseId);
+        $schedule->setTeacherId((string)$courseId);
         $schedule->setScheduleType($type);
         $schedule->setStartTime(\DateTimeImmutable::createFromInterface($startTime));
         $schedule->setEndTime(\DateTimeImmutable::createFromInterface($endTime));
@@ -88,9 +90,9 @@ class ScheduleService implements ScheduleServiceInterface
     ): array {
         return $this->scheduleRepository->findConflictingSchedules(
             $classroom,
-            $startTime,
-            $endTime,
-            $excludeScheduleId
+            \DateTimeImmutable::createFromInterface($startTime),
+            \DateTimeImmutable::createFromInterface($endTime),
+            $excludeScheduleId !== null ? (string)$excludeScheduleId : null
         );
     }
 
@@ -104,7 +106,7 @@ class ScheduleService implements ScheduleServiceInterface
         
         if ($reason !== null) {
             $currentRemark = $schedule->getRemark();
-            $newRemark = $currentRemark 
+            $newRemark = ($currentRemark !== null && $currentRemark !== '')
                 ? $currentRemark . "\n状态变更：{$oldStatus->getDescription()} -> {$status->getDescription()}，原因：{$reason}"
                 : "状态变更：{$oldStatus->getDescription()} -> {$status->getDescription()}，原因：{$reason}";
             $schedule->setRemark($newRemark);
@@ -141,12 +143,12 @@ class ScheduleService implements ScheduleServiceInterface
         array $requiredFeatures = []
     ): array {
         // 获取所有教室
-        $classrooms = $this->entityManager->getRepository(Classroom::class)->findAll();
+        $classrooms = $this->classroomRepository->findAll();
         $availableClassrooms = [];
 
         foreach ($classrooms as $classroom) {
             // 检查容量要求
-            if ($minCapacity && $classroom->getCapacity() < $minCapacity) {
+            if ($minCapacity !== null && $classroom->getCapacity() < $minCapacity) {
                 continue;
             }
 
@@ -194,8 +196,7 @@ class ScheduleService implements ScheduleServiceInterface
 
         foreach ($scheduleData as $index => $data) {
             try {
-                $classroom = $this->entityManager->getRepository(Classroom::class)
-                    ->find($data['classroom_id']);
+                $classroom = $this->classroomRepository->find($data['classroom_id']);
 
                 if (($classroom === null)) {
                     throw new \InvalidArgumentException('教室不存在');
@@ -207,7 +208,7 @@ class ScheduleService implements ScheduleServiceInterface
                 // 检查冲突
                 $conflicts = $this->detectScheduleConflicts($classroom, $startTime, $endTime);
                 if (!empty($conflicts)) {
-                    if ($skipConflicts !== null) {
+                    if ($skipConflicts) {
                         $results['skipped']++;
                         continue;
                     } else {
@@ -259,7 +260,7 @@ class ScheduleService implements ScheduleServiceInterface
             $schedule->getClassroom(),
             $newStartTime,
             $newEndTime,
-            $schedule->getId()
+            (int)$schedule->getId()
         );
 
         if (!empty($conflicts)) {
@@ -278,7 +279,7 @@ class ScheduleService implements ScheduleServiceInterface
         // 添加延期备注
         $postponeRemark = "延期：原时间 {$originalStartTime} - {$originalEndTime}，延期原因：{$reason}";
         $currentRemark = $schedule->getRemark();
-        $newRemark = $currentRemark ? $currentRemark . "\n" . $postponeRemark : $postponeRemark;
+        $newRemark = ($currentRemark !== null && $currentRemark !== '') ? $currentRemark . "\n" . $postponeRemark : $postponeRemark;
         $schedule->setRemark($newRemark);
 
         $this->entityManager->flush();
@@ -315,17 +316,17 @@ class ScheduleService implements ScheduleServiceInterface
 
             $calendar[$date][] = [
                 'id' => $schedule->getId(),
-                'title' => $schedule->getTitle(),
+                'title' => $schedule->getCourseContent() ?? '未设置课程内容',
                 'classroom' => $schedule->getClassroom()->getName(),
                 'classroom_id' => $schedule->getClassroom()->getId(),
-                'course_id' => $schedule->getCourseId(),
-                'type' => $schedule->getType()->value,
+                'teacher_id' => $schedule->getTeacherId(),
+                'type' => $schedule->getScheduleType()->value,
                 'status' => $schedule->getScheduleStatus()->value,
                 'start_time' => $schedule->getStartTime()->format('H:i'),
                 'end_time' => $schedule->getEndTime()->format('H:i'),
                 'duration' => $schedule->getDurationInMinutes(),
-                'instructor_id' => $schedule->getInstructorId(),
-                'max_participants' => $schedule->getMaxParticipants(),
+                'expected_students' => $schedule->getExpectedStudents(),
+                'actual_students' => $schedule->getActualStudents(),
             ];
         }
 

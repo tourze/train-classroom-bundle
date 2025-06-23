@@ -263,12 +263,7 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     public function removeRegistration(Registration $registration): static
     {
-        if ($this->registrations->removeElement($registration)) {
-            // set the owning side to null (unless already changed)
-            if ($registration->getClassroom() === $this) {
-                $registration->setClassroom(null);
-            }
-        }
+        $this->registrations->removeElement($registration);
 
         return $this;
     }
@@ -316,7 +311,6 @@ class Classroom implements \Stringable, ApiArrayInterface
             'startTime' => $this->getStartTime()?->format('Y-m-d H:i:s'),
             'endTime' => $this->getEndTime()?->format('Y-m-d H:i:s'),
             'category' => $this->getCategory()->retrieveApiArray(),
-            'topCategory' => $this->getCategory()->getTopCategory()->retrieveApiArray(),
             'title' => $this->getTitle(),
             'registrationCount' => $this->getRegistrations()->count(),
         ];
@@ -342,12 +336,7 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     public function removeQrcode(Qrcode $qrcode): static
     {
-        if ($this->qrcodes->removeElement($qrcode)) {
-            // set the owning side to null (unless already changed)
-            if ($qrcode->getClassroom() === $this) {
-                $qrcode->setClassroom(null);
-            }
-        }
+        $this->qrcodes->removeElement($qrcode);
 
         return $this;
     }
@@ -372,12 +361,7 @@ class Classroom implements \Stringable, ApiArrayInterface
 
     public function removeSchedule(ClassroomSchedule $schedule): static
     {
-        if ($this->schedules->removeElement($schedule)) {
-            // set the owning side to null (unless already changed)
-            if ($schedule->getClassroom() === $this) {
-                $schedule->setClassroom(null);
-            }
-        }
+        $this->schedules->removeElement($schedule);
 
         return $this;
     }

@@ -4,56 +4,72 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Bundle\FrameworkBundle\Routing\AttributeRouteControllerLoader;
+use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Component\Routing\RouteCollection;
+use Tourze\RoutingAutoLoaderBundle\Service\RoutingAutoLoaderInterface;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\BatchImportAttendanceController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\DetectAnomaliesController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\GetAttendanceRateStatisticsController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\GetAttendanceStatisticsController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\GetCourseSummaryController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\MakeupAttendanceController;
+use Tourze\TrainClassroomBundle\Controller\Api\Attendance\RecordAttendanceController;
+use Tourze\TrainClassroomBundle\Controller\Api\Register\RegisterFormController;
+use Tourze\TrainClassroomBundle\Controller\Api\Register\RegisterSubmitController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\BatchCreateScheduleController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\CancelScheduleController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\CreateScheduleController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\GetScheduleDetailController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\GetScheduleListController;
+use Tourze\TrainClassroomBundle\Controller\Api\Schedule\UpdateScheduleController;
+use Tourze\TrainClassroomBundle\Controller\Classroom\CreateClassroomController;
 
-final class AttributeControllerLoader
+#[AutoconfigureTag('routing.loader')]
+final class AttributeControllerLoader extends Loader implements RoutingAutoLoaderInterface
 {
-    /**
-     * 注册控制器服务
-     */
-    public static function registerControllers(ContainerBuilder $container, Bundle $bundle): void
+    private AttributeRouteControllerLoader $controllerLoader;
+
+    public function __construct()
     {
-        $bundleDir = $bundle->getPath();
-        $bundleNamespace = $bundle->getNamespace();
-        
-        // 扫描控制器目录
-        $controllerDir = $bundleDir . '/Controller';
-        if (!is_dir($controllerDir)) {
-            return;
-        }
+        parent::__construct();
+        $this->controllerLoader = new AttributeRouteControllerLoader();
+    }
 
-        $controllerFiles = glob($controllerDir . '/**/*Controller.php');
-        if (empty($controllerFiles)) {
-            return;
-        }
+    public function load(mixed $resource, ?string $type = null): RouteCollection
+    {
+        return $this->autoload();
+    }
 
-        foreach ($controllerFiles as $file) {
-            $relativePath = str_replace($bundleDir . '/', '', $file);
-            $relativePath = str_replace('/', '\\', $relativePath);
-            $relativePath = str_replace('.php', '', $relativePath);
-            
-            $controllerClass = $bundleNamespace . '\\' . $relativePath;
-            
-            if (!class_exists($controllerClass)) {
-                continue;
-            }
-            
-            $reflection = new \ReflectionClass($controllerClass);
-            if ($reflection->isAbstract() || !$reflection->isSubclassOf(AbstractController::class)) {
-                continue;
-            }
+    public function supports(mixed $resource, ?string $type = null): bool
+    {
+        return false;
+    }
 
-            // 创建控制器定义
-            $definition = new Definition($controllerClass);
-            $definition->setAutowired(true);
-            $definition->setAutoconfigured(true);
-            $definition->addTag('controller.service_arguments');
-            
-            $serviceId = 'train_classroom.controller.' . $reflection->getShortName();
-            $container->setDefinition($serviceId, $definition);
-        }
+    public function autoload(): RouteCollection
+    {
+        $collection = new RouteCollection();
+        // Attendance Controllers
+        $collection->addCollection($this->controllerLoader->load(RecordAttendanceController::class));
+        $collection->addCollection($this->controllerLoader->load(BatchImportAttendanceController::class));
+        $collection->addCollection($this->controllerLoader->load(GetAttendanceStatisticsController::class));
+        $collection->addCollection($this->controllerLoader->load(GetCourseSummaryController::class));
+        $collection->addCollection($this->controllerLoader->load(DetectAnomaliesController::class));
+        $collection->addCollection($this->controllerLoader->load(MakeupAttendanceController::class));
+        $collection->addCollection($this->controllerLoader->load(GetAttendanceRateStatisticsController::class));
+        // Schedule Controllers
+        $collection->addCollection($this->controllerLoader->load(CreateScheduleController::class));
+        $collection->addCollection($this->controllerLoader->load(BatchCreateScheduleController::class));
+        $collection->addCollection($this->controllerLoader->load(UpdateScheduleController::class));
+        $collection->addCollection($this->controllerLoader->load(CancelScheduleController::class));
+        $collection->addCollection($this->controllerLoader->load(GetScheduleListController::class));
+        $collection->addCollection($this->controllerLoader->load(GetScheduleDetailController::class));
+        // Register Controllers
+        $collection->addCollection($this->controllerLoader->load(RegisterFormController::class));
+        $collection->addCollection($this->controllerLoader->load(RegisterSubmitController::class));
+        // Classroom Controllers
+        $collection->addCollection($this->controllerLoader->load(CreateClassroomController::class));
+        return $collection;
     }
 }

@@ -12,6 +12,7 @@ use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\AttendanceType;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 use Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository;
+use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 /**
  * 考勤服务实现
@@ -23,6 +24,7 @@ class AttendanceService implements AttendanceServiceInterface
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly AttendanceRecordRepository $attendanceRepository,
+        private readonly RegistrationRepository $registrationRepository,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -72,8 +74,7 @@ class AttendanceService implements AttendanceServiceInterface
 
         foreach ($attendanceData as $index => $data) {
             try {
-                $registration = $this->entityManager->getRepository(Registration::class)
-                    ->find($data['registration_id']);
+                $registration = $this->registrationRepository->find($data['registration_id']);
 
                 if (($registration === null)) {
                     throw new \InvalidArgumentException('报名记录不存在');
@@ -190,8 +191,8 @@ class AttendanceService implements AttendanceServiceInterface
         ?\DateTimeInterface $date = null
     ): array {
         $date = $date ?? new \DateTimeImmutable();
-        $startOfDay = $date->setTime(0, 0, 0, 0);
-        $endOfDay = $date->setTime(23, 59, 59, 999999);
+        $startOfDay = \DateTimeImmutable::createFromInterface($date)->setTime(0, 0, 0, 0);
+        $endOfDay = \DateTimeImmutable::createFromInterface($date)->setTime(23, 59, 59, 999999);
 
         $records = $this->attendanceRepository->findByRegistrationAndDateRange(
             $registration,
@@ -206,7 +207,7 @@ class AttendanceService implements AttendanceServiceInterface
         $signOutRecords = array_filter($records, fn($r) => $r->getType() === AttendanceType::SIGN_OUT);
 
         // 异常1：多次签到
-        if ((bool) count($signInRecords) > 1) {
+        if (count($signInRecords) > 1) {
             $anomalies[] = [
                 'type' => 'multiple_sign_in',
                 'message' => '当日存在多次签到记录',
@@ -215,7 +216,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常2：多次签退
-        if ((bool) count($signOutRecords) > 1) {
+        if (count($signOutRecords) > 1) {
             $anomalies[] = [
                 'type' => 'multiple_sign_out',
                 'message' => '当日存在多次签退记录',
@@ -224,7 +225,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常3：只有签退没有签到
-        if ((bool) count($signOutRecords) > 0 && count($signInRecords) === 0) {
+        if (count($signOutRecords) > 0 && count($signInRecords) === 0) {
             $anomalies[] = [
                 'type' => 'sign_out_without_sign_in',
                 'message' => '存在签退记录但无签到记录',
@@ -233,7 +234,7 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 异常4：签退时间早于签到时间
-        if ((bool) count($signInRecords) > 0 && count($signOutRecords) > 0) {
+        if (count($signInRecords) > 0 && count($signOutRecords) > 0) {
             $latestSignIn = max(array_map(fn($r) => $r->getRecordTime(), $signInRecords));
             $earliestSignOut = min(array_map(fn($r) => $r->getRecordTime(), $signOutRecords));
 
@@ -291,14 +292,11 @@ class AttendanceService implements AttendanceServiceInterface
         }
 
         // 检查是否在课程时间范围内
-        $course = $registration->getCourse();
-        if ($course && $course->getEndTime() && $recordTime > $course->getEndTime()) {
-            return false;
-        }
+        // TODO: Course 实体需要添加时间范围属性
 
         // 检查当日是否已有相同类型的考勤记录
-        $startOfDay = $recordTime->setTime(0, 0, 0);
-        $endOfDay = $recordTime->setTime(23, 59, 59);
+        $startOfDay = \DateTimeImmutable::createFromInterface($recordTime)->setTime(0, 0, 0);
+        $endOfDay = \DateTimeImmutable::createFromInterface($recordTime)->setTime(23, 59, 59);
 
         $existingRecords = $this->attendanceRepository->findByRegistrationTypeAndDateRange(
             $registration,
@@ -308,7 +306,7 @@ class AttendanceService implements AttendanceServiceInterface
         );
 
         // 签到和签退每天只能有一次
-        if ((bool) in_array($type, [AttendanceType::SIGN_IN, AttendanceType::SIGN_OUT]) && count($existingRecords) > 0) {
+        if (in_array($type, [AttendanceType::SIGN_IN, AttendanceType::SIGN_OUT]) && count($existingRecords) > 0) {
             return false;
         }
 
@@ -341,7 +339,7 @@ class AttendanceService implements AttendanceServiceInterface
         // 临时使用报名时间作为课程时间
         $startDate = $registration->getBeginTime();
         $endDate = $registration->getEndTime();
-        if (!$startDate || !$endDate) {
+        if ($endDate === null) {
             return 0;
         }
         $interval = $startDate->diff($endDate);

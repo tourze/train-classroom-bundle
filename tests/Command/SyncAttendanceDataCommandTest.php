@@ -35,7 +35,8 @@ class SyncAttendanceDataCommandTest extends TestCase
      */
     public function test_execute_method_exists(): void
     {
-        $this->assertTrue(method_exists(SyncAttendanceDataCommand::class, 'execute'));
+        $reflection = new \ReflectionClass(SyncAttendanceDataCommand::class);
+        $this->assertTrue($reflection->hasMethod('execute'));
     }
 
     /**
@@ -43,7 +44,8 @@ class SyncAttendanceDataCommandTest extends TestCase
      */
     public function test_configure_method_exists(): void
     {
-        $this->assertTrue(method_exists(SyncAttendanceDataCommand::class, 'configure'));
+        $reflection = new \ReflectionClass(SyncAttendanceDataCommand::class);
+        $this->assertTrue($reflection->hasMethod('configure'));
     }
 
     /**
@@ -111,14 +113,6 @@ class SyncAttendanceDataCommandTest extends TestCase
         $this->assertTrue($loadFromFileMethod->isPrivate());
     }
 
-    /**
-     * 测试类常量
-     */
-    public function test_class_constants(): void
-    {
-        $reflection = new \ReflectionClass(SyncAttendanceDataCommand::class);
-        $constants = $reflection->getConstants();
-    }
 
     /**
      * 测试类属性

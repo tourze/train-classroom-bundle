@@ -190,11 +190,10 @@ class ScheduleStatusTest extends TestCase
     public function test_enum_comparison(): void
     {
         $scheduled1 = ScheduleStatus::SCHEDULED;
-        $scheduled2 = ScheduleStatus::SCHEDULED;
+        $scheduled2 = ScheduleStatus::from('SCHEDULED');
         $ongoing = ScheduleStatus::ONGOING;
         
-        $this->assertTrue($scheduled1 === $scheduled2);
-        $this->assertFalse($scheduled1 === $ongoing);
-        $this->assertTrue($scheduled1 !== $ongoing);
+        $this->assertSame($scheduled1, $scheduled2);
+        $this->assertNotSame($scheduled1, $ongoing);
     }
 } 

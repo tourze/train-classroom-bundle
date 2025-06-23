@@ -17,8 +17,7 @@ use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\TrainClassroomBundle\Enum\OrderStatus;
 use Tourze\TrainClassroomBundle\Enum\TrainType;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
@@ -30,10 +29,10 @@ use Tourze\TrainCourseBundle\Entity\Course;
 #[ORM\Entity(repositoryClass: RegistrationRepository::class)]
 #[ORM\Table(name: 'job_training_class_registration', options: ['comment' => '报班记录'])]
 #[ORM\UniqueConstraint(name: 'job_training_class_registration_idx_uniq', columns: ['classroom_id', 'student_id'])]
-#[ORM\HasLifecycleCallbacks]
 class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterface
 {
     use TimestampableAware;
+    use BlameableAware;
     #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -63,7 +62,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
 
     #[Groups(['admin_curd'])]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '开通时间'])]
-    private ?\DateTimeInterface $beginTime;
+    private \DateTimeInterface $beginTime;
 
     #[Groups(['admin_curd'])]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '过期时间'])]
@@ -105,15 +104,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\OneToMany(targetEntity: AttendanceRecord::class, mappedBy: 'registration')]
     private Collection $attendanceRecords;
 
-    #[CreatedByColumn]
-    #[Groups(['restful_read'])]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    #[Groups(['restful_read'])]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
-    private ?string $updatedBy = null;
 
     #[CreateIpColumn]
     private ?string $createdFromIp = null;
@@ -130,6 +120,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     public function __construct()
     {
         $this->attendanceRecords = new ArrayCollection();
+        $this->beginTime = new \DateTimeImmutable();
     }
 
     public function __toString(): string
@@ -146,29 +137,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this->id;
     }
 
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
 
     public function setCreatedFromIp(?string $createdFromIp): self
     {
@@ -275,36 +243,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return $this;
     }
 
-    /**
-     * @return Collection<int, FaceDetect>
-     */
-    // public function getFaceDetects(): Collection
-    // {
-    //     return $this->faceDetects;
-    // }
-
-    public function addFaceDetect($faceDetect): static
-    {
-        // if (!$this->faceDetects->contains($faceDetect)) {
-        //     $this->faceDetects->add($faceDetect);
-        //     $faceDetect->setRegistration($this);
-        // }
-
-        return $this;
-    }
-
-    public function removeFaceDetect($faceDetect): static
-    {
-        // if ($this->faceDetects->removeElement($faceDetect)) {
-        //     // set the owning side to null (unless already changed)
-        //     if ($faceDetect->getRegistration() === $this) {
-        //         $faceDetect->setRegistration(null);
-        //     }
-        // }
-
-        return $this;
-    }
-
     public function getBeginTime(): \DateTimeInterface
     {
         return $this->beginTime;
@@ -405,7 +343,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     {
         return [
             'id' => $this->getId(),
-            'beginTime' => $this->getBeginTime()?->format('Y-m-d H:i:s'),
+            'beginTime' => $this->getBeginTime()->format('Y-m-d H:i:s'),
             'endTime' => $this->getEndTime()?->format('Y-m-d H:i:s'),
             'createTime' => $this->getCreateTime()?->format('Y-m-d H:i:s'),
             'classroom' => $this->getClassroom()->retrieveApiArray(),
@@ -429,10 +367,10 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         
         // 检查时间范围
         $now = new \DateTimeImmutable();
-        if ($this->beginTime && $now < $this->beginTime) {
+        if ($now < $this->beginTime) {
             return false;
         }
-        if ($this->endTime && $now > $this->endTime) {
+        if ($this->endTime !== null && $now > $this->endTime) {
             return false;
         }
         
@@ -465,7 +403,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
             'createTime' => $this->getCreateTime()?->format('Y-m-d H:i:s'),
             'updateTime' => $this->getUpdateTime()?->format('Y-m-d H:i:s'),
             'trainType' => $this->getTrainType()?->value,
-            'beginTime' => $this->getBeginTime()?->format('Y-m-d H:i:s'),
+            'beginTime' => $this->getBeginTime()->format('Y-m-d H:i:s'),
             'endTime' => $this->getEndTime()?->format('Y-m-d H:i:s'),
             'status' => $this->getStatus()?->value,
         ];
