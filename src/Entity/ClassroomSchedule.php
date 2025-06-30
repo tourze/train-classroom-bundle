@@ -7,7 +7,7 @@ namespace Tourze\TrainClassroomBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
@@ -25,11 +25,7 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 class ClassroomSchedule implements Stringable
 {
     use TimestampableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     /**
      * 关联的教室
@@ -72,10 +68,6 @@ class ClassroomSchedule implements Stringable
     private ?string $remark = null;
 
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getClassroom(): Classroom
     {

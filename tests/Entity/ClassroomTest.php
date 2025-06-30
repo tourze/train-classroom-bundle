@@ -7,7 +7,7 @@ use Tourze\TrainClassroomBundle\Entity\Classroom;
 
 /**
  * Classroom实体测试类
- * 
+ *
  * 测试教室实体的基本功能，避免外部依赖
  */
 class ClassroomTest extends TestCase

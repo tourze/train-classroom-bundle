@@ -11,11 +11,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
+use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 
 /**
  * 考勤数据同步命令
- * 
+ *
  * 用于从外部设备同步考勤数据
  */
 #[AsCommand(
@@ -162,7 +164,7 @@ class SyncAttendanceDataCommand extends Command
             case 'database':
                 return $this->loadFromDatabase($input, $io);
             default:
-                throw new \InvalidArgumentException('不支持的数据源类型: ' . $source);
+                throw new InvalidArgumentException('不支持的数据源类型: ' . $source);
         }
     }
 
@@ -173,11 +175,11 @@ class SyncAttendanceDataCommand extends Command
     {
         $filePath = $input->getOption('file');
         if (($filePath === null)) {
-            throw new \InvalidArgumentException('使用文件数据源时必须指定 --file 参数');
+            throw new InvalidArgumentException('使用文件数据源时必须指定 --file 参数');
         }
 
         if (!file_exists($filePath)) {
-            throw new \InvalidArgumentException('文件不存在: ' . $filePath);
+            throw new InvalidArgumentException('文件不存在: ' . $filePath);
         }
 
         $io->info('从文件加载数据: ' . $filePath);
@@ -190,7 +192,7 @@ class SyncAttendanceDataCommand extends Command
             case 'json':
                 return $this->loadFromJson($filePath);
             default:
-                throw new \InvalidArgumentException('不支持的文件格式: ' . $extension);
+                throw new InvalidArgumentException('不支持的文件格式: ' . $extension);
         }
     }
 
@@ -203,13 +205,13 @@ class SyncAttendanceDataCommand extends Command
         $handle = fopen($filePath, 'r');
 
         if ($handle === false) {
-            throw new \RuntimeException('无法打开文件: ' . $filePath);
+            throw new RuntimeException('无法打开文件: ' . $filePath);
         }
 
         // 读取表头
         $headers = fgetcsv($handle);
         if ($headers === false) {
-            throw new \RuntimeException('无法读取CSV表头');
+            throw new RuntimeException('无法读取CSV表头');
         }
 
         // 读取数据行
@@ -230,12 +232,12 @@ class SyncAttendanceDataCommand extends Command
     {
         $content = file_get_contents($filePath);
         if ($content === false) {
-            throw new \RuntimeException('无法读取文件: ' . $filePath);
+            throw new RuntimeException('无法读取文件: ' . $filePath);
         }
 
         $data = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('JSON格式错误: ' . json_last_error_msg());
+            throw new RuntimeException('JSON格式错误: ' . json_last_error_msg());
         }
 
         return is_array($data) ? $data : [];
@@ -248,7 +250,7 @@ class SyncAttendanceDataCommand extends Command
     {
         $apiUrl = $input->getOption('api-url');
         if (($apiUrl === null)) {
-            throw new \InvalidArgumentException('使用API数据源时必须指定 --api-url 参数');
+            throw new InvalidArgumentException('使用API数据源时必须指定 --api-url 参数');
         }
 
         $io->info('从API加载数据: ' . $apiUrl);
@@ -280,12 +282,12 @@ class SyncAttendanceDataCommand extends Command
 
         $response = file_get_contents($url, false, $context);
         if ($response === false) {
-            throw new \RuntimeException('API请求失败: ' . $url);
+            throw new RuntimeException('API请求失败: ' . $url);
         }
 
         $data = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('API响应JSON格式错误: ' . json_last_error_msg());
+            throw new RuntimeException('API响应JSON格式错误: ' . json_last_error_msg());
         }
 
         return $data['data'] ?? $data;
@@ -298,7 +300,7 @@ class SyncAttendanceDataCommand extends Command
     {
         $dsn = $input->getOption('database-dsn');
         if (($dsn === null)) {
-            throw new \InvalidArgumentException('使用数据库数据源时必须指定 --database-dsn 参数');
+            throw new InvalidArgumentException('使用数据库数据源时必须指定 --database-dsn 参数');
         }
 
         $io->info('从数据库加载数据: ' . $dsn);

@@ -17,7 +17,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 排课状态更新命令
- * 
+ *
  * 自动更新过期或需要状态变更的排课记录
  */
 #[AsCommand(

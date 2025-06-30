@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
+use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 use Tourze\TrainClassroomBundle\Enum\ClassroomStatus;
 use Tourze\TrainClassroomBundle\Enum\ClassroomType;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
@@ -16,7 +18,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 教室管理服务实现
- * 
+ *
  * 提供教室的创建、更新、查询、状态管理等核心业务功能
  */
 class ClassroomService implements ClassroomServiceInterface
@@ -77,7 +79,7 @@ class ClassroomService implements ClassroomServiceInterface
             // 检查是否有未完成的排课
             $activeSchedules = $this->scheduleRepository->findActiveSchedulesByClassroom($classroom);
             if (!empty($activeSchedules)) {
-                throw new \RuntimeException('教室存在未完成的排课，无法删除');
+                throw new RuntimeException('教室存在未完成的排课，无法删除');
             }
             
             $this->entityManager->remove($classroom);
@@ -126,11 +128,18 @@ class ClassroomService implements ClassroomServiceInterface
         // 应用其他过滤条件
         foreach ($filters as $field => $value) {
             $classrooms = array_filter($classrooms, function (Classroom $classroom) use ($field, $value) {
-                $getter = 'get' . ucfirst($field);
-                if ((bool) method_exists($classroom, $getter)) {
-                    return $classroom->$getter() === $value;
+                switch ($field) {
+                    case 'type':
+                        return $classroom->getType() === $value;
+                    case 'status':
+                        return $classroom->getStatus() === $value;
+                    case 'location':
+                        return $classroom->getLocation() === $value;
+                    case 'supplierId':
+                        return $classroom->getSupplierId() === $value;
+                    default:
+                        return true;
                 }
-                return true;
             });
         }
         
@@ -285,13 +294,13 @@ class ClassroomService implements ClassroomServiceInterface
             try {
                 // 验证必需字段
                 if ((bool) empty($data['name'])) {
-                    throw new \InvalidArgumentException('教室名称不能为空');
+                    throw new InvalidArgumentException('教室名称不能为空');
                 }
                 
                 // 检查是否已存在
                 $existing = $this->classroomRepository->findOneBy(['name' => $data['name']]);
                 if ($existing !== null) {
-                    throw new \InvalidArgumentException('教室名称已存在');
+                    throw new InvalidArgumentException('教室名称已存在');
                 }
                 
                 if (!$dryRun) {

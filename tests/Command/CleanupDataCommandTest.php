@@ -14,7 +14,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * CleanupDataCommand测试类
- * 
+ *
  * 测试命令类的基本功能和配置
  */
 class CleanupDataCommandTest extends TestCase

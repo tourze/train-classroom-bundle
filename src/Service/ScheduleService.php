@@ -7,6 +7,7 @@ namespace Tourze\TrainClassroomBundle\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
 use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
@@ -15,7 +16,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 排课服务实现
- * 
+ *
  * 提供教室排课管理的核心业务功能实现
  */
 class ScheduleService implements ScheduleServiceInterface
@@ -38,13 +39,13 @@ class ScheduleService implements ScheduleServiceInterface
     ): ClassroomSchedule {
         // 验证时间参数
         if ($startTime >= $endTime) {
-            throw new \InvalidArgumentException('开始时间必须早于结束时间');
+            throw new InvalidArgumentException('开始时间必须早于结束时间');
         }
 
         // 检测时间冲突
         $conflicts = $this->detectScheduleConflicts($classroom, $startTime, $endTime);
         if (!empty($conflicts)) {
-            throw new \InvalidArgumentException('排课时间冲突，已存在' . count($conflicts) . '个冲突的排课');
+            throw new InvalidArgumentException('排课时间冲突，已存在' . count($conflicts) . '个冲突的排课');
         }
 
         // 创建排课记录
@@ -199,7 +200,7 @@ class ScheduleService implements ScheduleServiceInterface
                 $classroom = $this->classroomRepository->find($data['classroom_id']);
 
                 if (($classroom === null)) {
-                    throw new \InvalidArgumentException('教室不存在');
+                    throw new InvalidArgumentException('教室不存在');
                 }
 
                 $startTime = new \DateTimeImmutable($data['start_time']);
@@ -212,7 +213,7 @@ class ScheduleService implements ScheduleServiceInterface
                         $results['skipped']++;
                         continue;
                     } else {
-                        throw new \InvalidArgumentException('排课时间冲突');
+                        throw new InvalidArgumentException('排课时间冲突');
                     }
                 }
 
@@ -252,7 +253,7 @@ class ScheduleService implements ScheduleServiceInterface
     ): ClassroomSchedule {
         // 验证新时间
         if ($newStartTime >= $newEndTime) {
-            throw new \InvalidArgumentException('新的开始时间必须早于结束时间');
+            throw new InvalidArgumentException('新的开始时间必须早于结束时间');
         }
 
         // 检测新时间是否冲突
@@ -264,7 +265,7 @@ class ScheduleService implements ScheduleServiceInterface
         );
 
         if (!empty($conflicts)) {
-            throw new \InvalidArgumentException('新的排课时间冲突');
+            throw new InvalidArgumentException('新的排课时间冲突');
         }
 
         // 记录原时间

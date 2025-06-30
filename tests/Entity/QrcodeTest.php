@@ -7,7 +7,7 @@ use Tourze\TrainClassroomBundle\Entity\Qrcode;
 
 /**
  * Qrcode实体测试类
- * 
+ *
  * 测试二维码实体的基本功能，避免外部依赖
  */
 class QrcodeTest extends TestCase

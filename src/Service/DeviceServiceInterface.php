@@ -9,7 +9,7 @@ use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 
 /**
  * 设备集成服务接口
- * 
+ *
  * 提供考勤设备、监控设备等的集成和管理功能
  */
 interface DeviceServiceInterface

@@ -7,7 +7,7 @@ use Tourze\TrainClassroomBundle\Repository\AttendanceRecordRepository;
 
 /**
  * AttendanceRecordRepository测试类
- * 
+ *
  * 测试仓储类的基本功能和方法存在性
  */
 class AttendanceRecordRepositoryTest extends TestCase

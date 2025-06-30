@@ -20,7 +20,7 @@ final class UpdateScheduleController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/update/{id}', name: 'api_schedule_update', methods: ['PUT', 'PATCH'])]
+    #[Route(path: '/api/schedule/update/{id}', name: 'api_schedule_update', methods: ['PUT', 'PATCH'])]
     public function __invoke(int $id, Request $request): JsonResponse
     {
         try {

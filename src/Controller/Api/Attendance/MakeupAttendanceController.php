@@ -21,7 +21,7 @@ final class MakeupAttendanceController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/makeup', name: 'api_attendance_makeup', methods: ['POST'])]
+    #[Route(path: '/api/attendance/makeup', name: 'api_attendance_makeup', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

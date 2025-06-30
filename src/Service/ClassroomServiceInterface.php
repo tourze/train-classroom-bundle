@@ -10,7 +10,7 @@ use Tourze\TrainClassroomBundle\Enum\ClassroomType;
 
 /**
  * 教室管理服务接口
- * 
+ *
  * 提供教室的创建、更新、查询、状态管理等核心业务功能
  */
 interface ClassroomServiceInterface

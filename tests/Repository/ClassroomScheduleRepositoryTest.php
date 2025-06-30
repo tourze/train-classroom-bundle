@@ -7,7 +7,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * ClassroomScheduleRepository测试类
- * 
+ *
  * 测试仓储类的基本功能和方法存在性
  */
 class ClassroomScheduleRepositoryTest extends TestCase

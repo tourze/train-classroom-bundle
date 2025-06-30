@@ -20,7 +20,7 @@ final class CancelScheduleController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/cancel/{id}', name: 'api_schedule_cancel', methods: ['POST'])]
+    #[Route(path: '/api/schedule/cancel/{id}', name: 'api_schedule_cancel', methods: ['POST'])]
     public function __invoke(int $id, Request $request): JsonResponse
     {
         try {

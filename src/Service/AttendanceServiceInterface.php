@@ -11,7 +11,7 @@ use Tourze\TrainClassroomBundle\Enum\AttendanceType;
 
 /**
  * 考勤服务接口
- * 
+ *
  * 提供培训考勤管理的核心业务功能，包括签到签退、考勤统计、异常处理等
  */
 interface AttendanceServiceInterface

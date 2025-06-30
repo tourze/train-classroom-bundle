@@ -26,7 +26,7 @@ use Tourze\TrainClassroomBundle\Controller\Api\Schedule\GetScheduleListControlle
 use Tourze\TrainClassroomBundle\Controller\Api\Schedule\UpdateScheduleController;
 use Tourze\TrainClassroomBundle\Controller\Classroom\CreateClassroomController;
 
-#[AutoconfigureTag('routing.loader')]
+#[AutoconfigureTag(name: 'routing.loader')]
 final class AttributeControllerLoader extends Loader implements RoutingAutoLoaderInterface
 {
     private AttributeRouteControllerLoader $controllerLoader;

@@ -20,7 +20,7 @@ final class BatchCreateScheduleController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/batch-create', name: 'api_schedule_batch_create', methods: ['POST'])]
+    #[Route(path: '/api/schedule/batch-create', name: 'api_schedule_batch_create', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

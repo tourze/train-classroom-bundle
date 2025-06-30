@@ -22,7 +22,7 @@ final class RecordAttendanceController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/record', name: 'api_attendance_record', methods: ['POST'])]
+    #[Route(path: '/api/attendance/record', name: 'api_attendance_record', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

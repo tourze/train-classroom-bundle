@@ -7,6 +7,7 @@ namespace Tourze\TrainClassroomBundle\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Tourze\TrainClassroomBundle\Entity\AttendanceRecord;
+use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
 use Tourze\TrainClassroomBundle\Entity\Registration;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\AttendanceType;
@@ -16,7 +17,7 @@ use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 /**
  * 考勤服务实现
- * 
+ *
  * 提供培训考勤管理的核心业务功能实现
  */
 class AttendanceService implements AttendanceServiceInterface
@@ -38,7 +39,7 @@ class AttendanceService implements AttendanceServiceInterface
     ): AttendanceRecord {
         // 验证考勤有效性
         if (!$this->validateAttendance($registration, $type)) {
-            throw new \InvalidArgumentException('考勤记录无效：时间或状态不符合要求');
+            throw new InvalidArgumentException('考勤记录无效：时间或状态不符合要求');
         }
 
         // 创建考勤记录
@@ -77,7 +78,7 @@ class AttendanceService implements AttendanceServiceInterface
                 $registration = $this->registrationRepository->find($data['registration_id']);
 
                 if (($registration === null)) {
-                    throw new \InvalidArgumentException('报名记录不存在');
+                    throw new InvalidArgumentException('报名记录不存在');
                 }
 
                 $this->recordAttendance(

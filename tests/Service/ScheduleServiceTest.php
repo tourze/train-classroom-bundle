@@ -8,7 +8,7 @@ use Tourze\TrainClassroomBundle\Service\ScheduleServiceInterface;
 
 /**
  * ScheduleService测试类
- * 
+ *
  * 测试排课服务类的基本功能和接口实现
  */
 class ScheduleServiceTest extends TestCase

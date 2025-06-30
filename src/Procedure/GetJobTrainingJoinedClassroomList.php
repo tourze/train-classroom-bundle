@@ -11,9 +11,9 @@ use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
-#[MethodDoc('获取当前学员的班级信息')]
-#[MethodExpose('GetJobTrainingJoinedClassroomList')]
-#[IsGranted('IS_AUTHENTICATED_FULLY')]
+#[MethodDoc(summary: '获取当前学员的班级信息')]
+#[MethodExpose(method: 'GetJobTrainingJoinedClassroomList')]
+#[IsGranted(attribute: 'IS_AUTHENTICATED_FULLY')]
 class GetJobTrainingJoinedClassroomList extends BaseProcedure
 {
     public function __construct(

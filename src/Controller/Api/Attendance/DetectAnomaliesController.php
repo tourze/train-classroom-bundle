@@ -20,7 +20,7 @@ final class DetectAnomaliesController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/anomalies/{registrationId}', name: 'api_attendance_anomalies', methods: ['GET'])]
+    #[Route(path: '/api/attendance/anomalies/{registrationId}', name: 'api_attendance_anomalies', methods: ['GET'])]
     public function __invoke(int $registrationId, Request $request): JsonResponse
     {
         try {

@@ -11,7 +11,7 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use Tourze\TrainClassroomBundle\Entity\Registration;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
-#[AsCronTask('* * * * *')]
+#[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '过期无效的报班记录')]
 class ExpireRegistrationLogCommand extends Command
 {

@@ -17,7 +17,7 @@ final class CreateClassroomController extends AbstractController
     ) {
     }
 
-    #[Route('/api/classrooms', name: 'api_classroom_create', methods: ['POST'])]
+    #[Route(path: '/api/classrooms', name: 'api_classroom_create', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

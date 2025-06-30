@@ -17,7 +17,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
 /**
  * 数据清理命令
- * 
+ *
  * 用于清理过期的考勤记录、排课记录和相关文件
  */
 #[AsCommand(

@@ -17,7 +17,7 @@ final class GetScheduleDetailController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/{id}', name: 'api_schedule_detail', methods: ['GET'])]
+    #[Route(path: '/api/schedule/{id}', name: 'api_schedule_detail', methods: ['GET'])]
     public function __invoke(int $id): JsonResponse
     {
         try {

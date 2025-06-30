@@ -7,12 +7,14 @@ namespace Tourze\TrainClassroomBundle\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
+use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
+use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 
 /**
  * 设备集成服务实现
- * 
+ *
  * 提供考勤设备、监控设备等的集成和管理功能
  */
 class DeviceService implements DeviceServiceInterface
@@ -50,7 +52,7 @@ class DeviceService implements DeviceServiceInterface
         // 测试设备连接
         $connectionTest = $this->testDeviceConnection($deviceConfig);
         if (!$connectionTest['success']) {
-            throw new \RuntimeException('设备连接测试失败: ' . $connectionTest['error']);
+            throw new RuntimeException('设备连接测试失败: ' . $connectionTest['error']);
         }
         
         $devices[$deviceId] = $deviceConfig;
@@ -93,7 +95,7 @@ class DeviceService implements DeviceServiceInterface
         $devices = $this->getClassroomDevices($classroom);
         
         if (!isset($devices[$deviceId])) {
-            throw new \InvalidArgumentException('设备不存在');
+            throw new InvalidArgumentException('设备不存在');
         }
         
         // 合并配置
@@ -121,7 +123,7 @@ class DeviceService implements DeviceServiceInterface
         
         if ($deviceId !== null) {
             if (!isset($devices[$deviceId])) {
-                throw new \InvalidArgumentException('设备不存在');
+                throw new InvalidArgumentException('设备不存在');
             }
             $devices = [$deviceId => $devices[$deviceId]];
         }
@@ -383,11 +385,11 @@ class DeviceService implements DeviceServiceInterface
     private function validateDeviceConfig(array $config): void
     {
         if (empty($config['type'])) {
-            throw new \InvalidArgumentException('设备类型不能为空');
+            throw new InvalidArgumentException('设备类型不能为空');
         }
         
         if (empty($config['name'])) {
-            throw new \InvalidArgumentException('设备名称不能为空');
+            throw new InvalidArgumentException('设备名称不能为空');
         }
     }
 

@@ -8,7 +8,7 @@ use Tourze\TrainClassroomBundle\Command\SyncAttendanceDataCommand;
 
 /**
  * SyncAttendanceDataCommand测试类
- * 
+ *
  * 测试考勤数据同步命令的基本功能
  */
 class SyncAttendanceDataCommandTest extends TestCase

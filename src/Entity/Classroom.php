@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Tourze\Arrayable\ApiArrayInterface;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\TrainCategoryBundle\Entity\Category;
 use Tourze\TrainClassroomBundle\Repository\ClassroomRepository;
@@ -20,27 +20,22 @@ use Tourze\TrainCourseBundle\Entity\Course;
 class Classroom implements \Stringable, ApiArrayInterface
 {
     use TimestampableAware;
-    #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     // #[FormField(title: '所属分类', optionWhere: 'a.parent IS NULL')]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private Category $category;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(length: 150, options: ['comment' => '班级名称'])]
     private string $title;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '开始时间'])]
     private ?\DateTimeInterface $startTime = null;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true, options: ['comment' => '结束时间'])]
     private ?\DateTimeInterface $endTime = null;
 
@@ -106,10 +101,6 @@ class Classroom implements \Stringable, ApiArrayInterface
         return $this->getTitle();
     }
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getType(): ?string
     {

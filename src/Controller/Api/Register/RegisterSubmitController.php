@@ -22,7 +22,7 @@ final class RegisterSubmitController extends AbstractController
     ) {
     }
 
-    #[Route('/job-training/register/submit/{id}', name: 'job-training-register-submit-data')]
+    #[Route(path: '/job-training/register/submit/{id}', name: 'job-training-register-submit-data')]
     public function __invoke(string $id, Request $request, MountManager $mountManager): Response
     {
         $qrcode = $this->qrcodeRepository->findOneBy([

@@ -13,7 +13,7 @@ use Tourze\Arrayable\AdminArrayInterface;
 use Tourze\Arrayable\ApiArrayInterface;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserAgentBundle\Attribute\CreateUserAgentColumn;
 use Tourze\DoctrineUserAgentBundle\Attribute\UpdateUserAgentColumn;
@@ -33,12 +33,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
 {
     use TimestampableAware;
     use BlameableAware;
-    #[Groups(['restful_read', 'admin_curd', 'recursive_view', 'api_tree'])]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
     #[ORM\JoinColumn(nullable: false)]
@@ -54,24 +49,24 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     #[ORM\JoinColumn(nullable: false)]
     private Course $course;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(length: 10, nullable: true, enumType: TrainType::class, options: ['comment' => '培训类型'])]
     private ?TrainType $trainType = null;
 
     private ?OrderStatus $status = OrderStatus::PENDING;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '开通时间'])]
     private \DateTimeInterface $beginTime;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '过期时间'])]
     private ?\DateTimeInterface $endTime = null;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     private ?\DateTimeInterface $firstLearnTime = null;
 
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     private ?\DateTimeInterface $lastLearnTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'registrations')]
@@ -132,10 +127,6 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
         return "{$this->getClassroom()->__toString()} 报名于 " . $this->getCreateTime()->format('Y-m-d H:i:s');
     }
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
 
     public function setCreatedFromIp(?string $createdFromIp): self

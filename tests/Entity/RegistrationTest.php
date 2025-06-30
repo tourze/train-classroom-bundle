@@ -9,7 +9,7 @@ use Tourze\TrainClassroomBundle\Enum\TrainType;
 
 /**
  * Registration实体测试类
- * 
+ *
  * 测试报名实体的基本功能，避免外部依赖
  */
 class RegistrationTest extends TestCase

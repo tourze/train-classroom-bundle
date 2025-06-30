@@ -18,7 +18,7 @@ final class GetScheduleListController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/list', name: 'api_schedule_list', methods: ['GET'])]
+    #[Route(path: '/api/schedule/list', name: 'api_schedule_list', methods: ['GET'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

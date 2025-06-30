@@ -8,7 +8,7 @@ use Tourze\TrainClassroomBundle\Command\UpdateScheduleStatusCommand;
 
 /**
  * UpdateScheduleStatusCommand测试类
- * 
+ *
  * 测试排课状态更新命令的基本功能
  */
 class UpdateScheduleStatusCommandTest extends TestCase

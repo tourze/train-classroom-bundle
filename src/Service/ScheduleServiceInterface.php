@@ -11,7 +11,7 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 
 /**
  * 排课服务接口
- * 
+ *
  * 提供教室排课管理的核心业务功能，包括排课冲突检测、资源调度、使用率统计等
  */
 interface ScheduleServiceInterface

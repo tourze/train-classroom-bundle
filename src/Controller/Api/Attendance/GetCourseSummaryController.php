@@ -18,7 +18,7 @@ final class GetCourseSummaryController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/course-summary/{courseId}', name: 'api_attendance_course_summary', methods: ['GET'])]
+    #[Route(path: '/api/attendance/course-summary/{courseId}', name: 'api_attendance_course_summary', methods: ['GET'])]
     public function __invoke(int $courseId, Request $request): JsonResponse
     {
         try {

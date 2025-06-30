@@ -18,7 +18,7 @@ final class GetAttendanceRateStatisticsController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/rate-statistics/{courseId}', name: 'api_attendance_rate_statistics', methods: ['GET'])]
+    #[Route(path: '/api/attendance/rate-statistics/{courseId}', name: 'api_attendance_rate_statistics', methods: ['GET'])]
     public function __invoke(int $courseId, Request $request): JsonResponse
     {
         try {

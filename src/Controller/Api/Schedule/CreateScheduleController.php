@@ -21,7 +21,7 @@ final class CreateScheduleController extends AbstractController
     ) {
     }
 
-    #[Route('/api/schedule/create', name: 'api_schedule_create', methods: ['POST'])]
+    #[Route(path: '/api/schedule/create', name: 'api_schedule_create', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

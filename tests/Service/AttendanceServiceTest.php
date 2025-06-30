@@ -8,7 +8,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 
 /**
  * AttendanceService测试类
- * 
+ *
  * 测试服务类的基本功能和接口实现
  */
 class AttendanceServiceTest extends TestCase

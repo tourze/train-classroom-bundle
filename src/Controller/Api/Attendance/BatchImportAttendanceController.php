@@ -18,7 +18,7 @@ final class BatchImportAttendanceController extends AbstractController
     ) {
     }
 
-    #[Route('/api/attendance/batch-import', name: 'api_attendance_batch_import', methods: ['POST'])]
+    #[Route(path: '/api/attendance/batch-import', name: 'api_attendance_batch_import', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         try {

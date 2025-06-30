@@ -18,7 +18,7 @@ final class RegisterFormController extends AbstractController
     ) {
     }
 
-    #[Route('/job-training/register/form/{id}', name: 'job-training-register-form')]
+    #[Route(path: '/job-training/register/form/{id}', name: 'job-training-register-form')]
     public function __invoke(string $id): Response
     {
         $qrcode = $this->qrcodeRepository->findOneBy([
