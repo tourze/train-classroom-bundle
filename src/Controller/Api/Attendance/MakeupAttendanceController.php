@@ -17,7 +17,7 @@ final class MakeupAttendanceController extends AbstractController
 {
     public function __construct(
         private readonly AttendanceServiceInterface $attendanceService,
-        private readonly RegistrationRepository $registrationRepository
+        private readonly RegistrationRepository $registrationRepository,
     ) {
     }
 
@@ -27,6 +27,16 @@ final class MakeupAttendanceController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
 
+            // 验证 JSON 是否有效
+            if (null === $data && JSON_ERROR_NONE !== json_last_error()) {
+                return $this->json([
+                    'success' => false,
+                    'error' => '无效的JSON数据',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            assert(is_array($data));
+
             // 验证必需参数
             if (!isset($data['registration_id'], $data['type'], $data['record_time'], $data['reason'])) {
                 return $this->json([
@@ -35,10 +45,16 @@ final class MakeupAttendanceController extends AbstractController
                 ], Response::HTTP_BAD_REQUEST);
             }
 
+            // 类型验证
+            assert(is_int($data['registration_id']) || is_string($data['registration_id']));
+            assert(is_int($data['type']) || is_string($data['type']));
+            assert(is_string($data['record_time']));
+            assert(is_string($data['reason']));
+
             // 获取报名记录
             $registration = $this->registrationRepository->find($data['registration_id']);
 
-            if ($registration === null) {
+            if (null === $registration) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',

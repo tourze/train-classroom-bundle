@@ -1,0 +1,4 @@
+# Classroom Controllers
+train_classroom_bundle_controllers:
+    resource: '../src/Controller/'
+    type: attribute

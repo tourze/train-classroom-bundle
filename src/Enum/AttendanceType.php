@@ -2,6 +2,7 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -12,12 +13,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 考勤类型枚举
  * 定义学员考勤的不同类型
  */
-enum AttendanceType: string
- implements Itemable, Labelable, Selectable{
-    
+enum AttendanceType: string implements Itemable, Labelable, Selectable, BadgeInterface
+{
     use ItemTrait;
     use SelectTrait;
-case SIGN_IN = 'SIGN_IN';      // 签到
+    case SIGN_IN = 'SIGN_IN';      // 签到
     case SIGN_OUT = 'SIGN_OUT';    // 签退
     case BREAK_OUT = 'BREAK_OUT';  // 休息外出
     case BREAK_IN = 'BREAK_IN';    // 休息返回
@@ -37,6 +37,7 @@ case SIGN_IN = 'SIGN_IN';      // 签到
 
     /**
      * 获取所有类型的选项数组
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -44,6 +45,7 @@ case SIGN_IN = 'SIGN_IN';      // 签到
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getLabel();
         }
+
         return $options;
     }
 
@@ -52,7 +54,7 @@ case SIGN_IN = 'SIGN_IN';      // 签到
      */
     public function isSignIn(): bool
     {
-        return $this === self::SIGN_IN || $this === self::BREAK_IN;
+        return self::SIGN_IN === $this || self::BREAK_IN === $this;
     }
 
     /**
@@ -60,6 +62,19 @@ case SIGN_IN = 'SIGN_IN';      // 签到
      */
     public function isSignOut(): bool
     {
-        return $this === self::SIGN_OUT || $this === self::BREAK_OUT;
+        return self::SIGN_OUT === $this || self::BREAK_OUT === $this;
     }
-} 
+
+    /**
+     * 获取Badge样式
+     */
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::SIGN_IN => BadgeInterface::SUCCESS,
+            self::SIGN_OUT => BadgeInterface::INFO,
+            self::BREAK_OUT => BadgeInterface::WARNING,
+            self::BREAK_IN => BadgeInterface::PRIMARY,
+        };
+    }
+}

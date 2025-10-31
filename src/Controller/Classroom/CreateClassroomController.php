@@ -13,7 +13,7 @@ use Tourze\TrainClassroomBundle\Service\ClassroomServiceInterface;
 final class CreateClassroomController extends AbstractController
 {
     public function __construct(
-        private readonly ClassroomServiceInterface $classroomService
+        private readonly ClassroomServiceInterface $classroomService,
     ) {
     }
 
@@ -22,13 +22,14 @@ final class CreateClassroomController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);
-            
-            if ($data === null) {
+
+            if (!is_array($data)) {
                 return $this->json(['error' => '无效的JSON数据'], 400);
             }
-            
+
+            /** @var array<string, mixed> $data */
             $classroom = $this->classroomService->createClassroom($data);
-            
+
             return $this->json([
                 'success' => true,
                 'data' => [

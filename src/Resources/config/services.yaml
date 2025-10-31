@@ -13,3 +13,31 @@ services:
     resource: '../../Repository/'
   Tourze\TrainClassroomBundle\Service\:
     resource: '../../Service/'
+  
+  # 明确注册 RegistrationService 接口绑定
+  Tourze\TrainClassroomBundle\Service\RegistrationServiceInterface:
+    alias: Tourze\TrainClassroomBundle\Service\RegistrationService
+    public: true
+  
+  # 明确定义 RegistrationService
+  Tourze\TrainClassroomBundle\Service\RegistrationService:
+    arguments:
+      $registrationRepository: '@Tourze\TrainClassroomBundle\Repository\RegistrationRepository'
+      $entityManager: '@doctrine.orm.entity_manager'
+      $logger: '@monolog.logger.train_classroom'
+    public: true
+  Tourze\TrainClassroomBundle\Procedure\:
+    resource: '../../Procedure/'
+
+  # 接口到实现类的绑定
+  Tourze\TrainClassroomBundle\Service\DeviceServiceInterface:
+    alias: Tourze\TrainClassroomBundle\Service\DeviceService
+    public: true
+
+  # DataLoader类设置为public以便测试使用
+  Tourze\TrainClassroomBundle\Command\DataLoader\ApiDataLoader:
+    public: true
+  Tourze\TrainClassroomBundle\Command\DataLoader\DatabaseDataLoader:
+    public: true
+  Tourze\TrainClassroomBundle\Command\DataLoader\FileDataLoader:
+    public: true

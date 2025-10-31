@@ -12,12 +12,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 教室状态枚举
  * 定义教室的运行状态
  */
-enum ClassroomStatus: string
- implements Itemable, Labelable, Selectable{
-    
+enum ClassroomStatus: string implements Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-case ACTIVE = 'ACTIVE';           // 活跃
+    case ACTIVE = 'ACTIVE';           // 活跃
     case INACTIVE = 'INACTIVE';       // 非活跃
     case MAINTENANCE = 'MAINTENANCE'; // 维护中
     case RESERVED = 'RESERVED';       // 预留
@@ -37,6 +36,7 @@ case ACTIVE = 'ACTIVE';           // 活跃
 
     /**
      * 获取所有状态的选项数组
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -44,6 +44,7 @@ case ACTIVE = 'ACTIVE';           // 活跃
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getLabel();
         }
+
         return $options;
     }
 
@@ -52,7 +53,7 @@ case ACTIVE = 'ACTIVE';           // 活跃
      */
     public function isAvailableForTraining(): bool
     {
-        return $this === self::ACTIVE;
+        return self::ACTIVE === $this;
     }
 
     /**
@@ -60,7 +61,7 @@ case ACTIVE = 'ACTIVE';           // 活跃
      */
     public function needsMaintenance(): bool
     {
-        return $this === self::MAINTENANCE;
+        return self::MAINTENANCE === $this;
     }
 
     /**
@@ -101,4 +102,4 @@ case ACTIVE = 'ACTIVE';           // 活跃
             self::RESERVED => 'fa-bookmark',
         };
     }
-} 
+}

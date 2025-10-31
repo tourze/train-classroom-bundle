@@ -15,7 +15,7 @@ final class GetAttendanceStatisticsController extends AbstractController
 {
     public function __construct(
         private readonly AttendanceServiceInterface $attendanceService,
-        private readonly RegistrationRepository $registrationRepository
+        private readonly RegistrationRepository $registrationRepository,
     ) {
     }
 
@@ -25,7 +25,7 @@ final class GetAttendanceStatisticsController extends AbstractController
         try {
             $registration = $this->registrationRepository->find($registrationId);
 
-            if ($registration === null) {
+            if (null === $registration) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',

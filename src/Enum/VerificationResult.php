@@ -2,6 +2,7 @@
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -12,12 +13,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 验证结果枚举
  * 定义考勤验证的结果状态
  */
-enum VerificationResult: string
- implements Itemable, Labelable, Selectable{
-    
+enum VerificationResult: string implements Itemable, Labelable, Selectable, BadgeInterface
+{
     use ItemTrait;
     use SelectTrait;
-case SUCCESS = 'SUCCESS';     // 验证成功
+    case SUCCESS = 'SUCCESS';     // 验证成功
     case FAILED = 'FAILED';       // 验证失败
     case PENDING = 'PENDING';     // 待验证
     case TIMEOUT = 'TIMEOUT';     // 验证超时
@@ -41,6 +41,7 @@ case SUCCESS = 'SUCCESS';     // 验证成功
 
     /**
      * 获取所有结果的选项数组
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -48,6 +49,7 @@ case SUCCESS = 'SUCCESS';     // 验证成功
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getLabel();
         }
+
         return $options;
     }
 
@@ -56,7 +58,7 @@ case SUCCESS = 'SUCCESS';     // 验证成功
      */
     public function isSuccess(): bool
     {
-        return $this === self::SUCCESS;
+        return self::SUCCESS === $this;
     }
 
     /**
@@ -64,7 +66,7 @@ case SUCCESS = 'SUCCESS';     // 验证成功
      */
     public function isFailure(): bool
     {
-        return $this === self::FAILED || $this === self::TIMEOUT || $this === self::ERROR || $this === self::DEVICE_ERROR;
+        return self::FAILED === $this || self::TIMEOUT === $this || self::ERROR === $this || self::DEVICE_ERROR === $this;
     }
 
     /**
@@ -72,7 +74,7 @@ case SUCCESS = 'SUCCESS';     // 验证成功
      */
     public function isPending(): bool
     {
-        return $this === self::PENDING;
+        return self::PENDING === $this;
     }
 
     /**
@@ -104,4 +106,19 @@ case SUCCESS = 'SUCCESS';     // 验证成功
             self::DEVICE_ERROR => 'fa-cog',
         };
     }
-} 
+
+    /**
+     * 获取Badge样式
+     */
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::SUCCESS => BadgeInterface::SUCCESS,
+            self::FAILED => BadgeInterface::DANGER,
+            self::PENDING => BadgeInterface::WARNING,
+            self::TIMEOUT => BadgeInterface::SECONDARY,
+            self::ERROR => BadgeInterface::DANGER,
+            self::DEVICE_ERROR => BadgeInterface::DARK,
+        };
+    }
+}

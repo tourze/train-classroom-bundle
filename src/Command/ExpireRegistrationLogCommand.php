@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\TrainClassroomBundle\Command;
 
 use Carbon\CarbonImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +19,10 @@ use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 class ExpireRegistrationLogCommand extends Command
 {
     protected const NAME = 'job-training:expire-registration';
+
     public function __construct(
         private readonly RegistrationRepository $registrationRepository,
+        private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
     }
@@ -29,11 +34,21 @@ class ExpireRegistrationLogCommand extends Command
             ->where('a.endTime<:now AND a.expired=false AND a.finished=false')
             ->setParameter('now', CarbonImmutable::now())
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+
+        if (!\is_array($registrations)) {
+            return Command::SUCCESS;
+        }
+
         foreach ($registrations as $registration) {
             assert($registration instanceof Registration);
             $registration->setExpired(true);
-            $this->registrationRepository->save($registration);
+            $this->entityManager->persist($registration);
+        }
+
+        if (\count($registrations) > 0) {
+            $this->entityManager->flush();
         }
 
         return Command::SUCCESS;

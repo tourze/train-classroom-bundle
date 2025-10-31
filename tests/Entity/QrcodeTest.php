@@ -2,175 +2,247 @@
 
 namespace Tourze\TrainClassroomBundle\Tests\Entity;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
+use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Entity\Qrcode;
 
 /**
  * Qrcode实体测试类
  *
  * 测试二维码实体的基本功能，避免外部依赖
+ *
+ * @internal
  */
-class QrcodeTest extends TestCase
+#[CoversClass(Qrcode::class)]
+final class QrcodeTest extends AbstractEntityTestCase
 {
-    private Qrcode $qrcode;
+    private Classroom&MockObject $classroom;
 
-    protected function setUp(): void
+    protected function createEntity(): Qrcode
     {
-        $this->qrcode = new Qrcode();
+        /*
+         * 使用Classroom具体Entity类进行Mock的原因：
+         * 1) Classroom是Doctrine实体类，包含复杂的属性和关联关系
+         * 2) 测试需要验证Qrcode与Classroom的关联关系，使用具体类确保类型一致
+         * 3) Entity类没有对应的接口，使用具体类是唯一选择
+         * 4) 在Entity单元测试中模拟关联实体是常见做法，避免数据库依赖
+         */
+        $this->classroom = $this->createMock(Classroom::class);
+
+        $qrcode = new Qrcode();
+        $qrcode->setClassroom($this->classroom);
+        $qrcode->setTitle('测试二维码');
+        $qrcode->setLimitNumber(100);
+
+        return $qrcode;
+    }
+
+    /**
+     * @return iterable<string, array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        yield 'title' => ['title', '培训签到二维码'];
+        yield 'limitNumber_100' => ['limitNumber', 100];
+        yield 'limitNumber_0' => ['limitNumber', 0];
+        yield 'valid_true' => ['valid', true];
+        yield 'valid_false' => ['valid', false];
+        yield 'valid_null' => ['valid', null];
+        yield 'createdBy_admin' => ['createdBy', 'admin'];
+        yield 'createdBy_null' => ['createdBy', null];
+        yield 'updatedBy_admin' => ['updatedBy', 'admin'];
+        yield 'updatedBy_null' => ['updatedBy', null];
     }
 
     /**
      * 测试Title的设置和获取
      */
-    public function test_title_property(): void
+    public function testTitleProperty(): void
     {
+        $qrcode = $this->createEntity();
         $title = '培训签到二维码';
-        $this->qrcode->setTitle($title);
-        
-        $this->assertSame($title, $this->qrcode->getTitle());
+        $qrcode->setTitle($title);
+
+        $this->assertSame($title, $qrcode->getTitle());
     }
 
     /**
      * 测试LimitNumber的设置和获取
      */
-    public function test_limit_number_property(): void
+    public function testLimitNumberProperty(): void
     {
-        $limitNumber = 100;
-        $this->qrcode->setLimitNumber($limitNumber);
-        
-        $this->assertSame($limitNumber, $this->qrcode->getLimitNumber());
+        $qrcode = $this->createEntity();
+        $limitNumber = 50;
+        $qrcode->setLimitNumber($limitNumber);
+
+        $this->assertSame($limitNumber, $qrcode->getLimitNumber());
     }
 
     /**
      * 测试Valid的设置和获取
      */
-    public function test_valid_property(): void
+    public function testValidProperty(): void
     {
-        $this->qrcode->setValid(true);
-        $this->assertTrue($this->qrcode->isValid());
-        
-        $this->qrcode->setValid(false);
-        $this->assertFalse($this->qrcode->isValid());
+        $qrcode = $this->createEntity();
+        $qrcode->setValid(true);
+        $this->assertTrue($qrcode->isValid());
+
+        $qrcode->setValid(false);
+        $this->assertFalse($qrcode->isValid());
     }
 
     /**
      * 测试Valid的默认值
      */
-    public function test_valid_default_value(): void
+    public function testValidDefaultValue(): void
     {
-        $this->assertFalse($this->qrcode->isValid());
+        $qrcode = $this->createEntity();
+        $this->assertFalse($qrcode->isValid());
     }
 
     /**
      * 测试CreatedBy的设置和获取
      */
-    public function test_created_by_property(): void
+    public function testCreatedByProperty(): void
     {
+        $qrcode = $this->createEntity();
         $createdBy = 'admin';
-        $this->qrcode->setCreatedBy($createdBy);
-        
-        $this->assertSame($createdBy, $this->qrcode->getCreatedBy());
+        $qrcode->setCreatedBy($createdBy);
+
+        $this->assertSame($createdBy, $qrcode->getCreatedBy());
     }
 
     /**
      * 测试CreatedBy可以为null
      */
-    public function test_created_by_can_be_null(): void
+    public function testCreatedByCanBeNull(): void
     {
-        $this->qrcode->setCreatedBy(null);
-        
-        $this->assertNull($this->qrcode->getCreatedBy());
+        $qrcode = $this->createEntity();
+        $qrcode->setCreatedBy(null);
+
+        $this->assertNull($qrcode->getCreatedBy());
     }
 
     /**
      * 测试UpdatedBy的设置和获取
      */
-    public function test_updated_by_property(): void
+    public function testUpdatedByProperty(): void
     {
+        $qrcode = $this->createEntity();
         $updatedBy = 'admin';
-        $this->qrcode->setUpdatedBy($updatedBy);
-        
-        $this->assertSame($updatedBy, $this->qrcode->getUpdatedBy());
+        $qrcode->setUpdatedBy($updatedBy);
+
+        $this->assertSame($updatedBy, $qrcode->getUpdatedBy());
     }
 
     /**
      * 测试UpdatedBy可以为null
      */
-    public function test_updated_by_can_be_null(): void
+    public function testUpdatedByCanBeNull(): void
     {
-        $this->qrcode->setUpdatedBy(null);
-        
-        $this->assertNull($this->qrcode->getUpdatedBy());
+        $qrcode = $this->createEntity();
+        $qrcode->setUpdatedBy(null);
+
+        $this->assertNull($qrcode->getUpdatedBy());
+    }
+
+    /**
+     * 测试Classroom关联关系
+     */
+    public function testClassroomRelationship(): void
+    {
+        $qrcode = $this->createEntity();
+        $this->assertSame($this->classroom, $qrcode->getClassroom());
     }
 
     /**
      * 测试Registrations集合的初始化
      */
-    public function test_registrations_collection_initialization(): void
+    public function testRegistrationsCollectionInitialization(): void
     {
-        $registrations = $this->qrcode->getRegistrations();
-        
-        $this->assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $registrations);
+        $qrcode = $this->createEntity();
+        $registrations = $qrcode->getRegistrations();
+
         $this->assertCount(0, $registrations);
     }
 
     /**
-     * 测试方法链式调用
+     * 测试setter方法功能
      */
-    public function test_method_chaining(): void
+    public function testSetterMethods(): void
     {
-        $title = '链式调用测试';
+        $qrcode = $this->createEntity();
+        $title = '测试二维码修改';
         $limitNumber = 50;
-        
-        $result = $this->qrcode
-            ->setTitle($title)
-            ->setLimitNumber($limitNumber)
-            ->setValid(false);
-        
-        $this->assertSame($this->qrcode, $result);
-        $this->assertSame($title, $this->qrcode->getTitle());
-        $this->assertSame($limitNumber, $this->qrcode->getLimitNumber());
-        $this->assertFalse($this->qrcode->isValid());
+        $createdBy = 'user1';
+
+        $qrcode->setTitle($title);
+        $qrcode->setLimitNumber($limitNumber);
+        $qrcode->setValid(true);
+        $qrcode->setCreatedBy($createdBy);
+        $qrcode->setUpdatedBy($createdBy);
+
+        $this->assertSame($title, $qrcode->getTitle());
+        $this->assertSame($limitNumber, $qrcode->getLimitNumber());
+        $this->assertTrue($qrcode->isValid());
+        $this->assertSame($createdBy, $qrcode->getCreatedBy());
+        $this->assertSame($createdBy, $qrcode->getUpdatedBy());
     }
 
     /**
-     * 测试边界值
+     * 测试所有可选属性的默认值
      */
-    public function test_boundary_values(): void
+    public function testOptionalPropertiesDefaultValues(): void
     {
-        // 测试空字符串
-        $this->qrcode->setTitle('');
-        $this->assertSame('', $this->qrcode->getTitle());
-        
-        // 测试长字符串
-        $longTitle = str_repeat('A', 1000);
-        $this->qrcode->setTitle($longTitle);
-        $this->assertSame($longTitle, $this->qrcode->getTitle());
-        
-        // 测试负数限制
-        $this->qrcode->setLimitNumber(-1);
-        $this->assertSame(-1, $this->qrcode->getLimitNumber());
-        
-        // 测试零限制
-        $this->qrcode->setLimitNumber(0);
-        $this->assertSame(0, $this->qrcode->getLimitNumber());
+        $qrcode = $this->createEntity();
+        // title和limitNumber是必填属性，在createEntity中已设置
+        $this->assertSame('测试二维码', $qrcode->getTitle());
+        $this->assertSame(100, $qrcode->getLimitNumber());
+        $this->assertSame($this->classroom, $qrcode->getClassroom());
+        $this->assertNull($qrcode->getCreatedBy());
+        $this->assertNull($qrcode->getUpdatedBy());
+        $this->assertFalse($qrcode->isValid());
     }
 
     /**
-     * 测试时间属性默认值
+     * 测试边界值情况
      */
-    public function test_time_properties_default_values(): void
+    public function testBoundaryValues(): void
     {
-        $this->assertNull($this->qrcode->getCreateTime());
-        $this->assertNull($this->qrcode->getUpdateTime());
+        $qrcode = $this->createEntity();
+
+        // 测试空字符串标题
+        $qrcode->setTitle('');
+        $this->assertSame('', $qrcode->getTitle());
+
+        // 测试长字符串标题
+        $longTitle = str_repeat('这是一个很长的标题', 50);
+        $qrcode->setTitle($longTitle);
+        $this->assertSame($longTitle, $qrcode->getTitle());
+
+        // 测试限制数量边界值
+        $qrcode->setLimitNumber(0);
+        $this->assertSame(0, $qrcode->getLimitNumber());
+
+        $qrcode->setLimitNumber(PHP_INT_MAX);
+        $this->assertSame(PHP_INT_MAX, $qrcode->getLimitNumber());
+
+        // 测试负数限制数量
+        $qrcode->setLimitNumber(-1);
+        $this->assertSame(-1, $qrcode->getLimitNumber());
     }
 
     /**
-     * 测试用户属性默认值
+     * 测试集合操作
      */
-    public function test_user_properties_default_values(): void
+    public function testCollectionOperations(): void
     {
-        $this->assertNull($this->qrcode->getCreatedBy());
-        $this->assertNull($this->qrcode->getUpdatedBy());
+        $qrcode = $this->createEntity();
+        // 测试集合初始状态
+        $this->assertCount(0, $qrcode->getRegistrations());
     }
-} 
+}

@@ -1,19 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\TrainClassroomBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use Tourze\TrainClassroomBundle\Entity\Registration;
 
 /**
- * @method Registration|null find($id, $lockMode = null, $lockVersion = null)
- * @method Registration|null findOneBy(array $criteria, array $orderBy = null)
- * @method Registration[]    findAll()
- * @method Registration[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Registration>
  */
 #[Autoconfigure(public: true)]
+#[AsRepository(entityClass: Registration::class)]
 class RegistrationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,14 +22,20 @@ class RegistrationRepository extends ServiceEntityRepository
         parent::__construct($registry, Registration::class);
     }
 
-    /**
-     * 保存报名记录
-     */
-    public function save(Registration $registration, bool $flush = true): void
+    public function save(Registration $entity, bool $flush = true): void
     {
-        $this->getEntityManager()->persist($registration);
-        
-        if ((bool) $flush) {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Registration $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
             $this->getEntityManager()->flush();
         }
     }

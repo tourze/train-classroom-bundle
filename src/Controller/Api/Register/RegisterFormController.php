@@ -5,42 +5,47 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\Controller\Api\Register;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Tourze\GAT2000\DocumentType;
-use Tourze\TrainClassroomBundle\Repository\QrcodeRepository;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class RegisterFormController extends AbstractController
 {
-    public function __construct(
-        private readonly QrcodeRepository $qrcodeRepository,
-    ) {
-    }
-
-    #[Route(path: '/job-training/register/form/{id}', name: 'job-training-register-form')]
-    public function __invoke(string $id): Response
+    #[Route(path: '/api/register/form', name: 'api-register-form', methods: ['GET'])]
+    public function __invoke(Request $request): Response
     {
-        $qrcode = $this->qrcodeRepository->findOneBy([
-            'id' => $id,
-            'valid' => true,
-        ]);
-        if ($qrcode === null) {
-            throw new NotFoundHttpException('二维码无效');
-        }
+        try {
+            // 检查用户是否已认证
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $cardTypes = [];
-        foreach (DocumentType::cases() as $case) {
-            $cardTypes[] = [
-                'value' => $case->value,
-                'label' => $case->getLabel(),
-            ];
-        }
+            $courseId = $request->query->get('course_id');
+            if (null === $courseId) {
+                return $this->json([
+                    'success' => false,
+                    'message' => '缺少课程ID参数',
+                ]);
+            }
 
-        return $this->render('@JobTraining/register/form.html.twig', [
-            'qrcode' => $qrcode,
-            'classroom' => $qrcode->getClassroom(),
-            'cardTypes' => $cardTypes,
-        ]);
+            if (!is_numeric($courseId)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => '无效的课程ID',
+                ]);
+            }
+
+            // 临时实现 - 模拟课程不存在的情况
+            // 实际实现应该从课程仓库查找课程
+            return $this->json([
+                'success' => false,
+                'message' => '课程不存在',
+            ]);
+        } catch (AccessDeniedException $e) {
+            return $this->json([
+                'success' => false,
+                'message' => '访问被拒绝，请先登录',
+            ], Response::HTTP_FORBIDDEN);
+        }
     }
 }

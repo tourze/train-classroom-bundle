@@ -13,17 +13,26 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 final class GetScheduleDetailController extends AbstractController
 {
     public function __construct(
-        private readonly ClassroomScheduleRepository $scheduleRepository
+        private readonly ClassroomScheduleRepository $scheduleRepository,
     ) {
     }
 
-    #[Route(path: '/api/schedule/{id}', name: 'api_schedule_detail', methods: ['GET'])]
-    public function __invoke(int $id): JsonResponse
+    #[Route(path: '/api/schedule/detail/{id}', name: 'api_schedule_detail', methods: ['GET'])]
+    public function __invoke(int|string $id): JsonResponse
     {
         try {
+            // 验证ID参数
+            if (!is_numeric($id)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => '无效的排课ID',
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $id = (int) $id;
             $schedule = $this->scheduleRepository->find($id);
-            
-            if ($schedule === null) {
+
+            if (null === $schedule) {
                 return $this->json([
                     'success' => false,
                     'message' => '排课记录不存在',
@@ -37,7 +46,7 @@ final class GetScheduleDetailController extends AbstractController
                     'classroom' => [
                         'id' => $schedule->getClassroom()->getId(),
                         'name' => $schedule->getClassroom()->getName(),
-                        'type' => $schedule->getClassroom()->getType()->value,
+                        'type' => $schedule->getClassroom()->getType(),
                     ],
                     'teacher_id' => $schedule->getTeacherId(),
                     'type' => $schedule->getScheduleType()->value,
@@ -49,8 +58,8 @@ final class GetScheduleDetailController extends AbstractController
                     'actual_students' => $schedule->getActualStudents(),
                     'course_content' => $schedule->getCourseContent(),
                     'remark' => $schedule->getRemark(),
-                    'created_at' => $schedule->getCreatedAt()->format('Y-m-d H:i:s'),
-                    'updated_at' => $schedule->getUpdatedAt()?->format('Y-m-d H:i:s'),
+                    'created_at' => $schedule->getCreateTime()?->format('Y-m-d H:i:s'),
+                    'updated_at' => $schedule->getUpdateTime()?->format('Y-m-d H:i:s'),
                 ],
             ]);
         } catch (\Throwable $e) {

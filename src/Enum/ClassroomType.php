@@ -12,12 +12,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 教室类型枚举
  * 定义不同类型的培训教室
  */
-enum ClassroomType: string
- implements Itemable, Labelable, Selectable{
-    
+enum ClassroomType: string implements Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-case PHYSICAL = 'PHYSICAL';   // 物理教室
+    case PHYSICAL = 'PHYSICAL';   // 物理教室
     case VIRTUAL = 'VIRTUAL';     // 虚拟教室
     case HYBRID = 'HYBRID';       // 混合教室
 
@@ -35,6 +34,7 @@ case PHYSICAL = 'PHYSICAL';   // 物理教室
 
     /**
      * 获取所有类型的选项数组
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -42,6 +42,7 @@ case PHYSICAL = 'PHYSICAL';   // 物理教室
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getLabel();
         }
+
         return $options;
     }
 
@@ -50,7 +51,7 @@ case PHYSICAL = 'PHYSICAL';   // 物理教室
      */
     public function requiresPhysicalSpace(): bool
     {
-        return $this === self::PHYSICAL || $this === self::HYBRID;
+        return self::PHYSICAL === $this || self::HYBRID === $this;
     }
 
     /**
@@ -58,7 +59,7 @@ case PHYSICAL = 'PHYSICAL';   // 物理教室
      */
     public function supportsOnline(): bool
     {
-        return $this === self::VIRTUAL || $this === self::HYBRID;
+        return self::VIRTUAL === $this || self::HYBRID === $this;
     }
 
     /**
@@ -84,4 +85,4 @@ case PHYSICAL = 'PHYSICAL';   // 物理教室
             self::HYBRID => '混合式教室，支持线上线下同时进行',
         };
     }
-} 
+}

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -13,12 +14,11 @@ use Tourze\EnumExtra\SelectTrait;
 /**
  * 培训类型枚举
  */
-enum TrainType: string
- implements Itemable, Labelable, Selectable{
-    
+enum TrainType: string implements BadgeInterface, Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-case ONLINE = 'online';
+    case ONLINE = 'online';
     case OFFLINE = 'offline';
     case HYBRID = 'hybrid';
 
@@ -36,6 +36,7 @@ case ONLINE = 'online';
 
     /**
      * 获取所有选项
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -51,7 +52,7 @@ case ONLINE = 'online';
      */
     public function isOnline(): bool
     {
-        return $this === self::ONLINE;
+        return self::ONLINE === $this;
     }
 
     /**
@@ -59,7 +60,7 @@ case ONLINE = 'online';
      */
     public function isOffline(): bool
     {
-        return $this === self::OFFLINE;
+        return self::OFFLINE === $this;
     }
 
     /**
@@ -67,14 +68,47 @@ case ONLINE = 'online';
      */
     public function isHybrid(): bool
     {
-        return $this === self::HYBRID;
+        return self::HYBRID === $this;
     }
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::ONLINE => '线上培训',
+            self::OFFLINE => '线下培训',
+            self::HYBRID => '混合培训',
         };
     }
-} 
+
+    /**
+     * 获取徽章类型
+     */
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::ONLINE => BadgeInterface::INFO,
+            self::OFFLINE => BadgeInterface::PRIMARY,
+            self::HYBRID => BadgeInterface::SUCCESS,
+        };
+    }
+
+    /**
+     * 获取徽章CSS类
+     */
+    public function getBadgeClass(): string
+    {
+        return match ($this) {
+            self::ONLINE => 'badge-info',
+            self::OFFLINE => 'badge-primary',
+            self::HYBRID => 'badge-success',
+        };
+    }
+
+    /**
+     * 获取徽章显示标签
+     */
+    public function getBadgeLabel(): string
+    {
+        return $this->getLabel();
+    }
+}

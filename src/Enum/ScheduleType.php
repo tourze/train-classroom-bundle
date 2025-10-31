@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -14,12 +15,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 排课类型枚举
  * 定义不同的排课类型
  */
-enum ScheduleType: string
- implements Itemable, Labelable, Selectable{
-    
+enum ScheduleType: string implements BadgeInterface, Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-/**
+    /**
      * 常规课程
      */
     case REGULAR = 'REGULAR';
@@ -66,6 +66,7 @@ enum ScheduleType: string
 
     /**
      * 获取所有类型选项
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -73,6 +74,7 @@ enum ScheduleType: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getDescription();
         }
+
         return $options;
     }
 
@@ -86,7 +88,7 @@ enum ScheduleType: string
             self::MAKEUP,
             self::PRACTICE,
             self::LECTURE,
-        ]);
+        ], true);
     }
 
     /**
@@ -94,14 +96,30 @@ enum ScheduleType: string
      */
     public function isAssessment(): bool
     {
-        return $this === self::EXAM;
+        return self::EXAM === $this;
     }
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::REGULAR => '常规课程',
+            self::MAKEUP => '补课',
+            self::EXAM => '考试',
+            self::MEETING => '会议',
+            self::PRACTICE => '实训',
+            self::LECTURE => '讲座',
         };
     }
-} 
+
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::REGULAR => BadgeInterface::PRIMARY,
+            self::MAKEUP => BadgeInterface::WARNING,
+            self::EXAM => BadgeInterface::DANGER,
+            self::MEETING => BadgeInterface::INFO,
+            self::PRACTICE => BadgeInterface::SUCCESS,
+            self::LECTURE => BadgeInterface::SECONDARY,
+        };
+    }
+}

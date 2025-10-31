@@ -2,18 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Tests\Enum;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitEnum\AbstractEnumTestCase;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 
 /**
  * VerificationResult枚举测试类
- */
-class VerificationResultTest extends TestCase
+ *
+ * @internal
+ * */
+#[CoversClass(VerificationResult::class)]
+final class VerificationResultTest extends AbstractEnumTestCase
 {
     /**
      * 测试枚举值的正确性
      */
-    public function test_enum_values_are_correct(): void
+    public function testEnumValuesAreCorrect(): void
     {
         $this->assertEquals('SUCCESS', VerificationResult::SUCCESS->value);
         $this->assertEquals('FAILED', VerificationResult::FAILED->value);
@@ -25,10 +29,10 @@ class VerificationResultTest extends TestCase
     /**
      * 测试枚举cases方法返回所有枚举值
      */
-    public function test_cases_returns_all_enum_values(): void
+    public function testCasesReturnsAllEnumValues(): void
     {
         $cases = VerificationResult::cases();
-        
+
         $this->assertCount(6, $cases);
         $this->assertContains(VerificationResult::SUCCESS, $cases);
         $this->assertContains(VerificationResult::FAILED, $cases);
@@ -41,7 +45,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试getLabel方法返回正确的中文描述
      */
-    public function test_getLabel_returns_correct_chinese_description(): void
+    public function testGetLabelReturnsCorrectChineseDescription(): void
     {
         $this->assertEquals('验证成功', VerificationResult::SUCCESS->getLabel());
         $this->assertEquals('验证失败', VerificationResult::FAILED->getLabel());
@@ -54,10 +58,10 @@ class VerificationResultTest extends TestCase
     /**
      * 测试getOptions方法返回正确的选项数组
      */
-    public function test_getOptions_returns_correct_options_array(): void
+    public function testGetOptionsReturnsCorrectOptionsArray(): void
     {
         $options = VerificationResult::getOptions();
-        
+
         $expectedOptions = [
             'SUCCESS' => '验证成功',
             'FAILED' => '验证失败',
@@ -66,23 +70,25 @@ class VerificationResultTest extends TestCase
             'ERROR' => '验证错误',
             'DEVICE_ERROR' => '设备错误',
         ];
-        
+
         $this->assertEquals($expectedOptions, $options);
         $this->assertCount(6, $options);
-        
+
         // 验证所有键都是字符串
         foreach (array_keys($options) as $key) {
+            $this->assertIsString($key);
         }
-        
+
         // 验证所有值都是字符串
         foreach (array_values($options) as $value) {
+            $this->assertIsString($value);
         }
     }
 
     /**
      * 测试isSuccess方法正确识别成功状态
      */
-    public function test_isSuccess_correctly_identifies_success_status(): void
+    public function testIsSuccessCorrectlyIdentifiesSuccessStatus(): void
     {
         $this->assertTrue(VerificationResult::SUCCESS->isSuccess());
         $this->assertFalse(VerificationResult::FAILED->isSuccess());
@@ -94,7 +100,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试isFailure方法正确识别失败状态
      */
-    public function test_isFailure_correctly_identifies_failure_status(): void
+    public function testIsFailureCorrectlyIdentifiesFailureStatus(): void
     {
         $this->assertTrue(VerificationResult::FAILED->isFailure());
         $this->assertTrue(VerificationResult::TIMEOUT->isFailure());
@@ -107,7 +113,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试isPending方法正确识别待处理状态
      */
-    public function test_isPending_correctly_identifies_pending_status(): void
+    public function testIsPendingCorrectlyIdentifiesPendingStatus(): void
     {
         $this->assertTrue(VerificationResult::PENDING->isPending());
         $this->assertFalse(VerificationResult::SUCCESS->isPending());
@@ -120,7 +126,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试getColorClass方法返回正确的颜色类名
      */
-    public function test_getColorClass_returns_correct_color_classes(): void
+    public function testGetColorClassReturnsCorrectColorClasses(): void
     {
         $this->assertEquals('text-success', VerificationResult::SUCCESS->getColorClass());
         $this->assertEquals('text-danger', VerificationResult::FAILED->getColorClass());
@@ -133,7 +139,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试getIconClass方法返回正确的图标类名
      */
-    public function test_getIconClass_returns_correct_icon_classes(): void
+    public function testGetIconClassReturnsCorrectIconClasses(): void
     {
         $this->assertEquals('fa-check-circle', VerificationResult::SUCCESS->getIconClass());
         $this->assertEquals('fa-times-circle', VerificationResult::FAILED->getIconClass());
@@ -146,23 +152,32 @@ class VerificationResultTest extends TestCase
     /**
      * 测试状态的互斥性
      */
-    public function test_status_methods_are_mutually_exclusive(): void
+    public function testStatusMethodsAreMutuallyExclusive(): void
     {
         foreach (VerificationResult::cases() as $result) {
             $statusCount = 0;
-            if ($result->isSuccess()) $statusCount++;
-            if ($result->isFailure()) $statusCount++;
-            if ($result->isPending()) $statusCount++;
-            
-            $this->assertEquals(1, $statusCount, 
-                "验证结果 {$result->value} 应该只属于一种状态");
+            if ($result->isSuccess()) {
+                ++$statusCount;
+            }
+            if ($result->isFailure()) {
+                ++$statusCount;
+            }
+            if ($result->isPending()) {
+                ++$statusCount;
+            }
+
+            $this->assertEquals(
+                1,
+                $statusCount,
+                "验证结果 {$result->value} 应该只属于一种状态"
+            );
         }
     }
 
     /**
      * 测试颜色类名都是有效的字符串
      */
-    public function test_color_classes_are_valid_strings(): void
+    public function testColorClassesAreValidStrings(): void
     {
         foreach (VerificationResult::cases() as $result) {
             $colorClass = $result->getColorClass();
@@ -174,7 +189,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试图标类名都是有效的字符串
      */
-    public function test_icon_classes_are_valid_strings(): void
+    public function testIconClassesAreValidStrings(): void
     {
         foreach (VerificationResult::cases() as $result) {
             $iconClass = $result->getIconClass();
@@ -186,13 +201,16 @@ class VerificationResultTest extends TestCase
     /**
      * 测试失败状态都有危险颜色
      */
-    public function test_failure_statuses_have_danger_or_secondary_color(): void
+    public function testFailureStatusesHaveDangerOrSecondaryColor(): void
     {
         foreach (VerificationResult::cases() as $result) {
             if ($result->isFailure()) {
                 $colorClass = $result->getColorClass();
-                $this->assertContains($colorClass, ['text-danger', 'text-secondary'],
-                    "失败状态 {$result->value} 应该使用危险或次要颜色");
+                $this->assertContains(
+                    $colorClass,
+                    ['text-danger', 'text-secondary'],
+                    "失败状态 {$result->value} 应该使用危险或次要颜色"
+                );
             }
         }
     }
@@ -200,12 +218,15 @@ class VerificationResultTest extends TestCase
     /**
      * 测试成功状态有成功颜色
      */
-    public function test_success_status_has_success_color(): void
+    public function testSuccessStatusHasSuccessColor(): void
     {
         foreach (VerificationResult::cases() as $result) {
             if ($result->isSuccess()) {
-                $this->assertEquals('text-success', $result->getColorClass(),
-                    "成功状态应该使用成功颜色");
+                $this->assertEquals(
+                    'text-success',
+                    $result->getColorClass(),
+                    '成功状态应该使用成功颜色'
+                );
             }
         }
     }
@@ -213,12 +234,15 @@ class VerificationResultTest extends TestCase
     /**
      * 测试待处理状态有警告颜色
      */
-    public function test_pending_status_has_warning_color(): void
+    public function testPendingStatusHasWarningColor(): void
     {
         foreach (VerificationResult::cases() as $result) {
             if ($result->isPending()) {
-                $this->assertEquals('text-warning', $result->getColorClass(),
-                    "待处理状态应该使用警告颜色");
+                $this->assertEquals(
+                    'text-warning',
+                    $result->getColorClass(),
+                    '待处理状态应该使用警告颜色'
+                );
             }
         }
     }
@@ -226,7 +250,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试枚举值的字符串表示
      */
-    public function test_enum_string_representation(): void
+    public function testEnumStringRepresentation(): void
     {
         $this->assertEquals('SUCCESS', (string) VerificationResult::SUCCESS->value);
         $this->assertEquals('FAILED', (string) VerificationResult::FAILED->value);
@@ -238,7 +262,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试从字符串创建枚举实例
      */
-    public function test_enum_from_string(): void
+    public function testEnumFromString(): void
     {
         $this->assertEquals(VerificationResult::SUCCESS, VerificationResult::from('SUCCESS'));
         $this->assertEquals(VerificationResult::FAILED, VerificationResult::from('FAILED'));
@@ -250,7 +274,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试tryFrom方法处理无效值
      */
-    public function test_tryFrom_handles_invalid_values(): void
+    public function testTryFromHandlesInvalidValues(): void
     {
         $this->assertNull(VerificationResult::tryFrom('INVALID_RESULT'));
         $this->assertNull(VerificationResult::tryFrom(''));
@@ -261,7 +285,7 @@ class VerificationResultTest extends TestCase
     /**
      * 测试from方法抛出异常处理无效值
      */
-    public function test_from_throws_exception_for_invalid_values(): void
+    public function testFromThrowsExceptionForInvalidValues(): void
     {
         $this->expectException(\ValueError::class);
         VerificationResult::from('INVALID_RESULT');
@@ -270,29 +294,60 @@ class VerificationResultTest extends TestCase
     /**
      * 测试枚举值的比较
      */
-    public function test_enum_comparison(): void
+    public function testEnumComparison(): void
     {
         $success1 = VerificationResult::SUCCESS;
         $success2 = VerificationResult::from('SUCCESS');
         $failed = VerificationResult::FAILED;
-        
+
         $this->assertSame($success1, $success2);
-        $this->assertNotSame($success1, $failed);
+        $this->assertNotEquals($success1->value, $failed->value);
     }
 
     /**
      * 测试所有结果都有唯一的图标类名
      */
-    public function test_all_results_have_unique_icon_classes(): void
+    public function testAllResultsHaveUniqueIconClasses(): void
     {
         $iconClasses = [];
         foreach (VerificationResult::cases() as $result) {
             $iconClass = $result->getIconClass();
-            $this->assertNotContains($iconClass, $iconClasses, 
-                "图标类名 {$iconClass} 不应该重复");
+            $this->assertNotContains(
+                $iconClass,
+                $iconClasses,
+                "图标类名 {$iconClass} 不应该重复"
+            );
             $iconClasses[] = $iconClass;
         }
-        
+
         $this->assertCount(6, $iconClasses);
     }
-} 
+
+    public function testToArrayReturnsCorrectArrayFormat(): void
+    {
+        $result = VerificationResult::SUCCESS->toArray();
+
+        $expectedResult = [
+            'value' => 'SUCCESS',
+            'label' => '验证成功',
+        ];
+
+        $this->assertEquals($expectedResult, $result);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertEquals('SUCCESS', $result['value']);
+        $this->assertEquals('验证成功', $result['label']);
+    }
+
+    public function testToSelectItemReturnsCorrectSelectItemFormat(): void
+    {
+        $result = VerificationResult::SUCCESS->toSelectItem();
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertEquals('SUCCESS', $result['value']);
+        $this->assertEquals('验证成功', $result['label']);
+    }
+}

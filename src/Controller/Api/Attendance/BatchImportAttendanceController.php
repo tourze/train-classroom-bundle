@@ -14,7 +14,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 final class BatchImportAttendanceController extends AbstractController
 {
     public function __construct(
-        private readonly AttendanceServiceInterface $attendanceService
+        private readonly AttendanceServiceInterface $attendanceService,
     ) {
     }
 
@@ -24,14 +24,17 @@ final class BatchImportAttendanceController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
 
-            if (!isset($data['attendance_data']) || !is_array($data['attendance_data'])) {
+            if (!is_array($data) || !isset($data['attendance_data']) || !is_array($data['attendance_data'])) {
                 return $this->json([
                     'success' => false,
                     'message' => '缺少考勤数据数组',
                 ], Response::HTTP_BAD_REQUEST);
             }
 
-            $results = $this->attendanceService->batchImportAttendance($data['attendance_data']);
+            /** @var array<int, array<string, mixed>> $attendanceData */
+            $attendanceData = $data['attendance_data'];
+
+            $results = $this->attendanceService->batchImportAttendance($attendanceData);
 
             return $this->json([
                 'success' => true,

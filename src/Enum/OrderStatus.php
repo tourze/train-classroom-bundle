@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -13,13 +14,11 @@ use Tourze\EnumExtra\SelectTrait;
 /**
  * 订单状态枚举
  */
-enum OrderStatus: string
- implements Itemable, Labelable, Selectable{
-
-    
+enum OrderStatus: string implements BadgeInterface, Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-case PENDING = 'pending';
+    case PENDING = 'pending';
     case PAID = 'paid';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
@@ -39,6 +38,7 @@ case PENDING = 'pending';
 
     /**
      * 获取所有选项
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -55,7 +55,7 @@ case PENDING = 'pending';
      */
     public function isPaid(): bool
     {
-        return $this === self::PAID;
+        return self::PAID === $this;
     }
 
     /**
@@ -63,7 +63,7 @@ case PENDING = 'pending';
      */
     public function isPending(): bool
     {
-        return $this === self::PENDING;
+        return self::PENDING === $this;
     }
 
     /**
@@ -71,7 +71,7 @@ case PENDING = 'pending';
      */
     public function isCancelled(): bool
     {
-        return $this === self::CANCELLED;
+        return self::CANCELLED === $this;
     }
 
     /**
@@ -79,14 +79,50 @@ case PENDING = 'pending';
      */
     public function isRefunded(): bool
     {
-        return $this === self::REFUNDED;
+        return self::REFUNDED === $this;
     }
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::PENDING => '待支付',
+            self::PAID => '已支付',
+            self::CANCELLED => '已取消',
+            self::REFUNDED => '已退款',
         };
     }
-} 
+
+    /**
+     * 获取徽章类型
+     */
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::PENDING => BadgeInterface::WARNING,
+            self::PAID => BadgeInterface::SUCCESS,
+            self::CANCELLED => BadgeInterface::DANGER,
+            self::REFUNDED => BadgeInterface::SECONDARY,
+        };
+    }
+
+    /**
+     * 获取徽章CSS类
+     */
+    public function getBadgeClass(): string
+    {
+        return match ($this) {
+            self::PENDING => 'badge-warning',
+            self::PAID => 'badge-success',
+            self::CANCELLED => 'badge-danger',
+            self::REFUNDED => 'badge-secondary',
+        };
+    }
+
+    /**
+     * 获取徽章显示标签
+     */
+    public function getBadgeLabel(): string
+    {
+        return $this->getLabel();
+    }
+}

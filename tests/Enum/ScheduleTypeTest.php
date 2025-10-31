@@ -2,18 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Tests\Enum;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitEnum\AbstractEnumTestCase;
 use Tourze\TrainClassroomBundle\Enum\ScheduleType;
 
 /**
  * ScheduleType枚举测试类
- */
-class ScheduleTypeTest extends TestCase
+ *
+ * @internal
+ * */
+#[CoversClass(ScheduleType::class)]
+final class ScheduleTypeTest extends AbstractEnumTestCase
 {
     /**
      * 测试枚举值的正确性
      */
-    public function test_enum_values_are_correct(): void
+    public function testEnumValuesAreCorrect(): void
     {
         $this->assertEquals('REGULAR', ScheduleType::REGULAR->value);
         $this->assertEquals('MAKEUP', ScheduleType::MAKEUP->value);
@@ -26,7 +30,7 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试getDescription方法返回正确的中文描述
      */
-    public function test_getDescription_returns_correct_chinese_description(): void
+    public function testGetDescriptionReturnsCorrectChineseDescription(): void
     {
         $this->assertEquals('常规课程', ScheduleType::REGULAR->getDescription());
         $this->assertEquals('补课', ScheduleType::MAKEUP->getDescription());
@@ -39,10 +43,10 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试getOptions方法返回正确的选项数组
      */
-    public function test_getOptions_returns_correct_options_array(): void
+    public function testGetOptionsReturnsCorrectOptionsArray(): void
     {
         $options = ScheduleType::getOptions();
-        
+
         $expectedOptions = [
             'REGULAR' => '常规课程',
             'MAKEUP' => '补课',
@@ -51,7 +55,7 @@ class ScheduleTypeTest extends TestCase
             'PRACTICE' => '实训',
             'LECTURE' => '讲座',
         ];
-        
+
         $this->assertEquals($expectedOptions, $options);
         $this->assertCount(6, $options);
     }
@@ -59,7 +63,7 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试isTeaching方法正确识别教学类型
      */
-    public function test_isTeaching_correctly_identifies_teaching_types(): void
+    public function testIsTeachingCorrectlyIdentifiesTeachingTypes(): void
     {
         $this->assertTrue(ScheduleType::REGULAR->isTeaching());
         $this->assertTrue(ScheduleType::MAKEUP->isTeaching());
@@ -72,7 +76,7 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试isAssessment方法正确识别评估类型
      */
-    public function test_isAssessment_correctly_identifies_assessment_types(): void
+    public function testIsAssessmentCorrectlyIdentifiesAssessmentTypes(): void
     {
         $this->assertTrue(ScheduleType::EXAM->isAssessment());
         $this->assertFalse(ScheduleType::REGULAR->isAssessment());
@@ -85,32 +89,37 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试教学类型和评估类型的互斥性
      */
-    public function test_teaching_and_assessment_are_mutually_exclusive(): void
+    public function testTeachingAndAssessmentAreMutuallyExclusive(): void
     {
         foreach (ScheduleType::cases() as $type) {
             // 一个类型不能同时是教学和评估类型
-            $this->assertNotEquals($type->isTeaching() && $type->isAssessment(), true,
-                "类型 {$type->value} 不能同时是教学和评估类型");
+            $this->assertNotEquals(
+                $type->isTeaching() && $type->isAssessment(),
+                true,
+                "类型 {$type->value} 不能同时是教学和评估类型"
+            );
         }
     }
 
     /**
      * 测试所有类型都有分类
      */
-    public function test_all_types_have_classification(): void
+    public function testAllTypesHaveClassification(): void
     {
         foreach (ScheduleType::cases() as $type) {
-            $hasClassification = $type->isTeaching() || $type->isAssessment() || 
-                                $type === ScheduleType::MEETING;
-            $this->assertTrue($hasClassification, 
-                "类型 {$type->value} 应该有明确的分类");
+            $hasClassification = $type->isTeaching() || $type->isAssessment()
+                                || ScheduleType::MEETING === $type;
+            $this->assertTrue(
+                $hasClassification,
+                "类型 {$type->value} 应该有明确的分类"
+            );
         }
     }
 
     /**
      * 测试从字符串创建枚举实例
      */
-    public function test_enum_from_string(): void
+    public function testEnumFromString(): void
     {
         $this->assertEquals(ScheduleType::REGULAR, ScheduleType::from('REGULAR'));
         $this->assertEquals(ScheduleType::MAKEUP, ScheduleType::from('MAKEUP'));
@@ -123,7 +132,7 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试tryFrom方法处理无效值
      */
-    public function test_tryFrom_handles_invalid_values(): void
+    public function testTryFromHandlesInvalidValues(): void
     {
         $this->assertNull(ScheduleType::tryFrom('INVALID_TYPE'));
         $this->assertNull(ScheduleType::tryFrom(''));
@@ -133,7 +142,7 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试from方法抛出异常处理无效值
      */
-    public function test_from_throws_exception_for_invalid_values(): void
+    public function testFromThrowsExceptionForInvalidValues(): void
     {
         $this->expectException(\ValueError::class);
         ScheduleType::from('INVALID_TYPE');
@@ -142,13 +151,41 @@ class ScheduleTypeTest extends TestCase
     /**
      * 测试枚举值的比较
      */
-    public function test_enum_comparison(): void
+    public function testEnumComparison(): void
     {
         $regular1 = ScheduleType::REGULAR;
         $regular2 = ScheduleType::from('REGULAR');
         $exam = ScheduleType::EXAM;
-        
+
         $this->assertSame($regular1, $regular2);
-        $this->assertNotSame($regular1, $exam);
+        $this->assertNotEquals($regular1->value, $exam->value);
     }
-} 
+
+    public function testToArrayReturnsCorrectArrayFormat(): void
+    {
+        $result = ScheduleType::REGULAR->toArray();
+
+        $expectedResult = [
+            'value' => 'REGULAR',
+            'label' => '常规课程',
+        ];
+
+        $this->assertEquals($expectedResult, $result);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertEquals('REGULAR', $result['value']);
+        $this->assertEquals('常规课程', $result['label']);
+    }
+
+    public function testToSelectItemReturnsCorrectSelectItemFormat(): void
+    {
+        $result = ScheduleType::REGULAR->toSelectItem();
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertEquals('REGULAR', $result['value']);
+        $this->assertEquals('常规课程', $result['label']);
+    }
+}

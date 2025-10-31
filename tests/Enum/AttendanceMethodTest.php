@@ -2,18 +2,22 @@
 
 namespace Tourze\TrainClassroomBundle\Tests\Enum;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\PHPUnitEnum\AbstractEnumTestCase;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 
 /**
  * AttendanceMethod枚举测试类
- */
-class AttendanceMethodTest extends TestCase
+ *
+ * @internal
+ * */
+#[CoversClass(AttendanceMethod::class)]
+final class AttendanceMethodTest extends AbstractEnumTestCase
 {
     /**
      * 测试枚举值的正确性
      */
-    public function test_enum_values_are_correct(): void
+    public function testEnumValuesAreCorrect(): void
     {
         $this->assertEquals('FACE', AttendanceMethod::FACE->value);
         $this->assertEquals('CARD', AttendanceMethod::CARD->value);
@@ -26,10 +30,10 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试枚举cases方法返回所有枚举值
      */
-    public function test_cases_returns_all_enum_values(): void
+    public function testCasesReturnsAllEnumValues(): void
     {
         $cases = AttendanceMethod::cases();
-        
+
         $this->assertCount(6, $cases);
         $this->assertContains(AttendanceMethod::FACE, $cases);
         $this->assertContains(AttendanceMethod::CARD, $cases);
@@ -42,7 +46,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试getLabel方法返回正确的中文描述
      */
-    public function test_getLabel_returns_correct_chinese_description(): void
+    public function testGetLabelReturnsCorrectChineseDescription(): void
     {
         $this->assertEquals('人脸识别', AttendanceMethod::FACE->getLabel());
         $this->assertEquals('刷卡', AttendanceMethod::CARD->getLabel());
@@ -55,10 +59,10 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试getOptions方法返回正确的选项数组
      */
-    public function test_getOptions_returns_correct_options_array(): void
+    public function testGetOptionsReturnsCorrectOptionsArray(): void
     {
         $options = AttendanceMethod::getOptions();
-        
+
         $expectedOptions = [
             'FACE' => '人脸识别',
             'CARD' => '刷卡',
@@ -67,23 +71,25 @@ class AttendanceMethodTest extends TestCase
             'MANUAL' => '手动录入',
             'MOBILE' => '移动端',
         ];
-        
+
         $this->assertEquals($expectedOptions, $options);
         $this->assertCount(6, $options);
-        
+
         // 验证所有键都是字符串
         foreach (array_keys($options) as $key) {
+            $this->assertIsString($key);
         }
-        
+
         // 验证所有值都是字符串
         foreach (array_values($options) as $value) {
+            $this->assertIsString($value);
         }
     }
 
     /**
      * 测试requiresBiometric方法正确识别生物识别方式
      */
-    public function test_requiresBiometric_correctly_identifies_biometric_methods(): void
+    public function testRequiresBiometricCorrectlyIdentifiesBiometricMethods(): void
     {
         $this->assertTrue(AttendanceMethod::FACE->requiresBiometric());
         $this->assertTrue(AttendanceMethod::FINGERPRINT->requiresBiometric());
@@ -96,7 +102,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试isAutomatic方法正确识别自动识别方式
      */
-    public function test_isAutomatic_correctly_identifies_automatic_methods(): void
+    public function testIsAutomaticCorrectlyIdentifiesAutomaticMethods(): void
     {
         $this->assertTrue(AttendanceMethod::FACE->isAutomatic());
         $this->assertTrue(AttendanceMethod::CARD->isAutomatic());
@@ -109,7 +115,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试getIconClass方法返回正确的图标类名
      */
-    public function test_getIconClass_returns_correct_icon_classes(): void
+    public function testGetIconClassReturnsCorrectIconClasses(): void
     {
         $this->assertEquals('fa-user-circle', AttendanceMethod::FACE->getIconClass());
         $this->assertEquals('fa-id-card', AttendanceMethod::CARD->getIconClass());
@@ -122,7 +128,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试图标类名都是有效的字符串
      */
-    public function test_icon_classes_are_valid_strings(): void
+    public function testIconClassesAreValidStrings(): void
     {
         foreach (AttendanceMethod::cases() as $method) {
             $iconClass = $method->getIconClass();
@@ -134,12 +140,14 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试生物识别和自动识别的逻辑关系
      */
-    public function test_biometric_methods_are_automatic(): void
+    public function testBiometricMethodsAreAutomatic(): void
     {
         foreach (AttendanceMethod::cases() as $method) {
             if ($method->requiresBiometric()) {
-                $this->assertTrue($method->isAutomatic(), 
-                    "生物识别方式 {$method->value} 应该是自动识别的");
+                $this->assertTrue(
+                    $method->isAutomatic(),
+                    "生物识别方式 {$method->value} 应该是自动识别的"
+                );
             }
         }
     }
@@ -147,7 +155,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试枚举值的字符串表示
      */
-    public function test_enum_string_representation(): void
+    public function testEnumStringRepresentation(): void
     {
         $this->assertEquals('FACE', (string) AttendanceMethod::FACE->value);
         $this->assertEquals('CARD', (string) AttendanceMethod::CARD->value);
@@ -160,7 +168,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试从字符串创建枚举实例
      */
-    public function test_enum_from_string(): void
+    public function testEnumFromString(): void
     {
         $this->assertEquals(AttendanceMethod::FACE, AttendanceMethod::from('FACE'));
         $this->assertEquals(AttendanceMethod::CARD, AttendanceMethod::from('CARD'));
@@ -173,7 +181,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试tryFrom方法处理无效值
      */
-    public function test_tryFrom_handles_invalid_values(): void
+    public function testTryFromHandlesInvalidValues(): void
     {
         $this->assertNull(AttendanceMethod::tryFrom('INVALID_METHOD'));
         $this->assertNull(AttendanceMethod::tryFrom(''));
@@ -184,7 +192,7 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试from方法抛出异常处理无效值
      */
-    public function test_from_throws_exception_for_invalid_values(): void
+    public function testFromThrowsExceptionForInvalidValues(): void
     {
         $this->expectException(\ValueError::class);
         AttendanceMethod::from('INVALID_METHOD');
@@ -193,29 +201,78 @@ class AttendanceMethodTest extends TestCase
     /**
      * 测试枚举值的比较
      */
-    public function test_enum_comparison(): void
+    public function testEnumComparison(): void
     {
         $face1 = AttendanceMethod::FACE;
         $face2 = AttendanceMethod::from('FACE');
         $card = AttendanceMethod::CARD;
-        
+
         $this->assertSame($face1, $face2);
-        $this->assertNotSame($face1, $card);
+        $this->assertNotEquals($face1->value, $card->value);
     }
 
     /**
      * 测试所有方法都有唯一的图标类名
      */
-    public function test_all_methods_have_unique_icon_classes(): void
+    public function testAllMethodsHaveUniqueIconClasses(): void
     {
         $iconClasses = [];
         foreach (AttendanceMethod::cases() as $method) {
             $iconClass = $method->getIconClass();
-            $this->assertNotContains($iconClass, $iconClasses, 
-                "图标类名 {$iconClass} 不应该重复");
+            $this->assertNotContains(
+                $iconClass,
+                $iconClasses,
+                "图标类名 {$iconClass} 不应该重复"
+            );
             $iconClasses[] = $iconClass;
         }
-        
+
         $this->assertCount(6, $iconClasses);
     }
-} 
+
+    /**
+     * 测试toArray方法返回正确的数组格式
+     */
+    public function testToArrayReturnsCorrectArrayFormat(): void
+    {
+        $result = AttendanceMethod::FACE->toArray();
+
+        $expectedResult = [
+            'value' => 'FACE',
+            'label' => '人脸识别',
+        ];
+
+        $this->assertEquals($expectedResult, $result);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertEquals('FACE', $result['value']);
+        $this->assertEquals('人脸识别', $result['label']);
+    }
+
+    /**
+     * 测试toSelectItem方法返回正确的选择项格式
+     */
+    public function testToSelectItemReturnsCorrectSelectItemFormat(): void
+    {
+        $result = AttendanceMethod::FACE->toSelectItem();
+
+        $expectedResult = [
+            'value' => 'FACE',
+            'label' => '人脸识别',
+            'text' => '人脸识别',
+            'name' => '人脸识别',
+        ];
+
+        $this->assertEquals($expectedResult, $result);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('value', $result);
+        $this->assertArrayHasKey('label', $result);
+        $this->assertArrayHasKey('text', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertEquals('FACE', $result['value']);
+        $this->assertEquals('人脸识别', $result['label']);
+        $this->assertEquals('人脸识别', $result['text']);
+        $this->assertEquals('人脸识别', $result['name']);
+    }
+}

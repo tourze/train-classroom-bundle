@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tourze\TrainClassroomBundle\Tests\Command\SyncAttendanceDataCommandTest" file="/Users/air/work/source/php-monorepo/packages/train-classroom-bundle/tests/Command/SyncAttendanceDataCommandTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.961646">
+    <testcase name="testOptionApiUrl" file="/Users/air/work/source/php-monorepo/packages/train-classroom-bundle/tests/Command/SyncAttendanceDataCommandTest.php" line="281" class="Tourze\TrainClassroomBundle\Tests\Command\SyncAttendanceDataCommandTest" classname="Tourze.TrainClassroomBundle.Tests.Command.SyncAttendanceDataCommandTest" assertions="1" time="0.961646"/>
+  </testsuite>
+</testsuites>

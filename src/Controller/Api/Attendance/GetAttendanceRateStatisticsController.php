@@ -14,7 +14,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 final class GetAttendanceRateStatisticsController extends AbstractController
 {
     public function __construct(
-        private readonly AttendanceServiceInterface $attendanceService
+        private readonly AttendanceServiceInterface $attendanceService,
     ) {
     }
 
@@ -22,11 +22,13 @@ final class GetAttendanceRateStatisticsController extends AbstractController
     public function __invoke(int $courseId, Request $request): JsonResponse
     {
         try {
-            $startDate = $request->query->get('start_date')
-                ? new \DateTimeImmutable($request->query->get('start_date'))
+            $startDateParam = $request->query->get('start_date');
+            $startDate = null !== $startDateParam && '' !== $startDateParam
+                ? new \DateTimeImmutable((string) $startDateParam)
                 : null;
-            $endDate = $request->query->get('end_date')
-                ? new \DateTimeImmutable($request->query->get('end_date'))
+            $endDateParam = $request->query->get('end_date');
+            $endDate = null !== $endDateParam && '' !== $endDateParam
+                ? new \DateTimeImmutable((string) $endDateParam)
                 : null;
 
             $statistics = $this->attendanceService->getAttendanceRateStatistics(

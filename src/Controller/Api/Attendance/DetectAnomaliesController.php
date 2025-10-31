@@ -16,25 +16,26 @@ final class DetectAnomaliesController extends AbstractController
 {
     public function __construct(
         private readonly AttendanceServiceInterface $attendanceService,
-        private readonly RegistrationRepository $registrationRepository
+        private readonly RegistrationRepository $registrationRepository,
     ) {
     }
 
-    #[Route(path: '/api/attendance/anomalies/{registrationId}', name: 'api_attendance_anomalies', methods: ['GET'])]
+    #[Route(path: '/api/attendance/anomalies/{registrationId}', name: 'api_attendance_anomalies', methods: ['GET'], requirements: ['registrationId' => '\d+'])]
     public function __invoke(int $registrationId, Request $request): JsonResponse
     {
         try {
             $registration = $this->registrationRepository->find($registrationId);
 
-            if ($registration === null) {
+            if (null === $registration) {
                 return $this->json([
                     'success' => false,
                     'message' => '报名记录不存在',
                 ], Response::HTTP_NOT_FOUND);
             }
 
-            $date = $request->query->get('date')
-                ? new \DateTimeImmutable($request->query->get('date'))
+            $dateParam = $request->query->get('date');
+            $date = null !== $dateParam && '' !== $dateParam
+                ? new \DateTimeImmutable((string) $dateParam)
                 : null;
 
             $anomalies = $this->attendanceService->detectAttendanceAnomalies($registration, $date);

@@ -6,7 +6,8 @@ namespace Tourze\TrainClassroomBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
+use Symfony\Component\Validator\Constraints as Assert;
+use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
@@ -18,11 +19,8 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
  */
 #[ORM\Entity]
 #[ORM\Table(name: 'job_training_classroom_schedule', options: ['comment' => '表描述'])]
-#[ORM\Index(columns: ['classroom_id'], name: 'idx_classroom_id')]
-#[ORM\Index(columns: ['schedule_date'], name: 'idx_schedule_date')]
-#[ORM\Index(columns: ['teacher_id'], name: 'idx_teacher_id')]
 #[ORM\UniqueConstraint(name: 'uk_classroom_time', columns: ['classroom_id', 'start_time', 'end_time'])]
-class ClassroomSchedule implements Stringable
+class ClassroomSchedule implements \Stringable
 {
     use TimestampableAware;
     use SnowflakeKeyAware;
@@ -34,50 +32,73 @@ class ClassroomSchedule implements Stringable
     #[ORM\JoinColumn(name: 'classroom_id', referencedColumnName: 'id', nullable: false)]
     private Classroom $classroom;
 
-#[ORM\Column(type: Types::STRING, length: 100, options: ['comment' => '字段说明'])]
+    #[IndexColumn]
+    #[ORM\Column(type: Types::STRING, length: 100, options: ['comment' => '字段说明'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 100)]
     private string $teacherId;
 
-#[ORM\Column(type: Types::DATE_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[IndexColumn]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[Assert\NotNull]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private \DateTimeImmutable $scheduleDate;
 
-#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[Assert\NotNull]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private \DateTimeImmutable $startTime;
 
-#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '字段说明'])]
+    #[Assert\NotNull]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private \DateTimeImmutable $endTime;
 
-#[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleType::class, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleType::class, options: ['comment' => '字段说明'])]
+    #[Assert\NotNull]
+    #[Assert\Choice(callback: [ScheduleType::class, 'cases'])]
     private ScheduleType $scheduleType;
 
-#[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleStatus::class, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::STRING, length: 20, enumType: ScheduleStatus::class, options: ['comment' => '字段说明'])]
+    #[Assert\NotNull]
+    #[Assert\Choice(callback: [ScheduleStatus::class, 'cases'])]
     private ScheduleStatus $scheduleStatus;
 
-#[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
+    /**
+     * @var array<string, mixed>|null
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '字段说明'])]
+    #[Assert\Type(type: 'array')]
     private ?array $scheduleConfig = null;
 
-#[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
+    #[Assert\Type(type: 'string')]
+    #[Assert\Length(max: 65535)]
     private ?string $courseContent = null;
 
-#[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
+    #[Assert\Type(type: 'integer')]
+    #[Assert\PositiveOrZero]
     private ?int $expectedStudents = null;
 
-#[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['comment' => '字段说明'])]
+    #[Assert\Type(type: 'integer')]
+    #[Assert\PositiveOrZero]
     private ?int $actualStudents = null;
 
-#[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '字段说明'])]
+    #[Assert\Type(type: 'string')]
+    #[Assert\Length(max: 65535)]
     private ?string $remark = null;
-
-
 
     public function getClassroom(): Classroom
     {
         return $this->classroom;
     }
 
-    public function setClassroom(Classroom $classroom): self
+    public function setClassroom(Classroom $classroom): void
     {
         $this->classroom = $classroom;
-        return $this;
     }
 
     public function getTeacherId(): string
@@ -85,10 +106,9 @@ class ClassroomSchedule implements Stringable
         return $this->teacherId;
     }
 
-    public function setTeacherId(string $teacherId): self
+    public function setTeacherId(string $teacherId): void
     {
         $this->teacherId = $teacherId;
-        return $this;
     }
 
     public function getScheduleDate(): \DateTimeImmutable
@@ -96,10 +116,9 @@ class ClassroomSchedule implements Stringable
         return $this->scheduleDate;
     }
 
-    public function setScheduleDate(\DateTimeImmutable $scheduleDate): self
+    public function setScheduleDate(\DateTimeImmutable $scheduleDate): void
     {
         $this->scheduleDate = $scheduleDate;
-        return $this;
     }
 
     public function getStartTime(): \DateTimeImmutable
@@ -107,10 +126,9 @@ class ClassroomSchedule implements Stringable
         return $this->startTime;
     }
 
-    public function setStartTime(\DateTimeImmutable $startTime): self
+    public function setStartTime(\DateTimeImmutable $startTime): void
     {
         $this->startTime = $startTime;
-        return $this;
     }
 
     public function getEndTime(): \DateTimeImmutable
@@ -118,10 +136,9 @@ class ClassroomSchedule implements Stringable
         return $this->endTime;
     }
 
-    public function setEndTime(\DateTimeImmutable $endTime): self
+    public function setEndTime(\DateTimeImmutable $endTime): void
     {
         $this->endTime = $endTime;
-        return $this;
     }
 
     public function getScheduleType(): ScheduleType
@@ -129,10 +146,9 @@ class ClassroomSchedule implements Stringable
         return $this->scheduleType;
     }
 
-    public function setScheduleType(ScheduleType $scheduleType): self
+    public function setScheduleType(ScheduleType $scheduleType): void
     {
         $this->scheduleType = $scheduleType;
-        return $this;
     }
 
     public function getScheduleStatus(): ScheduleStatus
@@ -140,21 +156,21 @@ class ClassroomSchedule implements Stringable
         return $this->scheduleStatus;
     }
 
-    public function setScheduleStatus(ScheduleStatus $scheduleStatus): self
+    public function setScheduleStatus(ScheduleStatus $scheduleStatus): void
     {
         $this->scheduleStatus = $scheduleStatus;
-        return $this;
     }
 
+    /** @return array<string, mixed>|null */
     public function getScheduleConfig(): ?array
     {
         return $this->scheduleConfig;
     }
 
-    public function setScheduleConfig(?array $scheduleConfig): self
+    /** @param array<string, mixed>|null $scheduleConfig */
+    public function setScheduleConfig(?array $scheduleConfig): void
     {
         $this->scheduleConfig = $scheduleConfig;
-        return $this;
     }
 
     public function getCourseContent(): ?string
@@ -162,10 +178,9 @@ class ClassroomSchedule implements Stringable
         return $this->courseContent;
     }
 
-    public function setCourseContent(?string $courseContent): self
+    public function setCourseContent(?string $courseContent): void
     {
         $this->courseContent = $courseContent;
-        return $this;
     }
 
     public function getExpectedStudents(): ?int
@@ -173,10 +188,9 @@ class ClassroomSchedule implements Stringable
         return $this->expectedStudents;
     }
 
-    public function setExpectedStudents(?int $expectedStudents): self
+    public function setExpectedStudents(?int $expectedStudents): void
     {
         $this->expectedStudents = $expectedStudents;
-        return $this;
     }
 
     public function getActualStudents(): ?int
@@ -184,10 +198,9 @@ class ClassroomSchedule implements Stringable
         return $this->actualStudents;
     }
 
-    public function setActualStudents(?int $actualStudents): self
+    public function setActualStudents(?int $actualStudents): void
     {
         $this->actualStudents = $actualStudents;
-        return $this;
     }
 
     public function getRemark(): ?string
@@ -195,11 +208,11 @@ class ClassroomSchedule implements Stringable
         return $this->remark;
     }
 
-    public function setRemark(?string $remark): self
+    public function setRemark(?string $remark): void
     {
         $this->remark = $remark;
-        return $this;
     }
+
     /**
      * 获取课程持续时间（分钟）
      */
@@ -230,12 +243,14 @@ class ClassroomSchedule implements Stringable
     public function isOngoing(): bool
     {
         $now = new \DateTimeImmutable();
+
         return $this->startTime <= $now && $now <= $this->endTime;
     }
 
     /**
      * 获取排课摘要信息
      */
+    /** @return array<string, mixed> */
     public function getSummary(): array
     {
         return [
@@ -257,4 +272,4 @@ class ClassroomSchedule implements Stringable
     {
         return (string) $this->id;
     }
-} 
+}

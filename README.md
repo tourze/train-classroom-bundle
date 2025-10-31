@@ -1,37 +1,79 @@
 # TrainClassroomBundle
 
-培训教室管理Bundle，为安全生产培训系统提供完整的教室管理、考勤管理和排课管理功能。
+[![Latest Version](https://img.shields.io/packagist/v/tourze/train-classroom-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/train-classroom-bundle)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/tourze/train-classroom-bundle/ci.yml?branch=master&style=flat-square)](https://github.com/tourze/train-classroom-bundle/actions)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/tourze/train-classroom-bundle.svg?style=flat-square)](https://scrutinizer-ci.com/g/tourze/train-classroom-bundle/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/tourze/train-classroom-bundle.svg?style=flat-square)](https://packagist.org/packages/tourze/train-classroom-bundle)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-8892BF.svg)](https://www.php.net/)
+[![Symfony Version](https://img.shields.io/badge/symfony-%3E%3D6.4-000000.svg)](https://symfony.com/)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
 
-## 功能特性
+[English](README.md) | [中文](README.zh-CN.md)
 
-### 🎯 核心功能
+A comprehensive training classroom management bundle for safety production training systems, providing complete classroom management, attendance management, and course scheduling functionalities.
 
-- **考勤管理** - 多种考勤方式支持（人脸识别、刷卡、指纹、二维码等）
-- **排课管理** - 智能排课、冲突检测、资源调度
-- **教室管理** - 物理/虚拟教室、设施配置、环境监控
-- **数据统计** - 考勤率统计、使用率分析、异常检测
-- **档案管理** - "一期一档"、培训记录、视频存档
+## Table of Contents
 
-### 🏗️ 技术特性
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Commands](#commands)
+- [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Advanced Usage](#advanced-usage)
+- [Development](#development)
+- [Testing](#testing)
+- [License](#license)
 
-- **DDD架构** - 领域驱动设计，职责清晰
-- **RESTful API** - 完整的REST API接口
-- **多租户支持** - 通过supplierId支持多租户
-- **审计追踪** - 完整的操作审计记录
-- **配置灵活** - 丰富的配置选项
-- **命令行工具** - 数据同步、清理等维护工具
+## Features
 
-## 安装
+### 🎯 Core Features
 
-### 1. 通过Composer安装
+- **Attendance Management** - Multiple attendance methods support (face recognition, card reader, fingerprint, QR code, etc.)
+- **Schedule Management** - Smart scheduling, conflict detection, resource allocation
+- **Classroom Management** - Physical/virtual classrooms, facility configuration, environment monitoring
+- **Data Analytics** - Attendance rate statistics, utilization analysis, anomaly detection
+- **Archive Management** - "One Session One File", training records, video archiving
+
+### 🏗️ Technical Features
+
+- **DDD Architecture** - Domain-Driven Design with clear responsibilities
+- **RESTful API** - Complete REST API interfaces
+- **Multi-tenancy Support** - Multi-tenant support via supplierId
+- **Audit Trail** - Complete operation audit records
+- **Flexible Configuration** - Rich configuration options
+- **CLI Tools** - Data synchronization, cleanup, and maintenance tools
+- **Event-Driven** - Event-based architecture for extensibility
+- **PHP 8.1+** - Modern PHP features and strict typing
+- **Symfony 6.4+** - Built on stable Symfony components
+
+## Requirements
+
+- PHP 8.1 or higher
+- Symfony 6.4 or higher
+- Doctrine ORM 3.0 or higher
+- MySQL 5.7+ or PostgreSQL 10+
+- Bundle Dependencies:
+  - `tourze/doctrine-snowflake-bundle` - For ID generation
+  - `tourze/doctrine-timestamp-bundle` - For timestamp management
+  - `tourze/doctrine-indexed-bundle` - For index management
+  - `tourze/idcard-manage-bundle` - For ID card validation
+  - `tourze/train-course-bundle` - For course management integration
+  - `tourze/train-category-bundle` - For category management
+
+## Installation
+
+### 1. Install via Composer
 
 ```bash
 composer require tourze/train-classroom-bundle
 ```
 
-### 2. 注册Bundle
+### 2. Register the Bundle
 
-在 `config/bundles.php` 中添加：
+Add to your `config/bundles.php`:
 
 ```php
 return [
@@ -40,55 +82,102 @@ return [
 ];
 ```
 
-### 3. 配置Bundle
+### 3. Configure the Bundle
 
-创建配置文件 `config/packages/train_classroom.yaml`：
+This bundle uses environment variables and service configuration instead of YAML configuration files. All configurations are handled through service parameters and environment variables.
+
+Configure your services in `config/services.yaml`:
 
 ```yaml
-train_classroom:
-  attendance:
-    enable_face_recognition: true
-    enable_fingerprint: false
-    enable_card_reader: true
-    enable_qr_code: true
-    sign_in_tolerance_minutes: 15
-    sign_out_tolerance_minutes: 15
-    allow_makeup_attendance: true
-  
-  schedule:
-    default_schedule_duration_minutes: 120
-    min_break_between_schedules_minutes: 15
-    allow_overlapping_schedules: false
-    max_advance_booking_days: 90
-  
-  classroom:
-    enable_monitoring: true
-    enable_environment_monitoring: false
-    required_features: ['projector', 'whiteboard']
-  
-  notification:
-    enable_email_notifications: true
-    enable_sms_notifications: false
-    enable_wechat_notifications: true
-  
-  archive:
-    attendance_retention_days: 1095  # 3年
-    video_retention_days: 365        # 1年
-    enable_auto_cleanup: true
+services:
+  # Import bundle services
+  _instanceof:
+    Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface:
+      tags: ['train_classroom.attendance_service']
+    Tourze\TrainClassroomBundle\Service\ScheduleServiceInterface:
+      tags: ['train_classroom.schedule_service']
 ```
 
-### 4. 创建数据库表
+Set environment variables in your `.env` file:
+
+```bash
+# Attendance settings
+ATTENDANCE_FACE_RECOGNITION_ENABLED=true
+ATTENDANCE_CARD_READER_ENABLED=true
+ATTENDANCE_QR_CODE_ENABLED=true
+ATTENDANCE_SIGN_IN_TOLERANCE_MINUTES=15
+ATTENDANCE_SIGN_OUT_TOLERANCE_MINUTES=15
+
+# Schedule settings
+SCHEDULE_DEFAULT_DURATION_MINUTES=120
+SCHEDULE_MIN_BREAK_MINUTES=15
+SCHEDULE_MAX_ADVANCE_BOOKING_DAYS=90
+
+# Archive settings
+ARCHIVE_ATTENDANCE_RETENTION_DAYS=1095
+ARCHIVE_VIDEO_RETENTION_DAYS=365
+```
+
+### 4. Create Database Tables
 
 ```bash
 php bin/console doctrine:migrations:diff
 php bin/console doctrine:migrations:migrate
 ```
 
-## 使用指南
+## Configuration
 
-### 考勤管理
+This bundle uses environment variables for configuration. Set these in your `.env` file:
 
-#### 记录考勤
+### Attendance Configuration
+
+```bash
+# Enable/disable attendance methods
+ATTENDANCE_FACE_RECOGNITION_ENABLED=true
+ATTENDANCE_FINGERPRINT_ENABLED=false
+ATTENDANCE_CARD_READER_ENABLED=true
+ATTENDANCE_QR_CODE_ENABLED=true
+
+# Tolerance settings (in minutes)
+ATTENDANCE_SIGN_IN_TOLERANCE_MINUTES=15
+ATTENDANCE_SIGN_OUT_TOLERANCE_MINUTES=15
+
+# Allow makeup attendance
+ATTENDANCE_ALLOW_MAKEUP=true
+```
+
+### Schedule Configuration
+
+```bash
+# Schedule defaults
+SCHEDULE_DEFAULT_DURATION_MINUTES=120
+SCHEDULE_MIN_BREAK_MINUTES=15
+SCHEDULE_ALLOW_OVERLAPPING=false
+SCHEDULE_MAX_ADVANCE_BOOKING_DAYS=90
+```
+
+### Classroom Configuration
+
+```bash
+# Monitoring settings
+CLASSROOM_ENABLE_MONITORING=true
+CLASSROOM_ENABLE_ENVIRONMENT_MONITORING=false
+```
+
+### Archive Configuration
+
+```bash
+# Data retention settings (in days)
+ARCHIVE_ATTENDANCE_RETENTION_DAYS=1095  # 3 years
+ARCHIVE_VIDEO_RETENTION_DAYS=365        # 1 year
+ARCHIVE_ENABLE_AUTO_CLEANUP=true
+```
+
+## Usage
+
+### Attendance Management
+
+#### Record Attendance
 
 ```bash
 curl -X POST /api/attendance/record \
@@ -105,19 +194,19 @@ curl -X POST /api/attendance/record \
   }'
 ```
 
-#### 获取考勤统计
+#### Get Attendance Statistics
 
 ```bash
 curl /api/attendance/statistics/123
 ```
 
-#### 检测考勤异常
+#### Detect Attendance Anomalies
 
 ```bash
 curl /api/attendance/anomalies/123?date=2025-05-27
 ```
 
-#### 补录考勤
+#### Makeup Attendance
 
 ```bash
 curl -X POST /api/attendance/makeup \
@@ -130,9 +219,9 @@ curl -X POST /api/attendance/makeup \
   }'
 ```
 
-### 排课管理
+### Schedule Management
 
-#### 创建排课
+#### Create Schedule
 
 ```bash
 curl -X POST /api/schedule/create \
@@ -151,7 +240,7 @@ curl -X POST /api/schedule/create \
   }'
 ```
 
-#### 检测排课冲突
+#### Detect Schedule Conflicts
 
 ```bash
 curl -X POST /api/schedule/conflicts \
@@ -163,158 +252,218 @@ curl -X POST /api/schedule/conflicts \
   }'
 ```
 
-#### 查找可用教室
+#### Find Available Classrooms
 
 ```bash
 curl "/api/schedule/available-classrooms?start_time=2025-05-28 09:00:00&end_time=2025-05-28 11:00:00&min_capacity=20"
 ```
 
-#### 获取排课日历
+#### Get Schedule Calendar
 
 ```bash
 curl "/api/schedule/calendar?start_date=2025-05-01&end_date=2025-05-31&classroom_ids=1,2,3"
 ```
 
-### 命令行工具
+## Commands
 
-#### 同步考勤数据
+### Sync Attendance Data
 
-从CSV文件导入：
+Import from CSV file:
 ```bash
 php bin/console train-classroom:sync-attendance file --file=/path/to/attendance.csv
 ```
 
-从API接口同步：
+Sync from API endpoint:
 ```bash
 php bin/console train-classroom:sync-attendance api --api-url=https://device.example.com/api/attendance
 ```
 
-试运行模式：
+Dry run mode:
 ```bash
 php bin/console train-classroom:sync-attendance file --file=/path/to/data.csv --dry-run
 ```
 
-#### 清理过期数据
+### Cleanup Expired Data
 
-使用默认配置：
+Using default configuration:
 ```bash
 php bin/console train-classroom:cleanup-data
 ```
 
-自定义保留天数：
+Custom retention days:
 ```bash
 php bin/console train-classroom:cleanup-data --attendance-days=365 --video-days=180
 ```
 
-试运行模式：
+Dry run mode:
 ```bash
 php bin/console train-classroom:cleanup-data --dry-run
 ```
 
-## 数据模型
+### Update Schedule Status
 
-### 核心实体
+Automatically update schedule status (recommended for cron jobs):
+```bash
+php bin/console train-classroom:update-schedule-status
+```
 
-#### AttendanceRecord (考勤记录)
-- `id` - 主键
-- `registration` - 关联报名记录
-- `type` - 考勤类型（签到、签退、休息外出、休息返回）
-- `method` - 考勤方式（人脸、刷卡、指纹、二维码、手动、移动端）
-- `recordTime` - 记录时间
-- `verificationResult` - 验证结果
-- `deviceData` - 设备数据（JSON）
-- `remark` - 备注
+Dry run mode:
+```bash
+php bin/console train-classroom:update-schedule-status --dry-run
+```
 
-#### ClassroomSchedule (教室排课)
-- `id` - 主键
-- `classroom` - 关联教室
-- `courseId` - 课程ID
-- `type` - 排课类型（常规、补课、考试、会议、实训、讲座）
-- `status` - 排课状态（已排课、进行中、已完成、已取消、已暂停、已延期）
-- `startTime` - 开始时间
-- `endTime` - 结束时间
-- `title` - 标题
-- `instructorId` - 讲师ID
-- `maxParticipants` - 最大参与人数
+Set batch size:
+```bash
+php bin/console train-classroom:update-schedule-status --batch-size=50
+```
 
-### 枚举类型
+### Expire Registration Records
 
-- `AttendanceType` - 考勤类型
-- `AttendanceMethod` - 考勤方式
-- `VerificationResult` - 验证结果
-- `ClassroomType` - 教室类型
-- `ClassroomStatus` - 教室状态
-- `ScheduleType` - 排课类型
-- `ScheduleStatus` - 排课状态
+Automatically mark expired registration records (cron job):
+```bash
+php bin/console job-training:expire-registration
+```
 
-## 服务接口
+> Note: This command runs automatically every minute, no manual execution needed.
+
+## Data Models
+
+### Core Entities
+
+#### AttendanceRecord
+- `id` - Primary key (Snowflake ID)
+- `registration` - Related registration record
+- `type` - Attendance type (sign_in, sign_out, break_out, break_return)
+- `method` - Attendance method (face, card, fingerprint, qr_code, manual, mobile)
+- `recordTime` - Record timestamp
+- `verificationResult` - Verification result
+- `deviceData` - Device data (JSON)
+- `remark` - Remarks
+
+#### ClassroomSchedule
+- `id` - Primary key (Snowflake ID)
+- `classroom` - Related classroom
+- `courseId` - Course ID
+- `type` - Schedule type (regular, makeup, exam, meeting, training, lecture)
+- `status` - Schedule status (scheduled, in_progress, completed, cancelled, paused, postponed)
+- `startTime` - Start time
+- `endTime` - End time
+- `title` - Title
+- `instructorId` - Instructor ID
+- `maxParticipants` - Maximum participants
+
+#### Classroom
+
+- `id` - Primary key (Snowflake ID)
+- `name` - Classroom name
+- `type` - Classroom type (physical, virtual, hybrid)
+- `status` - Classroom status (active, inactive, maintenance, archived)
+- `capacity` - Maximum capacity
+- `location` - Physical location
+- `features` - Available features (JSON)
+- `supplierId` - Tenant ID
+
+#### Registration
+
+- `id` - Primary key (Snowflake ID)
+- `userId` - User ID
+- `courseId` - Course ID
+- `classroomId` - Classroom ID
+- `status` - Registration status
+- `learnStatus` - Learning status
+- `registrationTime` - Registration timestamp
+
+### Enumerations
+
+- `AttendanceType` - Attendance types (SIGN_IN, SIGN_OUT, BREAK_OUT, BREAK_RETURN)
+- `AttendanceMethod` - Attendance methods (FACE, CARD, FINGERPRINT, QR_CODE, MANUAL, MOBILE)
+- `VerificationResult` - Verification results (SUCCESS, FAILURE, PENDING, ERROR)
+- `ClassroomType` - Classroom types (PHYSICAL, VIRTUAL, HYBRID)
+- `ClassroomStatus` - Classroom status (ACTIVE, INACTIVE, MAINTENANCE, ARCHIVED)
+- `ScheduleType` - Schedule types (REGULAR, MAKEUP, EXAM, MEETING, TRAINING, LECTURE)
+- `ScheduleStatus` - Schedule status (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED, PAUSED, POSTPONED)
+- `RegistrationLearnStatus` - Learning status (NOT_STARTED, IN_PROGRESS, COMPLETED, FAILED)
+
+## API Reference
+
+### Service Interfaces
 
 ### AttendanceServiceInterface
 
-- `recordAttendance()` - 记录考勤
-- `batchImportAttendance()` - 批量导入考勤
-- `getAttendanceStatistics()` - 获取考勤统计
-- `getCourseAttendanceSummary()` - 获取课程考勤汇总
-- `detectAttendanceAnomalies()` - 检测考勤异常
-- `makeUpAttendance()` - 补录考勤
-- `validateAttendance()` - 验证考勤有效性
-- `getAttendanceRateStatistics()` - 获取考勤率统计
+- `recordAttendance()` - Record attendance
+- `batchImportAttendance()` - Batch import attendance records
+- `getAttendanceStatistics()` - Get attendance statistics
+- `getCourseAttendanceSummary()` - Get course attendance summary
+- `detectAttendanceAnomalies()` - Detect attendance anomalies
+- `makeUpAttendance()` - Makeup attendance
+- `validateAttendance()` - Validate attendance
+- `getAttendanceRateStatistics()` - Get attendance rate statistics
 
 ### ScheduleServiceInterface
 
-- `createSchedule()` - 创建排课
-- `detectScheduleConflicts()` - 检测排课冲突
-- `updateScheduleStatus()` - 更新排课状态
-- `getClassroomUtilizationRate()` - 获取教室使用率
-- `findAvailableClassrooms()` - 查找可用教室
-- `batchCreateSchedules()` - 批量创建排课
-- `cancelSchedule()` - 取消排课
-- `postponeSchedule()` - 延期排课
-- `getScheduleCalendar()` - 获取排课日历
-- `getScheduleStatisticsReport()` - 获取排课统计报表
+- `createSchedule()` - Create schedule
+- `detectScheduleConflicts()` - Detect schedule conflicts
+- `updateScheduleStatus()` - Update schedule status
+- `getClassroomUtilizationRate()` - Get classroom utilization rate
+- `findAvailableClassrooms()` - Find available classrooms
+- `batchCreateSchedules()` - Batch create schedules
+- `cancelSchedule()` - Cancel schedule
+- `postponeSchedule()` - Postpone schedule
+- `getScheduleCalendar()` - Get schedule calendar
+- `getScheduleStatisticsReport()` - Get schedule statistics report
 
-## 配置选项
+### ClassroomServiceInterface
 
-### 考勤配置 (attendance)
+- `createClassroom()` - Create classroom
+- `updateClassroom()` - Update classroom details
+- `getClassroomById()` - Get classroom by ID
+- `findClassrooms()` - Find classrooms by criteria
+- `setClassroomStatus()` - Set classroom status
+- `getClassroomFeatures()` - Get classroom features
 
-- `enable_face_recognition` - 是否启用人脸识别考勤
-- `enable_fingerprint` - 是否启用指纹考勤
-- `enable_card_reader` - 是否启用刷卡考勤
-- `enable_qr_code` - 是否启用二维码考勤
-- `sign_in_tolerance_minutes` - 签到容忍时间（分钟）
-- `sign_out_tolerance_minutes` - 签退容忍时间（分钟）
-- `allow_makeup_attendance` - 是否允许补录考勤
+## Advanced Usage
 
-### 排课配置 (schedule)
+### Custom Attendance Methods
 
-- `default_schedule_duration_minutes` - 默认排课时长（分钟）
-- `min_break_between_schedules_minutes` - 排课间最小间隔（分钟）
-- `allow_overlapping_schedules` - 是否允许重叠排课
-- `max_advance_booking_days` - 最大提前预约天数
+You can implement custom attendance methods by extending the base attendance service:
 
-### 教室配置 (classroom)
+```php
+<?php
 
-- `enable_monitoring` - 是否启用教室监控
-- `enable_environment_monitoring` - 是否启用环境监控
-- `required_features` - 教室必需设施
+namespace App\Service;
 
-### 通知配置 (notification)
+use Tourze\TrainClassroomBundle\Service\AttendanceService;
 
-- `enable_email_notifications` - 是否启用邮件通知
-- `enable_sms_notifications` - 是否启用短信通知
-- `enable_wechat_notifications` - 是否启用微信通知
+class CustomAttendanceService extends AttendanceService
+{
+    public function recordCustomAttendance(Registration $registration, array $customData): bool
+    {
+        // Custom attendance logic
+        return parent::recordAttendance($registration, $type, $method, $customData);
+    }
+}
+```
 
-### 归档配置 (archive)
+### Advanced Scheduling
 
-- `attendance_retention_days` - 考勤记录保留天数
-- `video_retention_days` - 视频记录保留天数
-- `enable_auto_cleanup` - 是否启用自动清理
+For complex scheduling scenarios, use the schedule service with custom filters:
 
-## 开发指南
+```php
+$criteria = [
+    'start_time' => new \DateTime('2024-01-01 09:00:00'),
+    'end_time' => new \DateTime('2024-01-01 17:00:00'),
+    'classroom_type' => 'PHYSICAL',
+    'min_capacity' => 20,
+];
 
-### 扩展服务
+$availableClassrooms = $scheduleService->findAvailableClassrooms($criteria);
+```
 
-如果需要扩展考勤服务，可以创建自定义服务类：
+## Development
+
+### Extending Services
+
+To extend the attendance service, create a custom service class:
 
 ```php
 <?php
@@ -340,7 +489,7 @@ class CustomAttendanceService extends AttendanceService
 }
 ```
 
-然后在服务配置中替换默认服务：
+Then replace the default service in your service configuration:
 
 ```yaml
 services:
@@ -348,9 +497,9 @@ services:
     alias: App\Service\CustomAttendanceService
 ```
 
-### 自定义考勤设备集成
+### Custom Attendance Device Integration
 
-实现设备接口来集成自定义考勤设备：
+Implement the device interface to integrate custom attendance devices:
 
 ```php
 <?php
@@ -364,17 +513,75 @@ interface AttendanceDeviceInterface
 }
 ```
 
-## 许可证
+### Event System
+
+The bundle dispatches several events that you can listen to:
+
+- `AttendanceRecordedEvent` - Dispatched when attendance is recorded
+- `ScheduleCreatedEvent` - Dispatched when a schedule is created
+- `ScheduleUpdatedEvent` - Dispatched when a schedule is updated
+- `ClassroomStatusChangedEvent` - Dispatched when classroom status changes
+
+Example event subscriber:
+
+```php
+<?php
+
+namespace App\EventSubscriber;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tourze\TrainClassroomBundle\Event\AttendanceRecordedEvent;
+
+class AttendanceSubscriber implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            AttendanceRecordedEvent::class => 'onAttendanceRecorded',
+        ];
+    }
+
+    public function onAttendanceRecorded(AttendanceRecordedEvent $event): void
+    {
+        $record = $event->getAttendanceRecord();
+        // Custom logic here
+    }
+}
+```
+
+## Testing
+
+Run the test suite:
+
+```bash
+# Run all tests
+./vendor/bin/phpunit packages/train-classroom-bundle/tests
+
+# Run specific test class
+./vendor/bin/phpunit packages/train-classroom-bundle/tests/Service/AttendanceServiceTest.php
+
+# Run with coverage
+./vendor/bin/phpunit packages/train-classroom-bundle/tests --coverage-html=coverage
+```
+
+Run static analysis:
+
+```bash
+# PHPStan analysis
+php -d memory_limit=2G ./vendor/bin/phpstan analyse packages/train-classroom-bundle
+```
+
+## License
 
 MIT License
 
-## 贡献
+## Contributing
 
-欢迎提交Issue和Pull Request来改进这个Bundle。
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 支持
+## Support
 
-如有问题，请通过以下方式联系：
+If you have any questions or issues, please contact:
 
-- 提交Issue: [GitHub Issues](https://github.com/tourze/train-classroom-bundle/issues)
-- 邮件: support@example.com
+- Submit an Issue: [GitHub Issues](https://github.com/tourze/train-classroom-bundle/issues)
+- Email: support@tourze.com

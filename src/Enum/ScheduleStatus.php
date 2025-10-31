@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Enum;
 
+use Tourze\EnumExtra\BadgeInterface;
 use Tourze\EnumExtra\Itemable;
 use Tourze\EnumExtra\ItemTrait;
 use Tourze\EnumExtra\Labelable;
@@ -14,12 +15,11 @@ use Tourze\EnumExtra\SelectTrait;
  * 排课状态枚举
  * 定义排课的不同状态
  */
-enum ScheduleStatus: string
- implements Itemable, Labelable, Selectable{
-    
+enum ScheduleStatus: string implements Itemable, Labelable, Selectable, BadgeInterface
+{
     use ItemTrait;
     use SelectTrait;
-/**
+    /**
      * 已排课
      */
     case SCHEDULED = 'SCHEDULED';
@@ -86,6 +86,7 @@ enum ScheduleStatus: string
 
     /**
      * 获取所有状态选项
+     * @return array<string, string>
      */
     public static function getOptions(): array
     {
@@ -93,6 +94,7 @@ enum ScheduleStatus: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->getDescription();
         }
+
         return $options;
     }
 
@@ -101,11 +103,11 @@ enum ScheduleStatus: string
      */
     public function isActive(): bool
     {
-        return in_array($this, [
+        return \in_array($this, [
             self::SCHEDULED,
             self::ONGOING,
             self::IN_PROGRESS,
-        ]);
+        ], true);
     }
 
     /**
@@ -113,10 +115,10 @@ enum ScheduleStatus: string
      */
     public function isFinished(): bool
     {
-        return in_array($this, [
+        return \in_array($this, [
             self::COMPLETED,
             self::CANCELLED,
-        ]);
+        ], true);
     }
 
     /**
@@ -124,18 +126,34 @@ enum ScheduleStatus: string
      */
     public function isEditable(): bool
     {
-        return in_array($this, [
+        return \in_array($this, [
             self::SCHEDULED,
             self::SUSPENDED,
             self::POSTPONED,
-        ]);
+        ], true);
     }
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::SCHEDULED => '已排课',
+            self::ONGOING, self::IN_PROGRESS => '进行中',
+            self::COMPLETED => '已完成',
+            self::CANCELLED => '已取消',
+            self::SUSPENDED => '已暂停',
+            self::POSTPONED => '已延期',
         };
     }
-} 
+
+    public function getBadge(): string
+    {
+        return match ($this) {
+            self::SCHEDULED => BadgeInterface::PRIMARY,
+            self::ONGOING, self::IN_PROGRESS => BadgeInterface::SUCCESS,
+            self::COMPLETED => BadgeInterface::INFO,
+            self::CANCELLED => BadgeInterface::DANGER,
+            self::SUSPENDED => BadgeInterface::WARNING,
+            self::POSTPONED => BadgeInterface::SECONDARY,
+        };
+    }
+}

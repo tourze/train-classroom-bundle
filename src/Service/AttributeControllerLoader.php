@@ -70,6 +70,7 @@ final class AttributeControllerLoader extends Loader implements RoutingAutoLoade
         $collection->addCollection($this->controllerLoader->load(RegisterSubmitController::class));
         // Classroom Controllers
         $collection->addCollection($this->controllerLoader->load(CreateClassroomController::class));
+
         return $collection;
     }
 }

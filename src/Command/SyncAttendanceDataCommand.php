@@ -11,8 +11,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Tourze\TrainClassroomBundle\Command\DataLoader\ApiDataLoader;
+use Tourze\TrainClassroomBundle\Command\DataLoader\DatabaseDataLoader;
+use Tourze\TrainClassroomBundle\Command\DataLoader\DataLoaderInterface;
+use Tourze\TrainClassroomBundle\Command\DataLoader\FileDataLoader;
 use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
-use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
 
 /**
@@ -20,17 +23,42 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
  *
  * 用于从外部设备同步考勤数据
  */
-#[AsCommand(
-    name: self::NAME,
-    description: '同步考勤数据从外部设备或系统'
-)]
+#[AsCommand(name: self::NAME, description: '同步考勤数据从外部设备或系统', help: <<<'TXT'
+
+    此命令用于从外部考勤设备或系统同步考勤数据。
+
+    支持的数据源类型：
+      file      - 从CSV或JSON文件导入
+      api       - 从REST API接口获取
+      database  - 从外部数据库同步
+
+    示例用法：
+      # 从CSV文件导入
+      php bin/console train-classroom:sync-attendance file --file=/path/to/attendance.csv
+      
+      # 从API接口同步
+      php bin/console train-classroom:sync-attendance api --api-url=https://device.example.com/api/attendance
+      
+      # 试运行模式
+      php bin/console train-classroom:sync-attendance file --file=/path/to/data.csv --dry-run
+                
+    TXT)]
 class SyncAttendanceDataCommand extends Command
 {
     protected const NAME = 'train-classroom:sync-attendance';
+
+    /** @var array<DataLoaderInterface> */
+    private readonly array $dataLoaders;
+
     public function __construct(
-        private readonly AttendanceServiceInterface $attendanceService
+        private readonly AttendanceServiceInterface $attendanceService,
     ) {
         parent::__construct();
+        $this->dataLoaders = [
+            new FileDataLoader(),
+            new ApiDataLoader(),
+            new DatabaseDataLoader(),
+        ];
     }
 
     protected function configure(): void
@@ -44,24 +72,7 @@ class SyncAttendanceDataCommand extends Command
             ->addOption('batch-size', 'b', InputOption::VALUE_REQUIRED, '批处理大小', '100')
             ->addOption('date-from', null, InputOption::VALUE_REQUIRED, '同步开始日期 (Y-m-d)')
             ->addOption('date-to', null, InputOption::VALUE_REQUIRED, '同步结束日期 (Y-m-d)')
-            ->setHelp('
-此命令用于从外部考勤设备或系统同步考勤数据。
-
-支持的数据源类型：
-  file      - 从CSV或JSON文件导入
-  api       - 从REST API接口获取
-  database  - 从外部数据库同步
-
-示例用法：
-  # 从CSV文件导入
-  php bin/console train-classroom:sync-attendance file --file=/path/to/attendance.csv
-  
-  # 从API接口同步
-  php bin/console train-classroom:sync-attendance api --api-url=https://device.example.com/api/attendance
-  
-  # 试运行模式
-  php bin/console train-classroom:sync-attendance file --file=/path/to/data.csv --dry-run
-            ');
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -69,270 +80,257 @@ class SyncAttendanceDataCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $source = $input->getArgument('source');
         $dryRun = (bool) $input->getOption('dry-run');
-        $batchSize = (int) (int) $input->getOption('batch-size');
+        $batchSizeOption = $input->getOption('batch-size');
+        $batchSize = is_numeric($batchSizeOption) ? (int) $batchSizeOption : 100;
 
         $io->title('考勤数据同步工具');
 
-        if ((bool) $dryRun) {
+        if ($dryRun) {
             $io->note('运行在试运行模式，不会实际写入数据');
         }
 
         try {
-            $attendanceData = $this->loadAttendanceData($source, $input, $io);
+            $sourceArg = is_string($source) ? $source : 'file';
+            $attendanceData = $this->loadAttendanceData($sourceArg, $input, $io);
 
-            if ((bool) empty($attendanceData)) {
+            if ([] === $attendanceData) {
                 $io->warning('没有找到需要同步的考勤数据');
+
                 return Command::SUCCESS;
             }
 
-            $io->info(sprintf('找到 %d 条考勤记录', count($attendanceData)));
+            $io->info(sprintf('找到 %d 条考勤记录', \count($attendanceData)));
 
-            // 分批处理数据
-            $batches = array_chunk($attendanceData, $batchSize);
-            $totalBatches = count($batches);
-            $totalSuccess = 0;
-            $totalFailed = 0;
-            $totalSkipped = 0;
+            $results = $this->processBatchData($attendanceData, $batchSize, $dryRun, $io);
 
-            $io->progressStart(count($attendanceData));
-
-            foreach ($batches as $batchIndex => $batch) {
-                $io->section(sprintf('处理批次 %d/%d (%d 条记录)', $batchIndex + 1, $totalBatches, count($batch)));
-
-                if (!$dryRun) {
-                    $results = $this->attendanceService->batchImportAttendance($batch);
-                    $totalSuccess += $results['success'];
-                    $totalFailed += $results['failed'];
-
-                    // 显示错误详情
-                    if (!empty($results['errors'])) {
-                        foreach ($results['errors'] as $error) {
-                            $io->error(sprintf('第 %d 行错误: %s', $error['index'] + 1, $error['error']));
-                        }
-                    }
-                } else {
-                    // 试运行模式，只验证数据格式
-                    foreach ($batch as $index => $record) {
-                        if ($this->validateAttendanceRecord($record)) {
-                            $totalSuccess++;
-                        } else {
-                            $totalFailed++;
-                            $io->error(sprintf('第 %d 行数据格式错误', $index + 1));
-                        }
-                    }
-                }
-
-                $io->progressAdvance(count($batch));
-            }
-
-            $io->progressFinish();
-
-            // 显示同步结果
-            $io->success('数据同步完成');
-            $io->table(
-                ['统计项', '数量'],
-                [
-                    ['成功', $totalSuccess],
-                    ['失败', $totalFailed],
-                    ['跳过', $totalSkipped],
-                    ['总计', count($attendanceData)],
-                ]
-            );
-
-            if ($totalFailed > 0) {
-                $io->warning(sprintf('有 %d 条记录同步失败，请检查错误信息', $totalFailed));
-                return Command::FAILURE;
-            }
-
-            return Command::SUCCESS;
+            return $this->handleSyncResults($results, $io);
         } catch (\Throwable $e) {
             $io->error('同步过程中发生错误: ' . $e->getMessage());
+
             return Command::FAILURE;
         }
     }
 
     /**
-     * 根据数据源类型加载考勤数据
+     * @param array<int, array<string, mixed>> $attendanceData
+     * @return array<string, int>
      */
-    private function loadAttendanceData(string $source, InputInterface $input, SymfonyStyle $io): array
+    private function processBatchData(array $attendanceData, int $batchSize, bool $dryRun, SymfonyStyle $io): array
     {
-        switch ($source) {
-            case 'file':
-                return $this->loadFromFile($input, $io);
-            case 'api':
-                return $this->loadFromApi($input, $io);
-            case 'database':
-                return $this->loadFromDatabase($input, $io);
-            default:
-                throw new InvalidArgumentException('不支持的数据源类型: ' . $source);
+        $batches = array_chunk($attendanceData, max(1, $batchSize));
+        $totalSuccess = 0;
+        $totalFailed = 0;
+
+        $io->progressStart(\count($attendanceData));
+
+        foreach ($batches as $batchIndex => $batch) {
+            [$success, $failed] = $this->processSingleBatch($batch, $batchIndex, \count($batches), $dryRun, $io);
+            $totalSuccess += $success;
+            $totalFailed += $failed;
         }
+
+        $io->progressFinish();
+
+        return [
+            'success' => $totalSuccess,
+            'failed' => $totalFailed,
+            'skipped' => 0,
+            'total' => \count($attendanceData),
+        ];
     }
 
     /**
-     * 从文件加载数据
+     * 处理单个批次
+     *
+     * @param array<int, array<string, mixed>> $batch
+     * @return array{int, int}
      */
-    private function loadFromFile(InputInterface $input, SymfonyStyle $io): array
+    private function processSingleBatch(array $batch, int $batchIndex, int $totalBatches, bool $dryRun, SymfonyStyle $io): array
     {
-        $filePath = $input->getOption('file');
-        if (($filePath === null)) {
-            throw new InvalidArgumentException('使用文件数据源时必须指定 --file 参数');
-        }
+        $io->section(sprintf('处理批次 %d/%d (%d 条记录)', $batchIndex + 1, $totalBatches, \count($batch)));
 
-        if (!file_exists($filePath)) {
-            throw new InvalidArgumentException('文件不存在: ' . $filePath);
-        }
+        $batchResults = $this->processBatch($batch, $dryRun, $io);
+        $success = is_int($batchResults['success'] ?? 0) ? ($batchResults['success'] ?? 0) : 0;
+        $failed = is_int($batchResults['failed'] ?? 0) ? ($batchResults['failed'] ?? 0) : 0;
 
-        $io->info('从文件加载数据: ' . $filePath);
+        $io->progressAdvance(\count($batch));
 
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-
-        switch ($extension) {
-            case 'csv':
-                return $this->loadFromCsv($filePath);
-            case 'json':
-                return $this->loadFromJson($filePath);
-            default:
-                throw new InvalidArgumentException('不支持的文件格式: ' . $extension);
-        }
+        return [$success, $failed];
     }
 
     /**
-     * 从CSV文件加载数据
+     * @param array<int, array<string, mixed>> $batch
+     * @return array<string, mixed>
      */
-    private function loadFromCsv(string $filePath): array
+    private function processBatch(array $batch, bool $dryRun, SymfonyStyle $io): array
     {
-        $data = [];
-        $handle = fopen($filePath, 'r');
-
-        if ($handle === false) {
-            throw new RuntimeException('无法打开文件: ' . $filePath);
+        if ($dryRun) {
+            return $this->validateBatch($batch, $io);
         }
 
-        // 读取表头
-        $headers = fgetcsv($handle);
-        if ($headers === false) {
-            throw new RuntimeException('无法读取CSV表头');
-        }
+        return $this->importBatch($batch, $io);
+    }
 
-        // 读取数据行
-        while (($row = fgetcsv($handle)) !== false) {
-            if (count($row) === count($headers)) {
-                $data[] = array_combine($headers, $row);
+    /**
+     * @param array<int, array<string, mixed>> $batch
+     * @return array<string, mixed>
+     */
+    private function validateBatch(array $batch, SymfonyStyle $io): array
+    {
+        $counts = ['success' => 0, 'failed' => 0];
+
+        foreach ($batch as $index => $record) {
+            $isValid = $this->validateAttendanceRecord($record);
+            ++$counts[$isValid ? 'success' : 'failed'];
+
+            if (!$isValid) {
+                $io->error(sprintf('第 %d 行数据格式错误', $index + 1));
             }
         }
 
-        fclose($handle);
-        return $data;
+        return $counts;
     }
 
     /**
-     * 从JSON文件加载数据
+     * @param array<int, array<string, mixed>> $batch
+     * @return array<string, mixed>
      */
-    private function loadFromJson(string $filePath): array
+    private function importBatch(array $batch, SymfonyStyle $io): array
     {
-        $content = file_get_contents($filePath);
-        if ($content === false) {
-            throw new RuntimeException('无法读取文件: ' . $filePath);
+        $results = $this->attendanceService->batchImportAttendance($batch);
+
+        if (isset($results['errors']) && is_array($results['errors']) && [] !== $results['errors']) {
+            /** @var array<int, array<string, mixed>> $errors */
+            $errors = $results['errors'];
+            $this->showBatchErrors($errors, $io);
         }
 
-        $data = json_decode($content, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('JSON格式错误: ' . json_last_error_msg());
-        }
-
-        return is_array($data) ? $data : [];
+        // Ensure proper return type structure
+        return [
+            'success' => is_int($results['success'] ?? 0) ? $results['success'] : 0,
+            'failed' => is_int($results['failed'] ?? 0) ? $results['failed'] : 0,
+            'errors' => $results['errors'] ?? [],
+        ];
     }
 
     /**
-     * 从API加载数据
+     * @param array<int, array<string, mixed>> $errors
      */
-    private function loadFromApi(InputInterface $input, SymfonyStyle $io): array
+    private function showBatchErrors(array $errors, SymfonyStyle $io): void
     {
-        $apiUrl = $input->getOption('api-url');
-        if (($apiUrl === null)) {
-            throw new InvalidArgumentException('使用API数据源时必须指定 --api-url 参数');
+        foreach ($errors as $error) {
+            if (is_array($error) && isset($error['index'], $error['error'])) {
+                $index = is_numeric($error['index']) ? (int) $error['index'] : 0;
+                $errorMsg = is_string($error['error']) ? $error['error'] : '未知错误';
+                $io->error(sprintf('第 %d 行错误: %s', $index + 1, $errorMsg));
+            }
         }
-
-        $io->info('从API加载数据: ' . $apiUrl);
-
-        // 构建查询参数
-        $params = [];
-        $dateFrom = $input->getOption('date-from');
-        if ($dateFrom !== null) {
-            $params['date_from'] = $dateFrom;
-        }
-        $dateTo = $input->getOption('date-to');
-        if ($dateTo !== null) {
-            $params['date_to'] = $dateTo;
-        }
-
-        $url = $apiUrl . '?' . http_build_query($params);
-
-        // 发送HTTP请求
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'header' => [
-                    'Accept: application/json',
-                    'User-Agent: TrainClassroom-SyncCommand/1.0',
-                ],
-                'timeout' => 30,
-            ],
-        ]);
-
-        $response = file_get_contents($url, false, $context);
-        if ($response === false) {
-            throw new RuntimeException('API请求失败: ' . $url);
-        }
-
-        $data = json_decode($response, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('API响应JSON格式错误: ' . json_last_error_msg());
-        }
-
-        return $data['data'] ?? $data;
     }
 
     /**
-     * 从数据库加载数据
+     * @param array<string, int> $results
      */
-    private function loadFromDatabase(InputInterface $input, SymfonyStyle $io): array
+    private function handleSyncResults(array $results, SymfonyStyle $io): int
     {
-        $dsn = $input->getOption('database-dsn');
-        if (($dsn === null)) {
-            throw new InvalidArgumentException('使用数据库数据源时必须指定 --database-dsn 参数');
+        $io->success('数据同步完成');
+        $io->table(
+            ['统计项', '数量'],
+            [
+                ['成功', $results['success']],
+                ['失败', $results['failed']],
+                ['跳过', $results['skipped']],
+                ['总计', $results['total']],
+            ]
+        );
+
+        if ($results['failed'] > 0) {
+            $io->warning(sprintf('有 %d 条记录同步失败，请检查错误信息', $results['failed']));
+
+            return Command::FAILURE;
         }
 
-        $io->info('从数据库加载数据: ' . $dsn);
+        return Command::SUCCESS;
+    }
 
-        // 这里应该实现具体的数据库连接和查询逻辑
-        // 为了简化，这里返回空数组
-        $io->warning('数据库数据源功能尚未实现');
-        return [];
+    /**
+     * 根据数据源类型加载考勤数据
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function loadAttendanceData(string $source, InputInterface $input, SymfonyStyle $io): array
+    {
+        foreach ($this->dataLoaders as $loader) {
+            if ($loader->supports($source)) {
+                return $loader->load($input, $io);
+            }
+        }
+
+        throw new InvalidArgumentException('不支持的数据源类型: ' . $source);
     }
 
     /**
      * 验证考勤记录格式
+     *
+     * @param array<string, mixed> $record
      */
     private function validateAttendanceRecord(array $record): bool
     {
-        $requiredFields = ['registration_id', 'type', 'method'];
+        return $this->hasRequiredFields($record)
+            && $this->isValidAttendanceType($record)
+            && $this->isValidAttendanceMethod($record);
+    }
 
-        foreach ($requiredFields as $field) {
-            if (!isset($record[$field]) || empty($record[$field])) {
+    /**
+     * 检查必填字段
+     *
+     * @param array<string, mixed> $record
+     */
+    private function hasRequiredFields(array $record): bool
+    {
+        foreach (['registration_id', 'type', 'method'] as $field) {
+            if (!isset($record[$field])) {
+                return false;
+            }
+
+            if (!$this->isNonEmptyScalar($record[$field])) {
                 return false;
             }
         }
 
-        // 验证枚举值
-        if (!in_array($record['type'], ['sign_in', 'sign_out', 'break_out', 'break_return'])) {
-            return false;
-        }
-
-        if (!in_array($record['method'], ['face', 'card', 'fingerprint', 'qr_code', 'manual', 'mobile'])) {
-            return false;
-        }
-
         return true;
     }
-} 
+
+    /**
+     * 检查是否为非空标量值
+     *
+     * @param mixed $value
+     */
+    private function isNonEmptyScalar($value): bool
+    {
+        return (is_string($value) || is_numeric($value)) && '' !== (string) $value;
+    }
+
+    /**
+     * 验证考勤类型
+     *
+     * @param array<string, mixed> $record
+     */
+    private function isValidAttendanceType(array $record): bool
+    {
+        $validTypes = ['sign_in', 'sign_out', 'break_out', 'break_return'];
+
+        return isset($record['type']) && \in_array($record['type'], $validTypes, true);
+    }
+
+    /**
+     * 验证考勤方式
+     *
+     * @param array<string, mixed> $record
+     */
+    private function isValidAttendanceMethod(array $record): bool
+    {
+        $validMethods = ['face', 'card', 'fingerprint', 'qr_code', 'manual', 'mobile'];
+
+        return isset($record['method']) && \in_array($record['method'], $validMethods, true);
+    }
+}

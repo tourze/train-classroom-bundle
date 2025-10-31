@@ -16,7 +16,7 @@ final class CancelScheduleController extends AbstractController
 {
     public function __construct(
         private readonly ScheduleServiceInterface $scheduleService,
-        private readonly ClassroomScheduleRepository $scheduleRepository
+        private readonly ClassroomScheduleRepository $scheduleRepository,
     ) {
     }
 
@@ -26,16 +26,21 @@ final class CancelScheduleController extends AbstractController
         try {
             // 获取排课记录
             $schedule = $this->scheduleRepository->find($id);
-            
-            if ($schedule === null) {
+
+            if (null === $schedule) {
                 return $this->json([
                     'success' => false,
                     'message' => '排课记录不存在',
                 ], Response::HTTP_NOT_FOUND);
             }
-            
+
             $data = json_decode($request->getContent(), true);
-            $reason = $data['reason'] ?? '未说明原因';
+
+            if (!is_array($data)) {
+                $reason = '未说明原因';
+            } else {
+                $reason = is_string($data['reason'] ?? null) ? $data['reason'] : '未说明原因';
+            }
 
             // 取消排课
             $schedule = $this->scheduleService->cancelSchedule($schedule, $reason);

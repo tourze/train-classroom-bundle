@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -12,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
 use Tourze\TrainClassroomBundle\Enum\ScheduleStatus;
 use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
 
@@ -20,13 +22,24 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
  *
  * 自动更新过期或需要状态变更的排课记录
  */
-#[AsCommand(
-    name: self::NAME,
-    description: '更新排课状态',
-)]
+#[AsCommand(name: self::NAME, description: '更新排课状态', help: <<<'TXT'
+
+    此命令会自动更新排课状态：
+    1. 将已过期的"已排课"状态更新为"已完成"
+    2. 将开始时间已到的"已排课"状态更新为"进行中"
+    3. 将结束时间已过的"进行中"状态更新为"已完成"
+
+    使用示例：
+      php bin/console train-classroom:update-schedule-status
+      php bin/console train-classroom:update-schedule-status --dry-run
+      php bin/console train-classroom:update-schedule-status --batch-size=50
+                
+    TXT)]
+#[WithMonologChannel(channel: 'train_classroom')]
 class UpdateScheduleStatusCommand extends Command
 {
     protected const NAME = 'train-classroom:update-schedule-status';
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly ClassroomScheduleRepository $scheduleRepository,
@@ -41,29 +54,20 @@ class UpdateScheduleStatusCommand extends Command
             ->addOption('dry-run', null, InputOption::VALUE_NONE, '试运行模式，不实际更新数据')
             ->addOption('batch-size', 'b', InputOption::VALUE_REQUIRED, '批处理大小', '100')
             ->addOption('force', 'f', InputOption::VALUE_NONE, '强制执行，忽略确认提示')
-            ->setHelp('
-此命令会自动更新排课状态：
-1. 将已过期的"已排课"状态更新为"已完成"
-2. 将开始时间已到的"已排课"状态更新为"进行中"
-3. 将结束时间已过的"进行中"状态更新为"已完成"
-
-使用示例：
-  php bin/console train-classroom:update-schedule-status
-  php bin/console train-classroom:update-schedule-status --dry-run
-  php bin/console train-classroom:update-schedule-status --batch-size=50
-            ');
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $dryRun = (bool) $input->getOption('dry-run');
-        $batchSize = (int) $input->getOption('batch-size');
+        $batchSizeOption = $input->getOption('batch-size');
+        $batchSize = is_string($batchSizeOption) ? (int) $batchSizeOption : 100;
         $force = (bool) $input->getOption('force');
 
         $io->title('排课状态更新');
 
-        if ((bool) $dryRun) {
+        if ($dryRun) {
             $io->note('运行在试运行模式，不会实际更新数据');
         }
 
@@ -91,8 +95,8 @@ class UpdateScheduleStatusCommand extends Command
             $scheduledToCompleted = $this->updateScheduledToCompleted($now, $batchSize, $dryRun, $io);
             $stats['scheduled_to_completed'] = $scheduledToCompleted;
 
-            $stats['total_processed'] = $stats['scheduled_to_in_progress'] + 
-                                      $stats['in_progress_to_completed'] + 
+            $stats['total_processed'] = $stats['scheduled_to_in_progress'] +
+                                      $stats['in_progress_to_completed'] +
                                       $stats['scheduled_to_completed'];
 
             // 显示统计信息
@@ -108,7 +112,7 @@ class UpdateScheduleStatusCommand extends Command
             );
 
             if ($stats['total_processed'] > 0) {
-                if ((bool) $dryRun) {
+                if ($dryRun) {
                     $io->success(sprintf('试运行完成，发现 %d 条记录需要更新', $stats['total_processed']));
                 } else {
                     $io->success(sprintf('状态更新完成，共更新 %d 条记录', $stats['total_processed']));
@@ -145,18 +149,26 @@ class UpdateScheduleStatusCommand extends Command
             ->andWhere('s.endTime > :now')
             ->setParameter('status', ScheduleStatus::SCHEDULED)
             ->setParameter('now', $now)
-            ->setMaxResults($batchSize);
+            ->setMaxResults($batchSize)
+        ;
 
         $schedules = $qb->getQuery()->getResult();
+
+        if (!is_array($schedules)) {
+            return 0;
+        }
+
         $count = count($schedules);
 
         if ($count > 0) {
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
+                if (!$schedule instanceof ClassroomSchedule) {
+                    continue;
+                }
                 if (!$dryRun) {
-                    $schedule->setStatus(ScheduleStatus::ONGOING);
-                    $schedule->setUpdatedAt(new \DateTime());
+                    $schedule->setScheduleStatus(ScheduleStatus::ONGOING);
                     $this->entityManager->persist($schedule);
                 }
                 $io->progressAdvance();
@@ -185,18 +197,26 @@ class UpdateScheduleStatusCommand extends Command
             ->andWhere('s.endTime <= :now')
             ->setParameter('status', ScheduleStatus::ONGOING)
             ->setParameter('now', $now)
-            ->setMaxResults($batchSize);
+            ->setMaxResults($batchSize)
+        ;
 
         $schedules = $qb->getQuery()->getResult();
+
+        if (!is_array($schedules)) {
+            return 0;
+        }
+
         $count = count($schedules);
 
         if ($count > 0) {
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
+                if (!$schedule instanceof ClassroomSchedule) {
+                    continue;
+                }
                 if (!$dryRun) {
-                    $schedule->setStatus(ScheduleStatus::COMPLETED);
-                    $schedule->setUpdatedAt(new \DateTime());
+                    $schedule->setScheduleStatus(ScheduleStatus::COMPLETED);
                     $this->entityManager->persist($schedule);
                 }
                 $io->progressAdvance();
@@ -225,18 +245,26 @@ class UpdateScheduleStatusCommand extends Command
             ->andWhere('s.endTime <= :now')
             ->setParameter('status', ScheduleStatus::SCHEDULED)
             ->setParameter('now', $now)
-            ->setMaxResults($batchSize);
+            ->setMaxResults($batchSize)
+        ;
 
         $schedules = $qb->getQuery()->getResult();
+
+        if (!is_array($schedules)) {
+            return 0;
+        }
+
         $count = count($schedules);
 
         if ($count > 0) {
             $io->progressStart($count);
 
             foreach ($schedules as $schedule) {
+                if (!$schedule instanceof ClassroomSchedule) {
+                    continue;
+                }
                 if (!$dryRun) {
-                    $schedule->setStatus(ScheduleStatus::COMPLETED);
-                    $schedule->setUpdatedAt(new \DateTime());
+                    $schedule->setScheduleStatus(ScheduleStatus::COMPLETED);
                     $this->entityManager->persist($schedule);
                 }
                 $io->progressAdvance();
@@ -254,4 +282,4 @@ class UpdateScheduleStatusCommand extends Command
 
         return $count;
     }
-} 
+}
