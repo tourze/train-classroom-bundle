@@ -35,7 +35,7 @@
     "tourze/arrayable": "1.*",
     "tourze/biz-user-bundle": "0.0.*",
     "tourze/bundle-dependency": "1.*",
-    "tourze/catalog-bundle": "0.0.*",
+    "tourze/catalog-bundle": "1.0.*",
     "tourze/cms-bundle": "0.0.*",
     "tourze/doctrine-indexed-bundle": "1.0.*",
     "tourze/doctrine-ip-bundle": "1.0.*",
