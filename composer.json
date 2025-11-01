@@ -46,10 +46,10 @@
     "tourze/doctrine-user-bundle": "1.0.*",
     "tourze/easy-admin-enum-field-bundle": "1.0.*",
     "tourze/easy-admin-menu-bundle": "1.0.*",
-    "tourze/enum-extra": "1.*",
+    "tourze/enum-extra": "1.0.*",
     "tourze/json-rpc-core": "1.0.*",
     "tourze/symfony-cron-job-bundle": "1.0.*",
-    "tourze/symfony-dependency-service-loader": "1.*",
+    "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-routing-auto-loader-bundle": "1.0.*",
     "tourze/train-course-bundle": "0.0.*"
   },
