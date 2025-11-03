@@ -16,6 +16,7 @@ use Tourze\DoctrineUserAgentBundle\DoctrineUserAgentBundle;
 use Tourze\DoctrineUserBundle\DoctrineUserBundle;
 use Tourze\RoutingAutoLoaderBundle\RoutingAutoLoaderBundle;
 use Tourze\TrainCourseBundle\TrainCourseBundle;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class TrainClassroomBundle extends Bundle implements BundleDependencyInterface
 {
@@ -34,6 +35,7 @@ class TrainClassroomBundle extends Bundle implements BundleDependencyInterface
             DoctrineUserBundle::class => ['all' => true],
             TrainCourseBundle::class => ['all' => true],
             RoutingAutoLoaderBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
