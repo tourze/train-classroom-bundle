@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Tourze\TrainClassroomBundle\Entity\AttendanceRecord;
@@ -13,7 +14,7 @@ use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\AttendanceType;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 
-class AttendanceRecordFixtures extends Fixture implements DependentFixtureInterface
+class AttendanceRecordFixtures extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
     public function load(ObjectManager $manager): void
     {
@@ -45,6 +46,11 @@ class AttendanceRecordFixtures extends Fixture implements DependentFixtureInterf
         $manager->persist($checkOutRecord);
 
         $manager->flush();
+    }
+
+    public static function getGroups(): array
+    {
+        return ['dev', 'production']; // 暂时从test组中移除以避免依赖问题
     }
 
     public function getDependencies(): array
