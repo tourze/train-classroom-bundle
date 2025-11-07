@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Tests\Repository;
 
-use BizUserBundle\Entity\BizUser;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -114,11 +114,11 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
         $this->classroom->setStatus('ACTIVE');
         self::getEntityManager()->persist($this->classroom);
 
-        $mockUser = $this->createMockUser();
+        $testUser = $this->createNormalUser('test_user');
 
         $this->registration = new Registration();
         $this->registration->setClassroom($this->classroom);
-        $this->registration->setStudent($mockUser);
+        $this->registration->setStudent($testUser);
         $this->registration->setTrainType(TrainType::ONLINE);
         $this->registration->setStatus(OrderStatus::PENDING);
         $this->registration->setBeginTime(new \DateTimeImmutable());
@@ -164,7 +164,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $registration2 = new Registration();
         $registration2->setClassroom($this->classroom);
-        $registration2->setStudent($this->createMockUser('user2'));
+        $registration2->setStudent($this->createNormalUser('user2'));
         $registration2->setTrainType(TrainType::OFFLINE);
         $registration2->setStatus(OrderStatus::PAID);
         $registration2->setBeginTime(new \DateTimeImmutable('+1 day'));
@@ -192,7 +192,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $registration2 = new Registration();
         $registration2->setClassroom($this->classroom);
-        $registration2->setStudent($this->createMockUser('user2'));
+        $registration2->setStudent($this->createNormalUser('user2'));
         $registration2->setTrainType(TrainType::HYBRID);
         $registration2->setStatus(OrderStatus::PAID);
         $registration2->setBeginTime(new \DateTimeImmutable('+2 days'));
@@ -200,7 +200,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
 
         $registration3 = new Registration();
         $registration3->setClassroom($this->classroom);
-        $registration3->setStudent($this->createMockUser('user3'));
+        $registration3->setStudent($this->createNormalUser('user3'));
         $registration3->setTrainType(TrainType::ONLINE);
         $registration3->setStatus(OrderStatus::CANCELLED);
         $registration3->setBeginTime(new \DateTimeImmutable('+3 days'));
@@ -273,7 +273,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $unfinishedRegistration = new Registration();
         $unfinishedRegistration->setClassroom($this->classroom);
-        $unfinishedRegistration->setStudent($this->createMockUser('unfinished'));
+        $unfinishedRegistration->setStudent($this->createNormalUser('unfinished'));
         $unfinishedRegistration->setTrainType(TrainType::OFFLINE);
         $unfinishedRegistration->setStatus(OrderStatus::PENDING);
         $unfinishedRegistration->setBeginTime(new \DateTimeImmutable());
@@ -282,7 +282,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
 
         $finishedRegistration = new Registration();
         $finishedRegistration->setClassroom($this->classroom);
-        $finishedRegistration->setStudent($this->createMockUser('finished'));
+        $finishedRegistration->setStudent($this->createNormalUser('finished'));
         $finishedRegistration->setTrainType(TrainType::ONLINE);
         $finishedRegistration->setStatus(OrderStatus::PAID);
         $finishedRegistration->setBeginTime(new \DateTimeImmutable('-10 days'));
@@ -313,7 +313,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $expiredRegistration = new Registration();
         $expiredRegistration->setClassroom($this->classroom);
-        $expiredRegistration->setStudent($this->createMockUser('expired'));
+        $expiredRegistration->setStudent($this->createNormalUser('expired'));
         $expiredRegistration->setTrainType(TrainType::HYBRID);
         $expiredRegistration->setStatus(OrderStatus::CANCELLED);
         $expiredRegistration->setBeginTime(new \DateTimeImmutable('-60 days'));
@@ -335,7 +335,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $paidRegistration = new Registration();
         $paidRegistration->setClassroom($this->classroom);
-        $paidRegistration->setStudent($this->createMockUser('paid'));
+        $paidRegistration->setStudent($this->createNormalUser('paid'));
         $paidRegistration->setTrainType(TrainType::ONLINE);
         $paidRegistration->setStatus(OrderStatus::PAID);
         $paidRegistration->setBeginTime(new \DateTimeImmutable());
@@ -357,7 +357,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $newRegistration = new Registration();
         $newRegistration->setClassroom($this->classroom);
-        $newRegistration->setStudent($this->createMockUser('new'));
+        $newRegistration->setStudent($this->createNormalUser('new'));
         $newRegistration->setTrainType(TrainType::OFFLINE);
         $newRegistration->setStatus(OrderStatus::PENDING);
         $newRegistration->setBeginTime(new \DateTimeImmutable('+1 week'));
@@ -375,7 +375,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $newRegistration = new Registration();
         $newRegistration->setClassroom($this->classroom);
-        $newRegistration->setStudent($this->createMockUser('delayed'));
+        $newRegistration->setStudent($this->createNormalUser('delayed'));
         $newRegistration->setTrainType(TrainType::HYBRID);
         $newRegistration->setStatus(OrderStatus::PENDING);
         $newRegistration->setBeginTime(new \DateTimeImmutable('+2 weeks'));
@@ -394,7 +394,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $registrationToRemove = new Registration();
         $registrationToRemove->setClassroom($this->classroom);
-        $registrationToRemove->setStudent($this->createMockUser('remove'));
+        $registrationToRemove->setStudent($this->createNormalUser('remove'));
         $registrationToRemove->setTrainType(TrainType::ONLINE);
         $registrationToRemove->setStatus(OrderStatus::CANCELLED);
         $registrationToRemove->setBeginTime(new \DateTimeImmutable());
@@ -413,7 +413,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
     {
         $specialRegistration = new Registration();
         $specialRegistration->setClassroom($this->classroom);
-        $specialRegistration->setStudent($this->createMockUser('special'));
+        $specialRegistration->setStudent($this->createNormalUser('special'));
         $specialRegistration->setTrainType(TrainType::ONLINE);
         $specialRegistration->setStatus(OrderStatus::PAID);
         $specialRegistration->setBeginTime(new \DateTimeImmutable());
@@ -458,27 +458,12 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
         $this->assertStringContainsString('报名于', $string);
     }
 
-    private function createMockUser(string $identifier = 'test_user'): BizUser
-    {
-        /** @var int $counter */
-        static $counter = 1;
-
-        $user = new BizUser();
-        $user->setUsername($identifier . '_' . ((string) $counter++));
-        $user->setNickName($identifier);
-        $user->setPasswordHash('password_hash');
-
-        self::getEntityManager()->persist($user);
-
-        return $user;
-    }
-
     public function testFindOneByWithOrderByCriteria(): void
     {
         // 创建多个报名记录用于排序测试
         $registration1 = new Registration();
         $registration1->setClassroom($this->classroom);
-        $registration1->setStudent($this->createMockUser('user_sort1'));
+        $registration1->setStudent($this->createNormalUser('user_sort1'));
         $registration1->setTrainType(TrainType::ONLINE);
         $registration1->setStatus(OrderStatus::PENDING);
         $registration1->setBeginTime(new \DateTimeImmutable('-1 day'));
@@ -487,7 +472,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
 
         $registration2 = new Registration();
         $registration2->setClassroom($this->classroom);
-        $registration2->setStudent($this->createMockUser('user_sort2'));
+        $registration2->setStudent($this->createNormalUser('user_sort2'));
         $registration2->setTrainType(TrainType::ONLINE);
         $registration2->setStatus(OrderStatus::PENDING);
         $registration2->setBeginTime(new \DateTimeImmutable('+1 day'));
@@ -533,7 +518,7 @@ final class RegistrationRepositoryTest extends AbstractRepositoryTestCase
         // 创建一个报名记录，某些可空字段为null
         $nullRegistration = new Registration();
         $nullRegistration->setClassroom($this->classroom);
-        $nullRegistration->setStudent($this->createMockUser('null_test'));
+        $nullRegistration->setStudent($this->createNormalUser('null_test'));
         $nullRegistration->setTrainType(TrainType::ONLINE);
         $nullRegistration->setStatus(OrderStatus::PENDING);
         $nullRegistration->setBeginTime(new \DateTimeImmutable());
