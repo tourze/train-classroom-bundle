@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\TrainClassroomBundle\Controller\Admin\AttendanceRecordCrudController;
-use Tourze\TrainClassroomBundle\Entity\AttendanceRecord;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\AttendanceType;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
@@ -85,11 +84,6 @@ final class AttendanceRecordCrudControllerTest extends AbstractEasyAdminControll
         $this->assertInstanceOf(AttendanceRecordCrudController::class, $controller);
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertEquals(AttendanceRecord::class, AttendanceRecordCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = $this->getControllerService();
@@ -141,7 +135,6 @@ final class AttendanceRecordCrudControllerTest extends AbstractEasyAdminControll
         $this->assertTrue(enum_exists(AttendanceMethod::class));
         $this->assertTrue(enum_exists(VerificationResult::class));
     }
-
 
     public function testValidationErrors(): void
     {

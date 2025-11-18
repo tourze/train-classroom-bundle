@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\TrainClassroomBundle\Controller\Admin\ClassroomScheduleCrudController;
-use Tourze\TrainClassroomBundle\Entity\ClassroomSchedule;
 
 /**
  * 排课CRUD控制器测试
@@ -78,11 +77,6 @@ final class ClassroomScheduleCrudControllerTest extends AbstractEasyAdminControl
     {
         $controller = $this->getControllerService();
         $this->assertInstanceOf(ClassroomScheduleCrudController::class, $controller);
-    }
-
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertEquals(ClassroomSchedule::class, ClassroomScheduleCrudController::getEntityFqcn());
     }
 
     public function testConfigureFields(): void

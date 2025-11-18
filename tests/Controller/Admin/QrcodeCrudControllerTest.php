@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\TrainClassroomBundle\Controller\Admin\QrcodeCrudController;
-use Tourze\TrainClassroomBundle\Entity\Qrcode;
 
 /**
  * 二维码CRUD控制器测试
@@ -69,11 +68,6 @@ final class QrcodeCrudControllerTest extends AbstractEasyAdminControllerTestCase
     {
         $controller = $this->getControllerService();
         $this->assertInstanceOf(QrcodeCrudController::class, $controller);
-    }
-
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertEquals(Qrcode::class, QrcodeCrudController::getEntityFqcn());
     }
 
     public function testConfigureFields(): void

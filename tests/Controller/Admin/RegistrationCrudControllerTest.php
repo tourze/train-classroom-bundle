@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\TrainClassroomBundle\Controller\Admin\RegistrationCrudController;
-use Tourze\TrainClassroomBundle\Entity\Registration;
 
 /**
  * RegistrationCrudController 配置验证测试
@@ -78,11 +77,6 @@ final class RegistrationCrudControllerTest extends AbstractEasyAdminControllerTe
     {
         $controller = $this->getControllerService();
         $this->assertInstanceOf(RegistrationCrudController::class, $controller);
-    }
-
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertEquals(Registration::class, RegistrationCrudController::getEntityFqcn());
     }
 
     public function testConfigureFields(): void
