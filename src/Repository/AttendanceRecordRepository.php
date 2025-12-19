@@ -21,7 +21,7 @@ use Tourze\TrainClassroomBundle\Enum\VerificationResult;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: AttendanceRecord::class)]
-class AttendanceRecordRepository extends ServiceEntityRepository
+final class AttendanceRecordRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

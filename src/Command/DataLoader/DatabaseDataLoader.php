@@ -11,7 +11,7 @@ use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
 /**
  * 数据库数据加载器
  */
-class DatabaseDataLoader implements DataLoaderInterface
+final class DatabaseDataLoader implements DataLoaderInterface
 {
     public function supports(string $source): bool
     {

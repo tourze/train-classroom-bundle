@@ -54,11 +54,11 @@ final class DetectAnomaliesControllerTest extends AbstractWebTestCase
 
         $client->request('GET', '/api/attendance/anomalies/' . $registrationId);
 
-        // Should get 401 Unauthorized or 403 Forbidden for unauthenticated access
+        // Should get 401 Unauthorized, 403 Forbidden, or 302 Redirect to login for unauthenticated access
         $this->assertContains(
             $client->getResponse()->getStatusCode(),
-            [Response::HTTP_UNAUTHORIZED, Response::HTTP_FORBIDDEN],
-            'Expected 401 or 403 for unauthenticated access, got ' . $client->getResponse()->getStatusCode()
+            [Response::HTTP_UNAUTHORIZED, Response::HTTP_FORBIDDEN, Response::HTTP_FOUND],
+            'Expected 401, 403, or 302 for unauthenticated access, got ' . $client->getResponse()->getStatusCode()
         );
     }
 

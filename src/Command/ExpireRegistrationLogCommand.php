@@ -16,7 +16,7 @@ use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 #[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '过期无效的报班记录')]
-class ExpireRegistrationLogCommand extends Command
+final class ExpireRegistrationLogCommand extends Command
 {
     protected const NAME = 'job-training:expire-registration';
 

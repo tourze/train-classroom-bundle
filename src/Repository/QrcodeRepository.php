@@ -13,7 +13,7 @@ use Tourze\TrainClassroomBundle\Entity\Qrcode;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: Qrcode::class)]
-class QrcodeRepository extends ServiceEntityRepository
+final class QrcodeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

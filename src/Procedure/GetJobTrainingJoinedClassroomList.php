@@ -9,8 +9,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
+use Tourze\TrainClassroomBundle\Param\GetJobTrainingJoinedClassroomListParam;
 use Tourze\TrainClassroomBundle\Repository\RegistrationRepository;
 
 #[MethodDoc(summary: '获取当前学员的班级信息')]
@@ -26,7 +29,10 @@ class GetJobTrainingJoinedClassroomList extends BaseProcedure
     ) {
     }
 
-    public function execute(): array
+    /**
+     * @phpstan-param GetJobTrainingJoinedClassroomListParam $param
+     */
+    public function execute(GetJobTrainingJoinedClassroomListParam|RpcParamInterface $param): ArrayResult
     {
         $user = $this->security->getUser();
         if (!$user instanceof UserInterface) {
@@ -39,8 +45,8 @@ class GetJobTrainingJoinedClassroomList extends BaseProcedure
             $list[] = $registration->retrieveApiArray();
         }
 
-        return [
+        return new ArrayResult([
             'list' => $list,
-        ];
+        ]);
     }
 }

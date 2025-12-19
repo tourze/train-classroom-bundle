@@ -17,9 +17,10 @@ use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPC\Core\Exception\ApiException;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Entity\Registration;
+use Tourze\TrainClassroomBundle\Param\GetJobTrainingJoinedClassroomListParam;
 use Tourze\TrainClassroomBundle\Procedure\GetJobTrainingJoinedClassroomList;
 use Tourze\TrainCourseBundle\Entity\Course;
 
@@ -76,11 +77,22 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
         $this->assertTrue($method->isPublic());
 
         $parameters = $method->getParameters();
-        $this->assertCount(0, $parameters);
+        $this->assertCount(1, $parameters);
+
+        $firstParam = $parameters[0];
+        $this->assertEquals('param', $firstParam->getName());
+        $this->assertTrue($firstParam->hasType());
+        $paramType = $firstParam->getType();
+        $this->assertInstanceOf(\ReflectionUnionType::class, $paramType);
+
+        $paramTypes = $paramType->getTypes();
+        $this->assertCount(2, $paramTypes);
+        $this->assertEquals(GetJobTrainingJoinedClassroomListParam::class, $paramTypes[0]->getName());
+        $this->assertEquals('Tourze\JsonRPC\Core\Contracts\RpcParamInterface', $paramTypes[1]->getName());
 
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', (string) $returnType);
+        $this->assertEquals('Tourze\JsonRPC\Core\Result\ArrayResult', (string) $returnType);
     }
 
     public function testProcedureAttributes(): void
@@ -176,14 +188,16 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
 
         // 执行 Procedure
         $procedure = self::getService(GetJobTrainingJoinedClassroomList::class);
-        $result = $procedure->execute();
+        $param = new GetJobTrainingJoinedClassroomListParam();
+        $result = $procedure->execute($param);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('list', $result);
-        $this->assertIsArray($result['list']);
-        $this->assertCount(1, $result['list']);
+        $this->assertInstanceOf(\Tourze\JsonRPC\Core\Result\ArrayResult::class, $result);
+        $resultArray = $result->jsonSerialize();
+        $this->assertArrayHasKey('list', $resultArray);
+        $this->assertIsArray($resultArray['list']);
+        $this->assertCount(1, $resultArray['list']);
 
-        $firstItem = $result['list'][0];
+        $firstItem = $resultArray['list'][0];
         $this->assertIsArray($firstItem);
         $this->assertEquals($registration->getId(), $firstItem['id']);
         $this->assertArrayHasKey('classroom', $firstItem);
@@ -196,12 +210,13 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
         // 不登录用户
 
         $procedure = self::getService(GetJobTrainingJoinedClassroomList::class);
+        $param = new GetJobTrainingJoinedClassroomListParam();
 
         $this->expectException(ApiException::class);
         $this->expectExceptionMessage('请先登录');
         $this->expectExceptionCode(-885);
 
-        $procedure->execute();
+        $procedure->execute($param);
     }
 
     public function testExecuteWithEmptyRegistrations(): void
@@ -216,12 +231,14 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
         $tokenStorage->setToken($token);
 
         $procedure = self::getService(GetJobTrainingJoinedClassroomList::class);
-        $result = $procedure->execute();
+        $param = new GetJobTrainingJoinedClassroomListParam();
+        $result = $procedure->execute($param);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('list', $result);
-        $this->assertIsArray($result['list']);
-        $this->assertCount(0, $result['list']);
+        $this->assertInstanceOf(\Tourze\JsonRPC\Core\Result\ArrayResult::class, $result);
+        $resultArray = $result->jsonSerialize();
+        $this->assertArrayHasKey('list', $resultArray);
+        $this->assertIsArray($resultArray['list']);
+        $this->assertCount(0, $resultArray['list']);
     }
 
     public function testExecuteWithMultipleRegistrations(): void
@@ -277,12 +294,14 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
         $entityManager->flush();
 
         $procedure = self::getService(GetJobTrainingJoinedClassroomList::class);
-        $result = $procedure->execute();
+        $param = new GetJobTrainingJoinedClassroomListParam();
+        $result = $procedure->execute($param);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('list', $result);
-        $this->assertIsArray($result['list']);
-        $this->assertCount(2, $result['list']);
+        $this->assertInstanceOf(\Tourze\JsonRPC\Core\Result\ArrayResult::class, $result);
+        $resultArray = $result->jsonSerialize();
+        $this->assertArrayHasKey('list', $resultArray);
+        $this->assertIsArray($resultArray['list']);
+        $this->assertCount(2, $resultArray['list']);
     }
 
     public function testProcedureNamespace(): void
@@ -300,7 +319,7 @@ final class GetJobTrainingJoinedClassroomListTest extends AbstractProcedureTestC
         // 验证方法有正确的返回类型声明
         $returnType = $method->getReturnType();
         $this->assertNotNull($returnType);
-        $this->assertEquals('array', (string) $returnType);
+        $this->assertEquals('Tourze\JsonRPC\Core\Result\ArrayResult', (string) $returnType);
 
         // 验证类使用了正确的异常处理属性
         $attributes = $reflection->getAttributes();

@@ -22,7 +22,7 @@ use Tourze\TrainClassroomBundle\Enum\ScheduleType;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: ClassroomSchedule::class)]
-class ClassroomScheduleRepository extends ServiceEntityRepository
+final class ClassroomScheduleRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

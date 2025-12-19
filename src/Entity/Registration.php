@@ -43,7 +43,7 @@ class Registration implements \Stringable, ApiArrayInterface, AdminArrayInterfac
     private Classroom $classroom;
 
     #[Ignore]
-    #[ORM\ManyToOne(targetEntity: UserInterface::class, inversedBy: 'registrations')]
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(nullable: false)]
     private UserInterface $student;
 

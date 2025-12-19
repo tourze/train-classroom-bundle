@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\Tests\Service\DeviceTester;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\TrainClassroomBundle\Service\DeviceTester\DeviceTesterInterface;
 use Tourze\TrainClassroomBundle\Service\DeviceTester\GenericDeviceTester;
 
@@ -17,13 +18,14 @@ use Tourze\TrainClassroomBundle\Service\DeviceTester\GenericDeviceTester;
  * @internal
  */
 #[CoversClass(GenericDeviceTester::class)]
-final class GenericDeviceTesterTest extends TestCase
+#[RunTestsInSeparateProcesses]
+final class GenericDeviceTesterTest extends AbstractIntegrationTestCase
 {
     private GenericDeviceTester $tester;
 
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        $this->tester = new GenericDeviceTester();
+        $this->tester = self::getService(GenericDeviceTester::class);
     }
 
     /**

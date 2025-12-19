@@ -15,7 +15,7 @@ use Tourze\TrainClassroomBundle\Entity\Registration;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: Registration::class)]
-class RegistrationRepository extends ServiceEntityRepository
+final class RegistrationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

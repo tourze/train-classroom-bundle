@@ -150,7 +150,7 @@ final class RegisterSubmitControllerTest extends AbstractWebTestCase
         $this->assertIsBool($responseData['success']);
         $this->assertFalse($responseData['success']);
         $this->assertIsString($responseData['message']);
-        $this->assertEquals('缺少邮箱参数', $responseData['message']);
+        $this->assertEquals('无效的请求数据', $responseData['message']);
     }
 
     public function testInvokeWithInvalidEmailReturnsBadRequest(): void

@@ -44,7 +44,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
       php bin/console train-classroom:cleanup-data --force
                 
     TXT)]
-class CleanupDataCommand extends Command
+final class CleanupDataCommand extends Command
 {
     protected const NAME = 'train-classroom:cleanup-data';
 

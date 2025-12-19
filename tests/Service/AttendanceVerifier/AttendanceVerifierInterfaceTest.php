@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\Tests\Service\AttendanceVerifier;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\TrainClassroomBundle\Service\AttendanceVerifier\AttendanceVerifierInterface;
 
 /**
@@ -16,8 +17,14 @@ use Tourze\TrainClassroomBundle\Service\AttendanceVerifier\AttendanceVerifierInt
  * @internal
  */
 #[CoversClass(AttendanceVerifierInterface::class)]
-final class AttendanceVerifierInterfaceTest extends TestCase
+#[RunTestsInSeparateProcesses]
+final class AttendanceVerifierInterfaceTest extends AbstractIntegrationTestCase
 {
+    protected function onSetUp(): void
+    {
+        // 接口测试不需要特殊设置
+    }
+
     /**
      * 测试接口存在
      */

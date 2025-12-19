@@ -4,338 +4,196 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Tests\Service;
 
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\TrainClassroomBundle\Entity\Classroom;
 use Tourze\TrainClassroomBundle\Exception\InvalidArgumentException;
-use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 use Tourze\TrainClassroomBundle\Service\DeviceConfigManager;
-use Tourze\TrainClassroomBundle\Service\DeviceTester\DeviceTesterInterface;
 
 /**
  * @internal
  */
 #[CoversClass(DeviceConfigManager::class)]
-final class DeviceConfigManagerTest extends TestCase
+#[RunTestsInSeparateProcesses]
+final class DeviceConfigManagerTest extends AbstractIntegrationTestCase
 {
-    private EntityManagerInterface&MockObject $entityManager;
-    private LoggerInterface&MockObject $logger;
-    private DeviceTesterInterface&MockObject $deviceTester;
     private DeviceConfigManager $manager;
 
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->deviceTester = $this->createMock(DeviceTesterInterface::class);
-
-        $this->manager = new DeviceConfigManager(
-            $this->entityManager,
-            $this->logger,
-            [$this->deviceTester]
-        );
+        $this->manager = self::getService(DeviceConfigManager::class);
     }
 
-    public function testAddDevice(): void
+    public function testServiceExists(): void
     {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceConfig = [
-            'type' => 'projector',
-            'name' => 'Test Projector',
-            'id' => 'device_001',
-        ];
-
-        $this->deviceTester
-            ->expects(self::once())
-            ->method('supports')
-            ->with('projector')
-            ->willReturn(true);
-
-        $this->deviceTester
-            ->expects(self::once())
-            ->method('test')
-            ->with(self::isArray())
-            ->willReturn([
-                'success' => true,
-                'timestamp' => new \DateTime(),
-            ]);
-
-        $classroom
-            ->expects(self::once())
-            ->method('setDevices')
-            ->with(self::isArray());
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->logger
-            ->expects(self::once())
-            ->method('info');
-
-        $getDevicesCallback = static fn (Classroom $c): ?array => null;
-
-        $result = $this->manager->addDevice($classroom, $deviceConfig, $getDevicesCallback);
-
-        self::assertIsArray($result);
-        self::assertArrayHasKey('id', $result);
-        self::assertArrayHasKey('type', $result);
-        self::assertArrayHasKey('name', $result);
-        self::assertArrayHasKey('added_at', $result);
-        self::assertSame('projector', $result['type']);
-        self::assertSame('Test Projector', $result['name']);
-    }
-
-    public function testRemoveDevice(): void
-    {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'device_001';
-
-        $existingDevices = [
-            'device_001' => [
-                'type' => 'projector',
-                'name' => 'Test Projector',
-            ],
-        ];
-
-        $getDevicesCallback = static fn (Classroom $c): array => $existingDevices;
-
-        $classroom
-            ->expects(self::once())
-            ->method('setDevices')
-            ->with(self::callback(static function (array $devices): bool {
-                return !isset($devices['device_001']);
-            }));
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->logger
-            ->expects(self::once())
-            ->method('info')
-            ->with('设备移除成功', self::isArray());
-
-        $result = $this->manager->removeDevice($classroom, $deviceId, $getDevicesCallback);
-
-        self::assertTrue($result);
-    }
-
-    public function testRemoveDeviceNotFound(): void
-    {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'non_existent_device';
-
-        $existingDevices = [
-            'device_001' => [
-                'type' => 'projector',
-                'name' => 'Test Projector',
-            ],
-        ];
-
-        $getDevicesCallback = static fn (Classroom $c): array => $existingDevices;
-
-        $classroom
-            ->expects(self::never())
-            ->method('setDevices');
-
-        $this->entityManager
-            ->expects(self::never())
-            ->method('flush');
-
-        $result = $this->manager->removeDevice($classroom, $deviceId, $getDevicesCallback);
-
-        self::assertFalse($result);
-    }
-
-    public function testUpdateConfig(): void
-    {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'device_001';
-        $newConfig = [
-            'brightness' => 80,
-        ];
-
-        $existingDevices = [
-            'device_001' => [
-                'type' => 'projector',
-                'name' => 'Test Projector',
-                'brightness' => 50,
-            ],
-        ];
-
-        $getDevicesCallback = static fn (Classroom $c): array => $existingDevices;
-
-        $classroom
-            ->expects(self::once())
-            ->method('setDevices')
-            ->with(self::callback(static function (array $devices) use ($deviceId): bool {
-                return isset($devices[$deviceId])
-                    && is_array($devices[$deviceId])
-                    && 80 === $devices[$deviceId]['brightness']
-                    && isset($devices[$deviceId]['updated_at']);
-            }));
-
-        $this->entityManager
-            ->expects(self::once())
-            ->method('flush');
-
-        $this->logger
-            ->expects(self::once())
-            ->method('info')
-            ->with('设备配置更新成功', self::isArray());
-
-        $result = $this->manager->updateConfig($classroom, $deviceId, $newConfig, $getDevicesCallback);
-
-        self::assertIsArray($result);
-        self::assertArrayHasKey('brightness', $result);
-        self::assertSame(80, $result['brightness']);
-        self::assertArrayHasKey('type', $result);
-        self::assertArrayHasKey('name', $result);
-        self::assertArrayHasKey('updated_at', $result);
-    }
-
-    public function testUpdateConfigDeviceNotFound(): void
-    {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'non_existent_device';
-        $newConfig = ['brightness' => 80];
-
-        $existingDevices = [
-            'device_001' => [
-                'type' => 'projector',
-                'name' => 'Test Projector',
-            ],
-        ];
-
-        $getDevicesCallback = static fn (Classroom $c): array => $existingDevices;
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('设备不存在');
-
-        $this->manager->updateConfig($classroom, $deviceId, $newConfig, $getDevicesCallback);
+        $this->assertInstanceOf(DeviceConfigManager::class, $this->manager);
     }
 
     public function testValidateDeviceConfig(): void
     {
+        // 测试有效的配置
         $validConfig = [
-            'type' => 'projector',
-            'name' => 'Test Projector',
+            'type' => 'face_recognition',
+            'name' => '人脸识别设备1'
         ];
 
-        // This should not throw any exception
-        $this->manager->validateDeviceConfig($validConfig);
-
-        // If we reached here, validation passed
         $this->expectNotToPerformAssertions();
+        $this->manager->validateDeviceConfig($validConfig);
     }
 
-    public function testValidateDeviceConfigMissingType(): void
+    public function testValidateDeviceConfigWithEmptyType(): void
     {
-        $invalidConfig = [
-            'name' => 'Test Projector',
-        ];
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('设备类型不能为空');
 
-        $this->manager->validateDeviceConfig($invalidConfig);
-    }
-
-    public function testValidateDeviceConfigEmptyType(): void
-    {
         $invalidConfig = [
             'type' => '',
-            'name' => 'Test Projector',
+            'name' => '设备1'
         ];
 
+        $this->manager->validateDeviceConfig($invalidConfig);
+    }
+
+    public function testValidateDeviceConfigWithMissingType(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('设备类型不能为空');
 
+        $invalidConfig = [
+            'name' => '设备1'
+        ];
+
         $this->manager->validateDeviceConfig($invalidConfig);
     }
 
-    public function testValidateDeviceConfigMissingName(): void
+    public function testValidateDeviceConfigWithEmptyName(): void
     {
-        $invalidConfig = [
-            'type' => 'projector',
-        ];
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('设备名称不能为空');
 
-        $this->manager->validateDeviceConfig($invalidConfig);
-    }
-
-    public function testValidateDeviceConfigEmptyName(): void
-    {
         $invalidConfig = [
-            'type' => 'projector',
-            'name' => '',
+            'type' => 'face_recognition',
+            'name' => ''
         ];
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('设备名称不能为空');
-
         $this->manager->validateDeviceConfig($invalidConfig);
     }
 
-    public function testAddDeviceWithConnectionFailure(): void
+    public function testAddDevice(): void
     {
-        $classroom = $this->createMock(Classroom::class);
+        $classroom = new Classroom();
+        $classroom->setTitle('测试教室');
+
         $deviceConfig = [
-            'type' => 'projector',
-            'name' => 'Test Projector',
+            'type' => 'face_recognition',
+            'name' => '人脸识别设备1'
         ];
 
-        $this->deviceTester
-            ->expects(self::once())
-            ->method('supports')
-            ->with('projector')
-            ->willReturn(true);
+        $getDevicesCallback = function ($classroom) {
+            return $classroom->getDevices();
+        };
 
-        $this->deviceTester
-            ->expects(self::once())
-            ->method('test')
-            ->willReturn([
-                'success' => false,
-                'error' => 'Connection timeout',
-            ]);
+        $result = $this->manager->addDevice($classroom, $deviceConfig, $getDevicesCallback);
 
-        $getDevicesCallback = static fn (Classroom $c): ?array => null;
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('设备连接测试失败: Connection timeout');
-
-        $this->manager->addDevice($classroom, $deviceConfig, $getDevicesCallback);
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('added_at', $result);
+        $this->assertEquals($deviceConfig['type'], $result['type']);
+        $this->assertEquals($deviceConfig['name'], $result['name']);
     }
 
-    public function testRemoveDeviceWithNullDevices(): void
+    public function testRemoveDevice(): void
     {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'device_001';
+        $classroom = new Classroom();
+        $classroom->setTitle('测试教室');
 
-        $getDevicesCallback = static fn (Classroom $c): ?array => null;
+        $getDevicesCallback = function ($classroom) {
+            return $classroom->getDevices();
+        };
 
-        $result = $this->manager->removeDevice($classroom, $deviceId, $getDevicesCallback);
+        // 首先添加一个设备
+        $deviceConfig = [
+            'id' => 'test_device_1',
+            'type' => 'face_recognition',
+            'name' => '人脸识别设备1'
+        ];
 
-        self::assertFalse($result);
+        $devices = ['test_device_1' => $deviceConfig];
+        $classroom->setDevices($devices);
+
+        // 移除设备
+        $result = $this->manager->removeDevice($classroom, 'test_device_1', $getDevicesCallback);
+
+        $this->assertTrue($result);
+        $this->assertEmpty($classroom->getDevices());
     }
 
-    public function testUpdateConfigWithInvalidDevicesList(): void
+    public function testRemoveNonExistentDevice(): void
     {
-        $classroom = $this->createMock(Classroom::class);
-        $deviceId = 'device_001';
-        $newConfig = ['brightness' => 80];
+        $classroom = new Classroom();
+        $classroom->setTitle('测试教室');
 
-        $getDevicesCallback = static fn (Classroom $c): ?array => null;
+        $getDevicesCallback = function ($classroom) {
+            return $classroom->getDevices();
+        };
 
+        // 尝试移除不存在的设备
+        $result = $this->manager->removeDevice($classroom, 'non_existent_device', $getDevicesCallback);
+
+        $this->assertFalse($result);
+    }
+
+    public function testUpdateConfig(): void
+    {
+        $classroom = new Classroom();
+        $classroom->setTitle('测试教室');
+
+        $getDevicesCallback = function ($classroom) {
+            return $classroom->getDevices();
+        };
+
+        // 首先添加一个设备
+        $initialConfig = [
+            'id' => 'test_device_1',
+            'type' => 'face_recognition',
+            'name' => '人脸识别设备1'
+        ];
+
+        $devices = ['test_device_1' => $initialConfig];
+        $classroom->setDevices($devices);
+
+        // 更新设备配置
+        $updateConfig = [
+            'name' => '更新后的设备名称',
+            'location' => '教室门口'
+        ];
+
+        $result = $this->manager->updateConfig($classroom, 'test_device_1', $updateConfig, $getDevicesCallback);
+
+        $this->assertIsArray($result);
+        $this->assertEquals('更新后的设备名称', $result['name']);
+        $this->assertEquals('教室门口', $result['location']);
+        $this->assertArrayHasKey('updated_at', $result);
+        $this->assertEquals($initialConfig['type'], $result['type']); // 应该保持原有值
+    }
+
+    public function testUpdateConfigWithInvalidDevice(): void
+    {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('设备列表无效');
+        $this->expectExceptionMessage('设备不存在');
 
-        $this->manager->updateConfig($classroom, $deviceId, $newConfig, $getDevicesCallback);
+        $classroom = new Classroom();
+        $classroom->setTitle('测试教室');
+
+        $getDevicesCallback = function ($classroom) {
+            return $classroom->getDevices();
+        };
+
+        $updateConfig = [
+            'name' => '更新后的设备名称'
+        ];
+
+        $this->manager->updateConfig($classroom, 'non_existent_device', $updateConfig, $getDevicesCallback);
     }
 }

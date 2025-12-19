@@ -6,7 +6,7 @@ namespace Tourze\TrainClassroomBundle\DependencyInjection;
 
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class TrainClassroomExtension extends AutoExtension
+final class TrainClassroomExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {

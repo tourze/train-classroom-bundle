@@ -12,7 +12,7 @@ use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 /**
  * API数据加载器
  */
-class ApiDataLoader implements DataLoaderInterface
+final class ApiDataLoader implements DataLoaderInterface
 {
     public function supports(string $source): bool
     {

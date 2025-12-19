@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tourze\TrainClassroomBundle\Tests\Service\AttendanceVerifier;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\TrainClassroomBundle\Enum\AttendanceMethod;
 use Tourze\TrainClassroomBundle\Enum\VerificationResult;
 use Tourze\TrainClassroomBundle\Service\AttendanceVerifier\AttendanceVerifierInterface;
@@ -19,13 +20,14 @@ use Tourze\TrainClassroomBundle\Service\AttendanceVerifier\FaceRecognitionVerifi
  * @internal
  */
 #[CoversClass(FaceRecognitionVerifier::class)]
-final class FaceRecognitionVerifierTest extends TestCase
+#[RunTestsInSeparateProcesses]
+final class FaceRecognitionVerifierTest extends AbstractIntegrationTestCase
 {
     private FaceRecognitionVerifier $verifier;
 
-    protected function setUp(): void
+    protected function onSetUp(): void
     {
-        $this->verifier = new FaceRecognitionVerifier();
+        $this->verifier = self::getService(FaceRecognitionVerifier::class);
     }
 
     /**

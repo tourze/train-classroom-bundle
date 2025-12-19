@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\TrainClassroomBundle\Service;
 
+use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -11,6 +12,7 @@ use Psr\Log\LoggerInterface;
  *
  * 负责设备数据的同步
  */
+#[WithMonologChannel(channel: 'train_classroom')]
 class DeviceSyncManager
 {
     public function __construct(

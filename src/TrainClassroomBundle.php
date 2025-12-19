@@ -2,7 +2,7 @@
 
 namespace Tourze\TrainClassroomBundle;
 
-use CmsBundle\CmsBundle;
+use Tourze\CmsBundle\CmsBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;

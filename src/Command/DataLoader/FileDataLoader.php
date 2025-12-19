@@ -12,7 +12,7 @@ use Tourze\TrainClassroomBundle\Exception\RuntimeException;
 /**
  * 文件数据加载器
  */
-class FileDataLoader implements DataLoaderInterface
+final class FileDataLoader implements DataLoaderInterface
 {
     public function supports(string $source): bool
     {

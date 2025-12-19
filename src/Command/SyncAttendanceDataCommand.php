@@ -43,7 +43,7 @@ use Tourze\TrainClassroomBundle\Service\AttendanceServiceInterface;
       php bin/console train-classroom:sync-attendance file --file=/path/to/data.csv --dry-run
                 
     TXT)]
-class SyncAttendanceDataCommand extends Command
+final class SyncAttendanceDataCommand extends Command
 {
     protected const NAME = 'train-classroom:sync-attendance';
 

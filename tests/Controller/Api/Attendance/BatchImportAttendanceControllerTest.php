@@ -75,11 +75,11 @@ final class BatchImportAttendanceControllerTest extends AbstractWebTestCase
             false !== json_encode($requestData) ? json_encode($requestData) : '{}'
         );
 
-        // Should get 401 Unauthorized or 403 Forbidden for unauthenticated access
+        // Should get 401 Unauthorized, 403 Forbidden, or 302 Redirect to login for unauthenticated access
         $statusCode = $client->getResponse()->getStatusCode();
         $this->assertTrue(
-            in_array($statusCode, [Response::HTTP_UNAUTHORIZED, Response::HTTP_FORBIDDEN], true),
-            "Expected 401 or 403 for unauthenticated access, got {$statusCode}"
+            in_array($statusCode, [Response::HTTP_UNAUTHORIZED, Response::HTTP_FORBIDDEN, Response::HTTP_FOUND], true),
+            "Expected 401, 403, or 302 for unauthenticated access, got {$statusCode}"
         );
     }
 

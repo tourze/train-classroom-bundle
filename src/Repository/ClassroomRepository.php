@@ -13,7 +13,7 @@ use Tourze\TrainClassroomBundle\Entity\Classroom;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: Classroom::class)]
-class ClassroomRepository extends ServiceEntityRepository
+final class ClassroomRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

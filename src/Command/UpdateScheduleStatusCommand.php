@@ -36,7 +36,7 @@ use Tourze\TrainClassroomBundle\Repository\ClassroomScheduleRepository;
                 
     TXT)]
 #[WithMonologChannel(channel: 'train_classroom')]
-class UpdateScheduleStatusCommand extends Command
+final class UpdateScheduleStatusCommand extends Command
 {
     protected const NAME = 'train-classroom:update-schedule-status';
 
